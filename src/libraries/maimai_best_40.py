@@ -215,25 +215,25 @@ class DrawBest(object):
 
             tempDraw = ImageDraw.Draw(temp)
             tempDraw.polygon(levelTriagle, Color[chartInfo.diff])
-            font = ImageFont.truetype(titleFontName, 16, encoding='utf-8')
+            font = ImageFont.truetype('src/static/adobe_simhei.otf', 16, encoding='utf-8')
+            tempDraw.text((8, 8), f'No.{num + 1}', 'white', font)
+            font = ImageFont.truetype(titleFontName, 15, encoding='utf-8')
             title = chartInfo.title
             if self._coloumWidth(title) > 15:
                 title = self._changeColumnWidth(title, 14) + '...'
-            tempDraw.text((8, 8), title, 'white', font)
+            tempDraw.text((7, 30), title, 'white', font)
             font = ImageFont.truetype(titleFontName, 14, encoding='utf-8')
 
-            tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            tempDraw.text((8, 50), f'Achv.:{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(self.pic_dir + f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png').convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.3)
-            temp.paste(rankImg, (88, 28), rankImg.split()[3])
+            temp.paste(rankImg, (60, 9), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(self.pic_dir + f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png').convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119, 27), comboImg.split()[3])
+                temp.paste(comboImg, (100, 8), comboImg.split()[3])
             font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
-            tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 18, encoding='utf-8')
-            tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
+            tempDraw.text((8, 66), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
@@ -264,26 +264,26 @@ class DrawBest(object):
 
             tempDraw = ImageDraw.Draw(temp)
             tempDraw.polygon(levelTriagle, Color[chartInfo.diff])
-            font = ImageFont.truetype(titleFontName, 16, encoding='utf-8')
+            font = ImageFont.truetype('src/static/adobe_simhei.otf', 16, encoding='utf-8')
+            tempDraw.text((8, 8), f'No.{num + 1}', 'white', font)
+            font = ImageFont.truetype(titleFontName, 15, encoding='utf-8')
             title = chartInfo.title
             if self._coloumWidth(title) > 15:
                 title = self._changeColumnWidth(title, 14) + '...'
-            tempDraw.text((8, 8), title, 'white', font)
+            tempDraw.text((7, 30), title, 'white', font)
             font = ImageFont.truetype(titleFontName, 14, encoding='utf-8')
 
-            tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            tempDraw.text((8, 50), f'Achv.:{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(self.pic_dir + f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png').convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.3)
-            temp.paste(rankImg, (88, 28), rankImg.split()[3])
+            temp.paste(rankImg, (60, 9), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(self.pic_dir + f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png').convert(
                     'RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119, 27), comboImg.split()[3])
+                temp.paste(comboImg, (100, 8), comboImg.split()[3])
             font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
-            tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 18, encoding='utf-8')
-            tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
+            tempDraw.text((8, 66), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
@@ -321,7 +321,7 @@ class DrawBest(object):
         shougouImg = Image.open(self.pic_dir + 'UI_CMN_Shougou_Rainbow.png').convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype('src/static/adobe_simhei.otf', 14, encoding='utf-8')
-        playCountInfo = f'底分: {self.musicRating} + 段位分: {self.rankRating}'
+        playCountInfo = f'底分: {self.musicRating}   |   段位: {self.rankRating}'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)

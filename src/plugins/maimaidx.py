@@ -31,7 +31,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"\n{'  <->  '.join(music.level)}"
+                "text": f"\n{' <-> '.join(music.level)}"
             }
         }
     ])
@@ -155,25 +155,27 @@ async def _(bot: Bot, event: Event, state: T_State):
             level = music['level'][level_index]
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             if len(chart['notes']) == 4:
-                msg = f'''Standard> {level_name[level_index]} | Lv.{level}({ds})
+                msg = f'''Standard | {level_name[level_index]} >> Lv.{level}({ds})
+Full> {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3]} Combo
 TAP> {chart['notes'][0]}
 HOLD> {chart['notes'][1]}
 SLIDE> {chart['notes'][2]}
 BREAK> {chart['notes'][3]}
-谱 师> {chart['charter']}'''
+谱师> {chart['charter']}'''
             else:
-                msg = f'''DX> {level_name[level_index]} | Lv.{level}({ds})
+                msg = f'''DX | {level_name[level_index]} >> Lv.{level}({ds})
+Full> {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3] + chart['notes'][4]} Combo
 TAP> {chart['notes'][0]}
 HOLD> {chart['notes'][1]}
 SLIDE>  {chart['notes'][2]}
 TOUCH> {chart['notes'][3]}
 BREAK> {chart['notes'][4]}
-谱 师> {chart['charter']}'''
+谱师> {chart['charter']}'''
             await query_chart.send(Message([
                 {
                     "type": "text",
                     "data": {
-                        "text": f"{music['id']} > {music['title']}\n"
+                        "text": f"{music['id']} >> {music['title']}\n"
                     }
                 },
                 {
@@ -372,7 +374,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     r = "([绿黄红紫白])(id)?([0-9]+)"
     argv = str(event.get_message()).strip().split(" ")
     if len(argv) == 1 and argv[0] == '帮助':
-        s = '''这个功能为你提供达到某首歌分数线的最低标准而设计的~~~
+        s = '''这个功能为你提供达到某首歌分数线的最低标准而设计的。
 命令格式：分数线 <难度+歌曲id> <分数线>
 例如：分数线 紫799 100
 命令将返回分数线允许的 TAP GREAT 容错以及 BREAK 50落等价的 TAP GREAT 数。
@@ -410,9 +412,10 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''{music['title']} {level_labels2[level_index]}这首歌，如果想要达到 {line}% 的话,
-可以允许有 {(total_score * reduce / 10000):.2f}个TAP GREAT(每个损失 {10000 / total_score:.4f}% 达成率),
-其中，这首歌的BREAK 50落(本谱面共{brk}个BREAK)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(每个50落损失 {break_50_reduce / total_score * 100:.4f}% 达成率)
+            await query_chart.send(f'''{music['title']} | {level_labels2[level_index]} | 达成率 {line}% 限制 >>>\n
+TAP Great 数量 | 最多 {(total_score * reduce / 10000):.2f}个 (每个损失 {10000 / total_score:.4f}% 达成率)\n
+BREAK 2550 换算 | 1个2550 Perfect = {(break_50_reduce / 100):.3f} 个 TAP GREAT(每个50落损失 {break_50_reduce / total_score * 100:.4f}% 达成率)\n
+Break 数量| 共 {brk} 个\n
 具体情况的换算您可以查看帮助来帮助您换算。''')
         except Exception:
             await query_chart.send("格式错误，输入“分数线 帮助”以查看帮助信息")
@@ -430,13 +433,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send("没有找到此玩家....请确保此玩家的用户名和查分器中的用户名相同。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send("没有找到此玩家....请确保此玩家的用户名和查分器中的用户名相同。\n需要修改查分器数据吗？请参阅： https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send("用户禁止了其他人获取数据。需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send("用户禁止了其他人获取数据。需要修改查分器数据吗？请参阅： https://www.diving-fish.com/maimaidx/prober/")
     else:
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text("下方是查询结果。需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/"),
+            MessageSegment.text("查询结果如图。需要修改查分器数据吗？请参阅： https://www.diving-fish.com/maimaidx/prober/"),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 

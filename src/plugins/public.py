@@ -24,7 +24,7 @@ help = on_command('help')
 
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    help_str = '''Kiba (Build 2.01_release)
+    help_str = '''Kiba (Build 2.02_release)
 Powered by BlitzR 2021.
 本bot基于千雪Chiyuki开源项目并遵守MIT协议。
 Mai-Bot Github: https://github.com/Diving-Fish/mai-bot

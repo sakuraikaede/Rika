@@ -1,6 +1,6 @@
-# mai bot 使用指南
-
-此 README 提供了最低程度的 mai bot 教程与支持。
+# Kiba 配置手册
+欢迎使用Kiba！ 本手册为您提供对Kiba最基础的配置、教程与支持。
+本项目基于 Mai-Bot 与 Chiyuki 。部分内容您可以参阅 https://github.com/Diving-Fish/mai-bot
 
 ## Step 1. 安装 Python
 
@@ -12,36 +12,31 @@
 
 建议使用 git 对此项目进行版本管理。您也可以直接在本界面下载代码的压缩包进行运行。
 
-在运行代码之前，您需要从[此链接](https://www.diving-fish.com/maibot/static.zip)下载资源文件并解压到`src`文件夹中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
-在 Windows 10 系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
-如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`Command Prompt`，`Powershell`以及`cd`命令的教程。
+在运行代码之前，您需要[点击下载](https://www.diving-fish.com/maibot/static.zip)此资源文件并解压到`src`文件夹中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
+在 Windows 10 / Windows Server 2016 以上的系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
+如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`命令提示符(Command Prompt)`，`Windows Powershell`以及`cd`命令的教程。
 
-之后，在打开的控制台中输入
+打开控制台后，您可以输入
 ```
 python --version
 ```
-控制台应该会打印出 Python 的版本。如果提示找不到 `python` 命令，请检查环境变量或干脆重装 Python，**并务必勾选 Add Python to system PATH**。
+控制台应该会打印出 Python 的版本。如果提示找不到 `python` 命令，请检查环境变量，**建议您安装 Python 时勾选 Add Python to system PATH**。
 
-之后，输入
+之后，输入以下命令自动安装依赖。
 ```
 pip install -r requirements.txt
 ```
-安装依赖完成后，运行
+在依赖安装完成后，输入此命令运行：
 ```
 python bot.py
 ```
-运行项目。如果输出如下所示的内容，代表运行成功：
+如果输出类似如下所示的内容，代表运行成功：
 ```
-08-02 11:26:48 [INFO] nonebot | NoneBot is initializing...
-08-02 11:26:48 [INFO] nonebot | Current Env: prod
-08-02 11:26:49 [INFO] nonebot | Succeeded to import "maimaidx"
-08-02 11:26:49 [INFO] nonebot | Succeeded to import "public"
-08-02 11:26:49 [INFO] nonebot | Running NoneBot...
-08-02 11:26:49 [INFO] uvicorn | Started server process [5268]
-08-02 11:26:49 [INFO] uvicorn | Waiting for application startup.
+......
 08-02 11:26:49 [INFO] uvicorn | Application startup complete.
 08-02 11:26:49 [INFO] uvicorn | Uvicorn running on http://127.0.0.1:10219 (Press CTRL+C to quit)
 ```
+如果输出了【ERROR】的红色输出，请您再次检查依赖项是否安装齐。
 
 ## Step 3. 连接 CQ-HTTP
 
@@ -67,14 +62,14 @@ servers:
 
 ## FAQ
 
-不是 Windows 系统该怎么办？
-> 请自行查阅其他系统上的 Python 安装方式。cqhttp提供了其他系统的可执行文件，您也可以自行配置 golang module 环境进行编译。
+我不是 Windows 系统？
+> 请您自行查阅其他系统上的 Python 安装方式。cqhttp提供了其他系统的可执行文件，您也可以自行配置 golang module 环境进行编译。
 
 配置 nonebot 或 cq-http 过程中出错？
 > 请查阅 https://github.com/nonebot/nonebot2 以及 https://github.com/Mrs4s/go-cqhttp 中的文档。
 
 部分消息发不出来？
-> 被风控了。解决方式：换号或者让这个号保持登陆状态和一定的聊天频率，持续一段时间。
+> 您的账号被风控了。解决方式：换号或者让这个号保持登陆状态和一定的聊天频率，持续一段时间。
 
 ## 说明
 
@@ -91,6 +86,7 @@ XXXmaimaiXXX什么 | 随机一首歌
 <歌曲别名>是什么歌 | 查询乐曲别名对应的乐曲
 定数查歌 <定数> <br> 定数查歌 <定数下限> <定数上限> |  查询定数对应的乐曲
 分数线 <难度+歌曲id> <分数线> | 展示歌曲的分数线
+XrY | 在限定的上、下限随机数，要求X、Y均为正整数。
 
 ## License
 
