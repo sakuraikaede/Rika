@@ -31,10 +31,10 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 
-jrxp = on_command('mjxp', aliases={'麻将性癖'})
+mjxp = on_command('mjxp', aliases={'麻将性癖'})
 
 
-@jrxp.handle()
+@mjxp.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
     h = hash(qq)
@@ -42,7 +42,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     xp = random.randint(0,35)
     s = f"今天你人品大约是 {rp}% !\n"
     s += f"你今天打麻将的癖好是做{maj_list[xp]}! 不满意的话再随一个吧。"
-    await jrxp.finish(Message([
+    await mjxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
 

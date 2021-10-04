@@ -43,7 +43,7 @@ XXXmaimaiXXX什么                  随机一首歌
 来戳戳我？
 本群戳一戳情况                    查看一下群里有几位杰出的无聊人
 今日雀魂                         查看今天的雀魂运势
-qhxp/雀魂性癖                    看看你今天要做什么牌捏？'''
+mjxp                   看看你今天要做什么牌捏？'''
     await help.send(Message([{
         "type": "image",
         "data": {
