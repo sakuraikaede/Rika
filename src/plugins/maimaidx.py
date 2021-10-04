@@ -271,7 +271,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     s = f"⏲️ → {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ → {nickname}"
     s += f"\n\n今日运势 | Date Fortune →\n\n运气之签 ↓\n--------------------\n"
     s += f"人品值: {rp}%\n"
-    s += f"幸运度: {luck}%\n"
+    s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
         s += "            小吉\n"
     elif rp >= 70 and rp < 90:
