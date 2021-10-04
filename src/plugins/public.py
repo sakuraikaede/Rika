@@ -24,26 +24,30 @@ help = on_command('help')
 
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    help_str = '''Kiba (Build 2.10_release_patch_211003)
-Powered by BlitzR 2021.
+    help_str = '''Kiba
+Build 2.11_release_patch_211005 |  Powered by BlitzR 2021.
 本bot基于千雪Chiyuki开源项目并遵守MIT/反996协议。
-Mai-Bot Github: https://github.com/Diving-Fish/mai-bot
-Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot
-=======================================
-可用命令帮助：
-今日舞萌/今日运势                  查看今天的舞萌运势
-XXXmaimaiXXX什么                  随机一首歌
+==============================================
+|   Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                    | 
+|   Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot               |
+|   GitHub: https://github.com/Blitz-Raynor/Kiba                                       |
+==============================================
+||                                              可用命令帮助                                                   ||
+==============================================
+今日舞萌/今日运势                             查看今天的舞萌运势
+XXXmaimaiXXX什么                         随机一首歌
 随个[dx/标准][绿黄红紫白]<难度>    随机一首指定条件的乐曲
-查歌<乐曲标题的一部分>             查询符合条件的乐曲
-[绿黄红紫白]id<歌曲编号>           查询乐曲信息或谱面信息
-<歌曲别名>是什么歌                查询乐曲别名对应的乐曲
-定数查歌 <定数下限> <定数上限>     查询定数对应的乐曲
+查歌<乐曲标题的一部分>                  查询符合条件的乐曲
+[绿黄红紫白]id<歌曲编号>                查询乐曲信息或谱面信息
+<歌曲别名>是什么歌                         查询乐曲别名对应的乐曲
+定数查歌 <定数下限> <定数上限>    查询定数对应的乐曲
 分数线 <难度+歌曲id> <分数线>     详情请输入“分数线 帮助”查看
-今日性癖/jrxp                    看看你今天性什么东西捏？
-来戳戳我？
-本群戳一戳情况                    查看一下群里有几位杰出的无聊人
-今日雀魂                         查看今天的雀魂运势
-mjxp                   看看你今天要做什么牌捏？'''
+今日性癖/jrxp                                     看看你今天性什么东西捏？
+戳一戳                                                来戳戳我？
+本群戳一戳情况                                  查看一下群里有几位杰出的无聊人
+今日雀魂                                             查看今天的雀魂运势
+mjxp                                                   看看你今天要做什么牌捏？
+=============================================='''
     await help.send(Message([{
         "type": "image",
         "data": {

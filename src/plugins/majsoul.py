@@ -71,21 +71,21 @@ async def _(bot: Bot, event: Event, state: T_State):
         h >>= 2
     s = f"⏲️ → {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ → {nickname}"
     s += f"\n\n雀魂运势 | MajSoul Fortune →\n\n一姬之签 ↓\n--------------------\n"
-    s += f"                 人品值: {rp}%\n"
+    s += f"人品值: {rp}%\n"
+    s += f"大和率: {luck}%"
     if rp >= 50 and rp < 70:
-        s += "    小吉"
+        s += "            小吉\n"
     elif rp >= 70 and rp < 90:
-        s += "     吉   "
+        s += "             吉\n"
     elif rp >= 90:
-        s += "    大吉"
+        s += "            大吉\n"
     elif rp >= 30 and rp < 50:
-        s += "    小凶"
+        s += "            小凶\n"
     elif rp >= 10 and rp < 30:
-        s += "     凶   "
+        s += "             凶\n"
     else:
-        s += "    大凶"
-    s += f"      大和率: {luck}%\n"
-    s += f"                 役满率: {ap}%\n--------------------\n\n日常运势 ↓\n"
+        s += "            大凶\n"
+    s += f"役满率: {ap}%\n--------------------\n\n日常运势 ↓\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 > 今天总体上平平无常。那就正常打麻将吧？\n'
@@ -101,18 +101,18 @@ async def _(bot: Bot, event: Event, state: T_State):
             bad_value[bad_count] = i
             bad_count = bad_count + 1
     if good_count == 0:
-        s += "宜 | 🚫 今日诸牌不宜"
+        s += "第一推荐 | 🚫 没有最适合的牌型"
     else:
-        s += f'宜 | 共 {good_count} 项 >\n'
+        s += f'第一推荐 | 共 {good_count} 项 >\n'
         for i in range(good_count):
             s += f'{maj_list[good_value[i]]} '
     if bad_count == 0:
-        s += '\n忌 | ✔️ 今日无所畏忌\n'
+        s += '\n第二推荐 | 🚫 没有最适合的牌型\n'
     else:
-        s += f'\n忌 | 共 {bad_count} 项 >\n'
+        s += f'\n第二推荐 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{maj_list[bad_value[i]]} '
-    s += f"\n\nKiba Tips →\n{majtips_list[tips_value]}\n"
+    s += f"\n\nKiba Tips →\n{majtips_list[tips_value]}"
     await jrmj.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
