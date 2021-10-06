@@ -93,7 +93,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         else:
             music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
         if len(music_data) == 0:
-            rand_result = "啊....没有这样的乐曲啦。"
+            rand_result = f'最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化）'
         else:
             rand_result = song_txt(music_data.random())
         await spec_rand.send(rand_result)
@@ -102,6 +102,16 @@ async def _(bot: Bot, event: Event, state: T_State):
         await spec_rand.finish("随机命令出错了...检查一下语法吧？")
 
 
+spec_15 = on_command("随个15")
+pandora_list = ['我觉得您打潘多拉不如先去打一下白茄子，嗯....是这样的。', '别潘了，别潘了，滴蜡熊快被潘跑了。', '没有精神！！转圈掉的那么多还想打15!!', '我当然会给你找潘多拉的。在此之前，我们想一下：截止2021/9，国内SSS+ 4人，SSS 18人，SS 69人。这和您有关吗？不，一点关系都没有。', '潘你🐎', '机厅老板笑着收砸坏键子的损失费。', '潘小鬼是吧？']
+
+@spec_15.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    ran = random.randint(0,6)
+    s = f'{pandora_list[ran]}'
+    await spec_15.finish(Message([
+        {"type": "text", "data": {"text": s}}
+    ]))
 
 mr = on_regex(r".*maimai.*什么")
 
@@ -313,7 +323,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             s += f'{wm_list[bad_value[i]]} '
     s += f"\n\nKiba Tips →\n{tips_list[tips_value]}\n"
     s += "\n运势推荐 | Recommendation →\n"
-    music = total_list[h % len(total_list)]
+    music = total_list[rp % len(total_list)]
     await jrwm.finish(Message([
         {"type": "text", "data": {"text": s}}
     ] + song_txt(music)))
@@ -344,7 +354,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     h = hash(qq)
     rp = h % 100
     s = "我算算哈...今天推荐你这首歌吧:\n"
-    music = total_list[h % len(total_list)]
+    music = total_list[(rp * 2) % len(total_list)]
     await jrgq.finish(Message([
         {"type": "text", "data": {"text": s}}
     ] + song_txt(music)))
@@ -425,9 +435,11 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''{music['title']} {level_labels2[level_index]}这首歌，如果想要达到 {line}% 的话,
-可以允许有 {(total_score * reduce / 10000):.2f}个TAP GREAT(每个损失 {10000 / total_score:.4f}% 达成率),
-其中，这首歌的BREAK 50落(本谱面共{brk}个BREAK)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT(每个50落损失 {break_50_reduce / total_score * 100:.4f}% 达成率)
+            await query_chart.send(f'''{music['title']} {level_labels2[level_index]} | 分数线: {line}% >\n
+Tap Great 最低损失量 | {(total_score * reduce / 10000):.2f}个\n
+每Tap Great 损失的完成度 | {10000 / total_score:.4f}%\n
+每50落的损失的完成度 | {break_50_reduce / total_score * 100:.4f}% ，等价于 {(break_50_reduce / 100):.3f} 个 Tap Great\n
+Break 数量 | {brk}\n
 具体情况的换算您可以查看帮助来帮助您换算。''')
         except Exception:
             await query_chart.send("格式错误，输入“分数线 帮助”以查看帮助信息")
@@ -439,19 +451,20 @@ best_40_pic = on_command('b40')
 @best_40_pic.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     username = str(event.get_message()).strip()
+    nickname = event.sender.nickname
     if username == "":
         payload = {'qq': str(event.get_user_id())}
     else:
         payload = {'username': username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send("没有找到此玩家....请确保此玩家的用户名和查分器中的用户名相同。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send("这名玩家404或者用户名输错了....检查一下用户名和查分器中的用户名是否相同呢？\n如果在此之前需要修改查分器，请参阅 https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send("用户禁止了其他人获取数据。需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f'{username}禁止了其他人获取数据。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/')
     else:
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text("下方是查询结果。需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/"),
+            MessageSegment.text(f'{nickname}查询的Best40找到啦。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 

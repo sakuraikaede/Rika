@@ -25,14 +25,14 @@ help = on_command('help')
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     help_str = '''Kiba
-Build 2.11_release_patch_211005 |  Powered by BlitzR 2021.
+Build 2.12_release_patch_211006 |  Powered by BlitzR 2021.
 本bot基于千雪Chiyuki开源项目并遵守MIT/反996协议。
 ==============================================
-|   Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                    | 
-|   Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot               |
+|   Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                     | 
+|   Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot                |
 |   GitHub: https://github.com/Blitz-Raynor/Kiba                                       |
 ==============================================
-||                                              可用命令帮助                                                   ||
+||                                              可用命令帮助                                               ||
 ==============================================
 今日舞萌/今日运势                             查看今天的舞萌运势
 XXXmaimaiXXX什么                         随机一首歌
@@ -47,6 +47,9 @@ XXXmaimaiXXX什么                         随机一首歌
 本群戳一戳情况                                  查看一下群里有几位杰出的无聊人
 今日雀魂                                             查看今天的雀魂运势
 mjxp                                                   看看你今天要做什么牌捏？
+低情商str1高情商str2                生成一张低情商高情商图片，把str1/2换成自己的话。
+gocho str1 str2                    生成一张gocho图。
+金龙盘旋 str1 str2 str3             生成一张金龙盘旋图。
 =============================================='''
     await help.send(Message([{
         "type": "image",
@@ -112,7 +115,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
     elif r == 2:
-        await poke.send(Message('妈你戳'))
+        await poke.send(Message('戳你🐎'))
     elif r == 3:
         url = await get_jlpx('戳', '你妈', '闲着没事干')
         await poke.send(Message([{
@@ -148,7 +151,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
     elif r == 1:
-        await poke.send(Message('戳你妈'))
+        await poke.send(Message('一天到晚就知道戳戳戳，戳自己肚皮不行吗？'))
     else:
         await poke.send(Message([{
             "type": "poke",
@@ -208,7 +211,7 @@ shuffle = on_command('shuffle')
 async def _(bot: Bot, event: Event):
     argv = int(str(event.get_message()))
     if argv > 100:
-        await shuffle.finish('请输入100以内的数字')
+        await shuffle.finish('随机排列太多了会刷屏，请输入100以内的数字。')
         return
     d = [str(i + 1) for i in range(argv)]
     random.shuffle(d)
@@ -224,4 +227,4 @@ async def _(bot: Bot, event: Event, state: T_State):
         num = random.randint(int(groups[0]),int(groups[1]))
         await roll.send(f"随机数是{num}.")
     except Exception:
-        await roll.send("...语法有错哦，您是不是输入的浮点数还是落了一个？这都是不可以的。")
+        await roll.send("语法有错哦，您是不是输入的浮点数还是落了一个？或者左面比右面的数字大？这都是不可以的。")
