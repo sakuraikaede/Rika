@@ -25,7 +25,7 @@ help = on_command('help')
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     help_str = '''Kiba
-Build 2.12_release_patch_211006 |  Powered by BlitzR 2021.
+Build 2.12_release_patch_211007 |  Powered by BlitzR 2021.
 本bot基于千雪Chiyuki开源项目并遵守MIT/反996协议。
 ==============================================
 |   Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                     | 
@@ -37,6 +37,7 @@ Build 2.12_release_patch_211006 |  Powered by BlitzR 2021.
 今日舞萌/今日运势                             查看今天的舞萌运势
 XXXmaimaiXXX什么                         随机一首歌
 随个[dx/标准][绿黄红紫白]<难度>    随机一首指定条件的乐曲
+随<数量>个[dx/标准][绿黄红紫白]<难度>  随机指定首指定条件的乐曲（不超过4个）
 查歌<乐曲标题的一部分>                  查询符合条件的乐曲
 [绿黄红紫白]id<歌曲编号>                查询乐曲信息或谱面信息
 <歌曲别名>是什么歌                         查询乐曲别名对应的乐曲
@@ -47,9 +48,10 @@ XXXmaimaiXXX什么                         随机一首歌
 本群戳一戳情况                                  查看一下群里有几位杰出的无聊人
 今日雀魂                                             查看今天的雀魂运势
 mjxp                                                   看看你今天要做什么牌捏？
-低情商str1高情商str2                生成一张低情商高情商图片，把str1/2换成自己的话。
-gocho str1 str2                    生成一张gocho图。
-金龙盘旋 str1 str2 str3             生成一张金龙盘旋图。
+低情商<str1>高情商<str2>                生成一张低情商高情商图片，把str1/2换成自己的话。
+gocho <str1> <str2>                      生成一张gocho图。
+金龙盘旋 <str1> <str2> <str3>               生成一张金龙盘旋图。
+投骰子<数量>                                         在线投骰子(?)
 =============================================='''
     await help.send(Message([{
         "type": "image",
@@ -228,3 +230,21 @@ async def _(bot: Bot, event: Event, state: T_State):
         await roll.send(f"随机数是{num}.")
     except Exception:
         await roll.send("语法有错哦，您是不是输入的浮点数还是落了一个？或者左面比右面的数字大？这都是不可以的。")
+
+tz = on_regex(r"^投骰子([1-9]\d*)")
+
+@tz.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    regex = "投骰子([1-9]\d*)"
+    groups = re.match(regex, str(event.get_message())).groups()
+    try:
+        if int(groups[0]) > 10:
+            await roll.send("骰子数量不能大于10个。你是要刷屏嘛？")
+        else:
+            s = "结果如下："
+            for i in range(int(groups[0])):
+                num = random.randint(1,6)
+                s += f'\n第 {i + 1} 个骰子 投掷结果是: {num}点'
+            await roll.send(s)
+    except Exception:
+        await roll.send("语法上可能有错哦。再检查一下试试吧！")

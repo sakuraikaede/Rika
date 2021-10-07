@@ -121,6 +121,40 @@ async def _(bot: Bot, event: Event, state: T_State):
     await mr.finish(song_txt(total_list.random()))
 
 
+spec_rand_multi = on_regex(r"^随([1-9]\d*)首(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
+
+@spec_rand_multi.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    level_labels = ['绿', '黄', '红', '紫', '白']
+    regex = "随([1-9]\d*)首((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
+    res = re.match(regex, str(event.get_message()).lower())
+    try:
+        if int(res.groups()[0]) > 4:
+            rand_result = f'国行DX最多就四首，所以我们不能随{res.groups()[0]}首。'
+            await spec_rand_multi.send(rand_result)
+        else:
+            for i in range(int(res.groups()[0])):
+                if res.groups()[1] == "dx":
+                    tp = ["DX"]
+                elif res.groups()[1] == "sd" or res.groups()[0] == "标准":
+                    tp = ["SD"]
+                else:
+                    tp = ["SD", "DX"]
+                level = res.groups()[3]
+                if res.groups()[2] == "":
+                    music_data = total_list.filter(level=level, type=tp)
+                else:
+                    music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[2])], type=tp)
+                if len(music_data) == 0:
+                    rand_result = f'最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化） x {i+1}'
+                else:
+                    rand_result = f'第 {i + 1} 首 >>\n' + song_txt(music_data.random())
+                    await spec_rand_multi.send(rand_result)
+    except Exception as e:
+        print(e)
+        await spec_rand_multi.finish("随机命令出错了...检查一下语法吧？")
+
+
 search_music = on_regex(r"^查歌.+")
 
 
