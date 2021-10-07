@@ -72,11 +72,13 @@ async def _(bot: Bot, event: Event, state: T_State):
     await inner_level.finish(s.strip())
 
 
+pandora_list = ['我觉得您打潘多拉不如先去打一下白茄子，嗯....是这样的。', '别潘了，别潘了，滴蜡熊快被潘跑了。', '没有精神！！转圈掉的那么多还想打15!!', '在您玩白潘之前，请您先想一下：截止2021/9，国内SSS+ 4人，SSS 18人，SS 69人。这和您有关吗？不，一点关系都没有。', '潘你🐎', '机厅老板笑着管你收砸坏键子的损失费。', '潘小鬼是吧？']
 spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
 
 
 @spec_rand.handle()
 async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
     level_labels = ['绿', '黄', '红', '紫', '白']
     regex = "随个((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
     res = re.match(regex, str(event.get_message()).lower())
@@ -93,25 +95,15 @@ async def _(bot: Bot, event: Event, state: T_State):
         else:
             music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
         if len(music_data) == 0:
-            rand_result = f'最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化）'
+            rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化）'
         else:
-            rand_result = song_txt(music_data.random())
+            rand_result = f'{nickname} 的随机歌曲 >>\n' + song_txt(music_data.random())
+            if level == '15':
+                rand_result += "\n\n......\n" + pandora_list[random.randint(0,6)]
         await spec_rand.send(rand_result)
     except Exception as e:
         print(e)
-        await spec_rand.finish("随机命令出错了...检查一下语法吧？")
-
-
-spec_15 = on_command("随个15")
-pandora_list = ['我觉得您打潘多拉不如先去打一下白茄子，嗯....是这样的。', '别潘了，别潘了，滴蜡熊快被潘跑了。', '没有精神！！转圈掉的那么多还想打15!!', '我当然会给你找潘多拉的。在此之前，我们想一下：截止2021/9，国内SSS+ 4人，SSS 18人，SS 69人。这和您有关吗？不，一点关系都没有。', '潘你🐎', '机厅老板笑着收砸坏键子的损失费。', '潘小鬼是吧？']
-
-@spec_15.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    ran = random.randint(0,6)
-    s = f'{pandora_list[ran]}'
-    await spec_15.finish(Message([
-        {"type": "text", "data": {"text": s}}
-    ]))
+        await spec_rand.finish("随机命令出错了...检查一下语法吧？如果不是语法错误请快点告诉 BlitzR 让他来修 Bug。")
 
 mr = on_regex(r".*maimai.*什么")
 
@@ -125,34 +117,40 @@ spec_rand_multi = on_regex(r"^随([1-9]\d*)首(?:dx|sd|标准)?[绿黄红紫白]
 
 @spec_rand_multi.handle()
 async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
     level_labels = ['绿', '黄', '红', '紫', '白']
-    regex = "随([1-9]\d*)首((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
+    regex = "随([1-9]\d*)首((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"   
     res = re.match(regex, str(event.get_message()).lower())
+    cf_list = [f'国行DX最多就四首，所以我们不能随{res.groups()[0]}首。', f'如果你真的想打{res.groups()[0]}首歌还不喘气的话，你应该去霓虹打超新超热去，这最多就4首，你要不要吧！╰(艹皿艹 )', f'这个指令不能对日本玩家服务....这里只能支持四首，{res.groups()[0]}真的太多了。']
     try:
         if int(res.groups()[0]) > 4:
-            rand_result = f'国行DX最多就四首，所以我们不能随{res.groups()[0]}首。'
+            rand_result = cf_list[random.randint(0,2)]
             await spec_rand_multi.send(rand_result)
         else:
-            for i in range(int(res.groups()[0])):
-                if res.groups()[1] == "dx":
-                    tp = ["DX"]
-                elif res.groups()[1] == "sd" or res.groups()[0] == "标准":
-                    tp = ["SD"]
-                else:
-                    tp = ["SD", "DX"]
-                level = res.groups()[3]
-                if res.groups()[2] == "":
-                    music_data = total_list.filter(level=level, type=tp)
-                else:
-                    music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[2])], type=tp)
-                if len(music_data) == 0:
-                    rand_result = f'最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化） x {i+1}'
-                else:
-                    rand_result = f'第 {i + 1} 首 >>\n' + song_txt(music_data.random())
+            if res.groups()[3] == '15':
+                rand_result = f'WDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n自己查 id834 去！！'
+                await spec_rand_multi.send(rand_result)
+            else:
+                for i in range(int(res.groups()[0])):
+                    if res.groups()[1] == "dx":
+                        tp = ["DX"]
+                    elif res.groups()[1] == "sd" or res.groups()[0] == "标准":
+                        tp = ["SD"]
+                    else:
+                        tp = ["SD", "DX"]
+                    level = res.groups()[3]
+                    if res.groups()[2] == "":
+                        music_data = total_list.filter(level=level, type=tp)
+                    else:
+                        music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[2])], type=tp)
+                    if len(music_data) == 0:
+                        rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣) x {i + 1}'
+                    else:
+                        rand_result = f'[{nickname} / 共 {res.groups()[0]} 首]\n第 {i + 1} 首 >>\n' + song_txt(music_data.random())
                     await spec_rand_multi.send(rand_result)
     except Exception as e:
         print(e)
-        await spec_rand_multi.finish("随机命令出错了...检查一下语法吧？")
+        await spec_rand_multi.finish("随机命令出错了...检查一下语法吧？如果不是语法错误请快点告诉 BlitzR 让他来修 Bug。")
 
 
 search_music = on_regex(r"^查歌.+")
