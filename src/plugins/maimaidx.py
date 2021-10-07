@@ -17,6 +17,12 @@ import datetime
 def song_txt(music: Music):
     return Message([
         {
+            "type": "text",
+            "data": {
+                "text": f"----> Cover <----\n"
+            }
+        },
+        {
             "type": "image",
             "data": {
                 "file": f"https://www.diving-fish.com/covers/{music.id}.jpg"
@@ -25,13 +31,13 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f" 🆔 {music.id} >> {music.title}\n谱面对应等级:"
+                "text": f"----------------\n🆔 {music.id} > {music.title}\nLevels |"
             }
         },
         {
             "type": "text",
             "data": {
-                "text": f"\n{' | '.join(music.level)}"
+                "text": f" {' | '.join(music.level)}"
             }
         }
     ])
@@ -97,7 +103,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(music_data) == 0:
             rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化）'
         else:
-            rand_result = f'{nickname} 的随机歌曲 >>\n' + song_txt(music_data.random())
+            rand_result = f'Track For {nickname} →\n' + song_txt(music_data.random())
             if level == '15':
                 rand_result += "\n\n......\n" + pandora_list[random.randint(0,6)]
         await spec_rand.send(rand_result)
@@ -146,7 +152,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                     if len(music_data) == 0:
                         rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣) x {i + 1}'
                     else:
-                        rand_result = f'[{nickname} / 共 {res.groups()[0]} 首]\n第 {i + 1} 首 >>\n' + song_txt(music_data.random())
+                        rand_result = f'Track {i + 1}/{res.group()[0]} For {nickname} →\n' + song_txt(music_data.random())
                     await spec_rand_multi.send(rand_result)
     except Exception as e:
         print(e)
@@ -168,7 +174,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     elif len(res) < 50:
         search_result = ""
         for music in sorted(res, key = lambda i: int(i['id'])):
-            search_result += f"搜索到以下内容:\n{music['id']}. {music['title']}\n"
+            search_result += f"---> 搜索结果 <---\n{music['id']}. {music['title']}\n"
         await search_music.finish(Message([
             {"type": "text",
                 "data": {
@@ -217,6 +223,12 @@ BREAK> {chart['notes'][4]}
 Notes Designer> {chart['charter']}'''
             await query_chart.send(Message([
                 {
+                    "type": "text",
+                    "data": {
+                        "text": f"----> Note Details <----\n"
+                    }
+                },
+                {
                     "type": "image",
                     "data": {
                         "file": f"{file}"
@@ -225,7 +237,7 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"🆔{music['id']} >> {music['title']}\n"
+                        "text": f"--------------------\n🆔 {music['id']} > {music['title']}\n"
                     }
                 },
                 {
@@ -244,6 +256,12 @@ Notes Designer> {chart['charter']}'''
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             await query_chart.send(Message([
                 {
+                    "type": "text",
+                    "data": {
+                        "text": f"---> Details <---\n"
+                    }
+                },
+                {
                     "type": "image",
                     "data": {
                         "file": f"{file}"
@@ -252,13 +270,13 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"🆔 {music['id']} >> {music['title']}\n"
+                        "text": f"---------------\n🆔 {music['id']} > {music['title']}\n"
                     }
                 },  
                 {
                     "type": "text",
                     "data": {
-                        "text": f"曲师/演唱> {music['basic_info']['artist']}\n分类> {music['basic_info']['genre']}\nBPM> {music['basic_info']['bpm']}\n版本> {music['basic_info']['from']}\n谱面难度> {' | '.join(music['level'])}"
+                        "text": f"Artists> {music['basic_info']['artist']}\n分类> {music['basic_info']['genre']}\nBPM> {music['basic_info']['bpm']}\n版本> {music['basic_info']['from']}\nLevels> {' | '.join(music['level'])}"
                     }
                 }
             ]))
@@ -311,22 +329,22 @@ async def _(bot: Bot, event: Event, state: T_State):
         wm_value.append(h & 3)
         h >>= 2
     s = f"⏲️ → {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ → {nickname}"
-    s += f"\n\n今日运势 | Date Fortune →\n\n运气之签 ↓\n--------------------\n"
+    s += f"\n\n今日运势 | Date Fortune →\n\n运气之签 ↓\n----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
-        s += "            小吉\n"
+        s += "            小吉!\n"
     elif rp >= 70 and rp < 90:
-        s += "             吉\n"
+        s += "             吉!\n"
     elif rp >= 90:
-        s += "            大吉\n"
+        s += "            大吉!\n"
     elif rp >= 30 and rp < 50:
-        s += "            小凶\n"
+        s += "            小凶!\n"
     elif rp >= 10 and rp < 30:
-        s += "             凶\n"
+        s += "             凶!\n"
     else:
-        s += "            大凶\n"
-    s += f"收歌率: {ap}%\n--------------------\n\n日常运势 ↓\n"
+        s += "            大凶!\n"
+    s += f"收歌率: {ap}%\n----------------------\n\n日常运势 ↓\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 > 今天总体上平平无常。向北走有财运，向南走运不佳....等一下，这句话好像在哪儿听过？\n'
@@ -354,7 +372,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         for i in range(bad_count):
             s += f'{wm_list[bad_value[i]]} '
     s += f"\n\nKiba Tips →\n{tips_list[tips_value]}\n"
-    s += "\n运势推荐 | Recommendation →\n"
+    s += "\n运势推荐 | Recommendation →\n\n"
     music = total_list[rp % len(total_list)]
     await jrwm.finish(Message([
         {"type": "text", "data": {"text": s}}
@@ -410,12 +428,12 @@ async def _(bot: Bot, event: Event, state: T_State):
     regex = "(.+)是什么歌"
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
     if name not in music_aliases:
-        await find_song.finish("可能这个别称太新了.....抱歉我找不到这首歌啦.....")
+        await find_song.finish("可能这个别称太新了.....我找不到这首歌啦。")
         return
     result_set = music_aliases[name]
     if len(result_set) == 1:
         music = total_list.by_title(result_set[0])
-        await find_song.finish(Message([{"type": "text", "data": {"text": "OHHH!! 我猜您要找的应该是：\n"}}] + song_txt(music)))
+        await find_song.finish(Message([{"type": "text", "data": {"text": "我猜您说的是：\n"}}] + song_txt(music)))
     else:
         s = '\n'.join(result_set)
         await find_song.finish(f"您要找的可能是以下歌曲中的其中一首：\n{ s }")
@@ -467,11 +485,11 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''{music['title']} {level_labels2[level_index]} | 分数线: {line}% >\n
-Tap Great 最低损失量 | {(total_score * reduce / 10000):.2f}个\n
-每Tap Great 损失的完成度 | {10000 / total_score:.4f}%\n
-每50落的损失的完成度 | {break_50_reduce / total_score * 100:.4f}% ，等价于 {(break_50_reduce / 100):.3f} 个 Tap Great\n
-Break 数量 | {brk}\n
+            await query_chart.send(f'''{music['title']} | {level_labels2[level_index]}\n 分数线: {line}% 最低要求→\n
+Tap Great 最低损失量 >\n {(total_score * reduce / 10000):.2f}个\n
+每Tap Great 损失的完成度 >\n {10000 / total_score:.4f}%\n
+每50落的损失的完成度 >\n {break_50_reduce / total_score * 100:.4f}% ，等价于 {(break_50_reduce / 100):.3f} 个 Tap Great\n
+Break 数量 > {brk}\n
 具体情况的换算您可以查看帮助来帮助您换算。''')
         except Exception:
             await query_chart.send("格式错误，输入“分数线 帮助”以查看帮助信息")
@@ -496,7 +514,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'{nickname}查询的Best40找到啦。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(f'{nickname} 查询的 Best 40 找到啦。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 
