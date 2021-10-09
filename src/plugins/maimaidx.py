@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from nonebot import on_command, on_regex
+from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
 from nonebot.adapters import Event, Bot
 from nonebot.adapters.cqhttp import Message, MessageSegment, GroupMessageEvent, PrivateMessageEvent
@@ -10,18 +10,25 @@ from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 import re
-
 import datetime
+import time
 
+from src.libraries.maimaidx_guess import GuessObject
+from nonebot.permission import Permission
+from nonebot.log import logger
+import requests
+import json
+import random
+from urllib import parse
+import asyncio
+
+driver = get_driver()
+@driver.on_startup
+def _():
+    logger.info("Kiba: Load Driver successfully")
 
 def song_txt(music: Music):
     return Message([
-        {
-            "type": "text",
-            "data": {
-                "text": f"----> Cover <----\n"
-            }
-        },
         {
             "type": "image",
             "data": {
@@ -31,7 +38,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"----------------\n🆔 {music.id} > {music.title}\nLevels |"
+                "text": f"谱面 ID > {music.id}\n{music.title}\n等级 >"
             }
         },
         {
@@ -101,9 +108,9 @@ async def _(bot: Bot, event: Event, state: T_State):
         else:
             music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
         if len(music_data) == 0:
-            rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？（瓜农化）'
+            rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？'
         else:
-            rand_result = f'Track For {nickname} →\n' + song_txt(music_data.random())
+            rand_result = f'To {nickname} | Track →\n' + song_txt(music_data.random())
             if level == '15':
                 rand_result += "\n\n......\n" + pandora_list[random.randint(0,6)]
         await spec_rand.send(rand_result)
@@ -134,9 +141,10 @@ async def _(bot: Bot, event: Event, state: T_State):
             await spec_rand_multi.send(rand_result)
         else:
             if res.groups()[3] == '15':
-                rand_result = f'WDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n自己查 id834 去！！'
+                rand_result = f'WDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n 自己查 id834 去！！'
                 await spec_rand_multi.send(rand_result)
             else:
+                rand_result = f'To | {nickname} >>\n'
                 for i in range(int(res.groups()[0])):
                     if res.groups()[1] == "dx":
                         tp = ["DX"]
@@ -150,10 +158,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                     else:
                         music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[2])], type=tp)
                     if len(music_data) == 0:
-                        rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣) x {i + 1}'
+                        rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣)'
                     else:
-                        rand_result = f'Track {i + 1}/{res.group()[0]} For {nickname} →\n' + song_txt(music_data.random())
-                    await spec_rand_multi.send(rand_result)
+                        rand_result += f'Track {i + 1} / {res.groups()[0]} →\n' + song_txt(music_data.random()) + '\n----------------------------\n'
+                await spec_rand_multi.send(rand_result)
     except Exception as e:
         print(e)
         await spec_rand_multi.finish("随机命令出错了...检查一下语法吧？如果不是语法错误请快点告诉 BlitzR 让他来修 Bug。")
@@ -258,7 +266,7 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"---> Details <---\n"
+                        "text": f"----> 详情 <----\n"
                     }
                 },
                 {
@@ -270,13 +278,13 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"---------------\n🆔 {music['id']} > {music['title']}\n"
+                        "text": f"\n谱面 ID > {music['id']}\n{music['title']}\n"
                     }
                 },  
                 {
                     "type": "text",
                     "data": {
-                        "text": f"Artists> {music['basic_info']['artist']}\n分类> {music['basic_info']['genre']}\nBPM> {music['basic_info']['bpm']}\n版本> {music['basic_info']['from']}\nLevels> {' | '.join(music['level'])}"
+                        "text": f"---------------\nArtists> {music['basic_info']['artist']}\n分类> {music['basic_info']['genre']}\nBPM> {music['basic_info']['bpm']}\n版本> {music['basic_info']['from']}\n等级> {' | '.join(music['level'])}"
                     }
                 }
             ]))
@@ -329,7 +337,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         wm_value.append(h & 3)
         h >>= 2
     s = f"⏲️ → {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ → {nickname}"
-    s += f"\n\n今日运势 | Date Fortune →\n\n运气之签 ↓\n----------------------\n"
+    s += f"\n\n今日运势 | Date Fortune →\n\n运气之签 ↓\n------------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
@@ -344,7 +352,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶!\n"
     else:
         s += "            大凶!\n"
-    s += f"收歌率: {ap}%\n----------------------\n\n日常运势 ↓\n"
+    s += f"收歌率: {ap}%\n------------------------\n\n日常运势 ↓\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 > 今天总体上平平无常。向北走有财运，向南走运不佳....等一下，这句话好像在哪儿听过？\n'
@@ -508,13 +516,61 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send("这名玩家404或者用户名输错了....检查一下用户名和查分器中的用户名是否相同呢？\n如果在此之前需要修改查分器，请参阅 https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send("这名玩家404或者用户名输错了....检查一下用户名和查分器中的用户名是否相同呢？\n如果在此之前需要修改查分器或确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send(f'{username}禁止了其他人获取数据。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/')
+        await best_40_pic.send(f'{username}禁止了其他人获取数据。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
     else:
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'{nickname} 查询的 Best 40 找到啦。\n需要修改查分器数据吗？请参阅 https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(f'{nickname} 查询的 Best 40 的内容如图所示。\n您需要修改查分器数据吗？请参阅: https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 
+
+guess_dict: Dict[Tuple[str, str], GuessObject] = {}
+guess_cd_dict: Dict[Tuple[str, str], float] = {}
+guess_music = on_command('猜歌', priority=0)
+
+
+async def guess_music_loop(bot: Bot, event: Event, state: T_State):
+    await asyncio.sleep(10)
+    guess: GuessObject = state["guess_object"]
+    if guess.is_end:
+        return
+    cycle = state["cycle"]
+    if cycle < 6:
+        asyncio.create_task(bot.send(event, f"{cycle + 1}/7 >> 这首歌" + guess.guess_options[cycle]))
+    else:
+        asyncio.create_task(bot.send(event, Message([
+            MessageSegment.text("7/7 >> 这首歌封面的一部分是："),
+            MessageSegment.image("base64://" + str(guess.b64image, encoding="utf-8")),
+            MessageSegment.text("猜到答案了吗？快和群里的小伙伴猜一下吧！答案将在 30 秒后揭晓。")
+        ])))
+        asyncio.create_task(give_answer(bot, event, state))
+        return
+    state["cycle"] += 1
+    asyncio.create_task(guess_music_loop(bot, event, state))
+
+
+async def give_answer(bot: Bot, event: Event, state: T_State):
+    await asyncio.sleep(30)
+    guess: GuessObject = state["guess_object"]
+    if guess.is_end:
+        return
+    asyncio.create_task(bot.send(event, Message([MessageSegment.text("现在揭晓答案！你猜对了吗？\n谱面 ID >>" + f"{guess.music['id']}\n{guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
+    del guess_dict[state["k"]]
+
+
+@guess_music.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    mt = event.message_type
+    k = (mt, event.user_id if mt == "private" else event.group_id)
+    whitelists = get_driver().config.whitelists
+    guess = GuessObject()
+    guess_dict[k] = guess
+    state["k"] = k
+    state["guess_object"] = guess
+    state["cycle"] = 0
+    guess_cd_dict[k] = time.time() + 600
+    await guess_music.send("-> Kiba 猜歌 (Preview) <-\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n\n**\n以下内容正在修复:\n1.目前Kiba不能回复你对错...(技术原因导致的长期问题)\n2.概率性不显示Cover。\n**\n\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
+    asyncio.create_task(guess_music_loop(bot, event, state))

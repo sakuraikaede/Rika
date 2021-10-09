@@ -70,7 +70,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         maj_value.append(h & 3)
         h >>= 2
     s = f"⏲️ → {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ → {nickname}"
-    s += f"\n\n雀魂运势 | MajSoul Fortune →\n\n一姬之签 ↓\n--------------------\n"
+    s += f"\n\n雀魂运势 | MajSoul Fortune →\n\n一姬之签 ↓\n----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"大和率: {luck}%"
     if rp >= 50 and rp < 70:
@@ -85,7 +85,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶\n"
     else:
         s += "            大凶\n"
-    s += f"役满率: {ap}%\n--------------------\n\n日常运势 ↓\n"
+    s += f"役满率: {ap}%\n----------------------\n\n日常运势 ↓\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 > 今天总体上平平无常。那就正常打麻将吧？\n'
