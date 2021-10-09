@@ -322,8 +322,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
-    luck = int((rp * 4 + 23) / 3 % 100)
-    ap = int((luck * 4) / 6 * 9 % 100)
+    luck = hash(int((h * 4) / 3)) % 100
+    ap = hash(int(((luck) / (rp * 4)) * (h / 2))) % 100
     wm_value = []
     good_value = {}
     bad_value = {}
@@ -381,7 +381,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             s += f'{wm_list[bad_value[i]]} '
     s += f"\n\nKiba Tips →\n{tips_list[tips_value]}\n"
     s += "\n运势推荐 | Recommendation →\n\n"
-    music = total_list[rp % len(total_list)]
+    music = total_list[hash(qq * luck * ap * 100 * rp * 100) % len(total_list)]
     await jrwm.finish(Message([
         {"type": "text", "data": {"text": s}}
     ] + song_txt(music)))

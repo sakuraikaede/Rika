@@ -55,8 +55,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
-    luck = int((rp * 4 + 18) / 3 % 100)
-    ap = int((luck * 3) / 6 * 9 % 100)
+    luck = hash(int((h * 6) / 2)) % 100
+    ap = hash(int(((luck) / (rp * 2)) * (h / 3))) % 100
     maj_value = []
     good_value = {}
     bad_value = {}
