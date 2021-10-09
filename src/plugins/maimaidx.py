@@ -25,7 +25,7 @@ import asyncio
 driver = get_driver()
 @driver.on_startup
 def _():
-    logger.info("Kiba: Load Driver successfully")
+    logger.info("Kiba: Load Maimai DX Plugin successfully")
 
 def song_txt(music: Music):
     return Message([
@@ -160,7 +160,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                     if len(music_data) == 0:
                         rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣)'
                     else:
-                        rand_result += f'Track {i + 1} / {res.groups()[0]} →\n' + song_txt(music_data.random()) + '\n----------------------------\n'
+                        rand_result += f'Track {i + 1} / {res.groups()[0]} →\n' + song_txt(music_data.random()) + '\n------------------------\n'
                 await spec_rand_multi.send(rand_result)
     except Exception as e:
         print(e)
