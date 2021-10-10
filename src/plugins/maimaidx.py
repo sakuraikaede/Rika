@@ -323,7 +323,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     h = hash(qq)
     rp = h % 100
     luck = hash(int((h * 4) / 3)) % 100
-    ap = hash(int(((luck) - (rp * 4)) * (h / 2))) % 100
+    ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
     wm_value = []
     good_value = {}
     bad_value = {}
