@@ -70,7 +70,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         maj_value.append(h & 3)
         h >>= 2
     s = f"⏲️ → {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ → {nickname}"
-    s += f"\n\n雀魂运势 | MajSoul Fortune →\n\n一姬之签 ↓\n----------------------\n"
+    s += f"\n\n-> 雀魂运势 | Maj Fortune <-\n\n一姬之签 >>\n----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"大和率: {luck}%"
     if rp >= 50 and rp < 70:
@@ -85,34 +85,34 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶\n"
     else:
         s += "            大凶\n"
-    s += f"役满率: {ap}%\n----------------------\n\n日常运势 ↓\n"
+    s += f"役满率: {ap}%\n----------------------\n\n打牌运势 >>\n"
 
     if dwm_value_1 == dwm_value_2:
-        s += f'平 > 今天总体上平平无常。那就正常打麻将吧？\n'
+        s += f'平 | 今天总体上平平无常。那就正常打麻将吧？\n'
     else:
-        s += f'宜 > {maj_list_perfect[dwm_value_1]}\n'
-        s += f'忌 > {maj_list_bad[dwm_value_2]}\n'
-    s += "\n牌型推荐 | Brand Recommendation →\n"
+        s += f'宜 | {maj_list_perfect[dwm_value_1]}\n'
+        s += f'忌 | {maj_list_bad[dwm_value_2]}\n'
+    s += "\n牌型推荐 >>\n"
     for i in range(36):
         if maj_value[i] == 3:
             good_value[good_count] = i
             good_count = good_count + 1
-        elif maj_value[i] == 0:
+        elif maj_value[i] > 0 and maj_value[i] < 3:
             bad_value[bad_count] = i
             bad_count = bad_count + 1
     if good_count == 0:
-        s += "第一推荐 | 🚫 没有最适合的牌型"
+        s += "推荐 | 🚫 没有最适合的牌型"
     else:
-        s += f'第一推荐 | 共 {good_count} 项 >\n'
+        s += f'推荐 | 共 {good_count} 项 >\n'
         for i in range(good_count):
             s += f'{maj_list[good_value[i]]} '
     if bad_count == 0:
-        s += '\n第二推荐 | 🚫 没有最适合的牌型\n'
+        s += '\n次推荐 | 🚫 没有最适合的牌型\n'
     else:
-        s += f'\n第二推荐 | 共 {bad_count} 项 >\n'
+        s += f'\n次推荐 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{maj_list[bad_value[i]]} '
-    s += f"\n\nKiba Tips →\n{majtips_list[tips_value]}"
+    s += f"\n\n------> Kiba Tips <------\n{majtips_list[tips_value]}"
     await jrmj.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))

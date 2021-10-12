@@ -14,6 +14,7 @@ from src.libraries.tool import hash
 
 import time
 from collections import defaultdict
+from src.libraries.config import Config
 
 driver = get_driver()
 
@@ -24,15 +25,14 @@ help = on_command('help')
 
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    help_str = '''Kiba
-Build 2.20_release_patch_211010 |  Powered by BlitzR 2021.
-
+    help_str = '''==============================================
+|    Kiba by BlitzR    |    Build 2.22_patch_211012    |   测试群: 895692945   |
 ==============================================
-|                      License: MIT License & Anti 996 License                              |
+|                               License: MIT License & Anti 996                                  |
 |                    GitHub: https://github.com/Blitz-Raynor/Kiba                       |
 ==============================================
-|   Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                     | 
-|   Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot                |
+|              Mai-Bot Github: https://github.com/Diving-Fish/mai-bot          | 
+|             Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot      |
 ==============================================
 
 
@@ -46,37 +46,43 @@ XXXmaimaiXXX什么                                     随机一首歌
 
 随<数量>个[dx/标准][绿黄红紫白]<难度>   随机指定首指定条件的乐曲（不超过4个）
 
-查歌<乐曲标题的一部分>                  查询符合条件的乐曲
+查歌<乐曲标题的一部分>                             查询符合条件的乐曲
 
-[绿黄红紫白]id<歌曲编号>                查询乐曲信息或谱面信息
+[绿黄红紫白]id<歌曲编号>                           查询乐曲信息或谱面信息
 
-<歌曲别名>是什么歌                         查询乐曲别名对应的乐曲
+<歌曲别名>是什么歌                                    查询乐曲别名对应的乐曲
 
-定数查歌 <定数下限> <定数上限>    查询定数对应的乐曲
+定数查歌 <定数下限> <定数上限>              查询定数对应的乐曲
 
-分数线 <难度+歌曲id> <分数线>     详情请输入“分数线 帮助”查看
+分数线 <难度+歌曲id> <分数线>               详情请输入“分数线 帮助”查看
 
-今日性癖/jrxp                                     看看你今天性什么东西捏？
+今日性癖/jrxp                                               看看你今天性什么东西捏？
 
-戳一戳                                                来戳戳我？
+戳一戳                                                          来戳戳我？
 
-本群戳一戳情况                                  查看一下群里有几位杰出的无聊人
+本群戳一戳情况                                            查看一下群里有几位杰出的无聊人
 
-今日雀魂                                             查看今天的雀魂运势
+今日雀魂                                                       查看今天的雀魂运势
 
-mjxp                                                   看看你今天要做什么牌捏？
+mjxp                                                            看看你今天要做什么牌捏？
 
-低情商<str1>高情商<str2>              生成一张低情商高情商图片，把str1/2换成自己的话。
+低情商<str1>高情商<str2>                       生成一张低情商高情商图片，
+                                                                    把str1/2换成自己的话。
 
-gocho <str1> <str2>                       生成一张gocho图。
+gocho <str1> <str2>                                生成一张gocho图。
 
-金龙盘旋 <str1> <str2> <str3>       生成一张金龙盘旋图。
+金龙盘旋 <str1> <str2> <str3>               生成一张金龙盘旋图。
 
-投骰子<数量>                                     在线投骰子(?)
+投骰子<数量>                                            在线投骰子(?)
+投百面骰子<数量>                                      * 可以选择六面/百面
 
-                                                            开始一轮猜歌*
-猜歌                                                     * 目前猜歌是 Beta Preview 状态，
-                                                               可能有功能性的不稳定。
+                                                                   开始一轮猜歌*
+猜歌                                                         * 目前猜歌是 Beta Preview 状态，
+                                                                   可能有功能性的不稳定。
+
+                                                                    这个功能可以随机禁言你1-600秒，前提Kiba是管理员。
+烟我                                                                * 注意：为防止误触发，
+                                                                    这个功能你需要at一下Kiba再说这个命令才能执行。
 =============================================='''
     await help.send(Message([{
         "type": "image",
@@ -163,20 +169,30 @@ async def _(bot: Bot, event: Event, state: T_State):
         }]))
     elif r == 5:
         await poke.send(Message('呜呜呜...不要再戳啦...'))
-    elif r <= 7:
+    elif r <= 7 and r > 5:
         await poke.send(Message([{
             "type": "image",
             "data": {
                 "file": f"https://www.diving-fish.com/images/poke/{r - 5}.gif",
             }
         }]))
-    elif r <= 12:
+    elif r <= 12 and r > 7:
         await poke.send(Message([{
             "type": "image",
             "data": {
                 "file": f"https://www.diving-fish.com/images/poke/{r - 7}.jpg",
             }
         }]))
+    elif r <= 17 and r > 12:
+        await poke.send(Message(f'好的大家伙，下一次请各位戳刚刚戳我的那位。'))
+    elif r <= 19 and r > 17:
+        t = random.randint(60,90)
+        try:
+            await bot.set_group_ban(group_id=event.__getattribute__('group_id'), user_id=event.sender_id, duration=t)
+            await poke.send(f'别戳了！！烟你{t}秒冷静一下。')
+        except Exception as e:
+            print(e)
+            await poke.send(Message('一天到晚就知道戳戳戳，你不许戳了！(╬▔皿▔)╯'))
     elif r == 1:
         await poke.send(Message('一天到晚就知道戳戳戳，戳自己肚皮不行吗？'))
     else:
@@ -269,6 +285,24 @@ async def _(bot: Bot, event: Event, state: T_State):
             s = "结果如下："
             for i in range(int(groups[0])):
                 num = random.randint(1,6)
+                s += f'\n第 {i + 1} 个骰子 投掷结果是: {num}点'
+            await roll.send(s)
+    except Exception:
+        await roll.send("语法上可能有错哦。再检查一下试试吧！")
+
+tz_100 = on_regex(r"^投百面骰子([1-9]\d*)")
+
+@tz_100.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    regex = "投百面骰子([1-9]\d*)"
+    groups = re.match(regex, str(event.get_message())).groups()
+    try:
+        if int(groups[0]) > 10:
+            await roll.send("骰子数量不能大于10个。你是要刷屏嘛？")
+        else:
+            s = "结果如下："
+            for i in range(int(groups[0])):
+                num = random.randint(1,100)
                 s += f'\n第 {i + 1} 个骰子 投掷结果是: {num}点'
             await roll.send(s)
     except Exception:
