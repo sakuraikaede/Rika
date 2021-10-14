@@ -25,19 +25,19 @@ help = on_command('help')
 
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    help_str = '''==============================================
-|    Kiba by BlitzR    |    Build 2.22_patch_211013    |   测试群: 895692945   |
-==============================================
-|                               License: MIT License & Anti 996                                  |
-|                    GitHub: https://github.com/Blitz-Raynor/Kiba                       |
-==============================================
-|              Mai-Bot Github: https://github.com/Diving-Fish/mai-bot          | 
-|             Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot      |
-==============================================
+    help_str = '''===============================================================
+|           Kiba by BlitzR           |           Build 2.23_patch_211014           |           测试群: 895692945           |
+===============================================================
+|                                                   License: MIT License & Anti 996                                                        |
+|                                         GitHub: https://github.com/Blitz-Raynor/Kiba                                            |
+===============================================================
+|                                  Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                                  | 
+|                                Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot                               |
+===============================================================
 
 
-                                                可用命令帮助                                                    
-==============================================
+                                                                      可用命令帮助                                                    
+===============================================================
 今日舞萌/今日运势                                        查看今天的舞萌运势
 
 XXXmaimaiXXX什么                                     随机一首歌
@@ -83,13 +83,15 @@ gocho <str1> <str2>                                生成一张gocho图。
                                                                    可能有功能性的不稳定。
 
                                                                     这个功能可以随机禁言你1-600秒，前提Kiba是管理员。
-烟我                                                              * 注意：为防止误触发，
+烟我                                                          * 注意：为防止误触发，
                                                                     这个功能你需要at一下Kiba再说这个命令才能执行。
 
                                                                    群里摇人。
 随个[男/女]群友                                         你也可以不带参数直接说“随个”然后后面加啥都可以。
                                                                    当然 Kiba 容易骂你就是了。
-=============================================='''
+
+b40 / b50                                                   根据查分器数据生成你的 Best 40 /Best 50。
+==============================================================='''
     await help.send(Message([{
         "type": "image",
         "data": {

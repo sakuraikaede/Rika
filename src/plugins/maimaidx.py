@@ -8,7 +8,7 @@ from nonebot.adapters.cqhttp import Message, MessageSegment, GroupMessageEvent, 
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
-from src.libraries.maimai_best_40 import generate
+from src.libraries.maimai_best_40 import generate, get_player_data
 import re
 import datetime
 import time
@@ -27,7 +27,7 @@ from nonebot.rule import to_me
 driver = get_driver()
 @driver.on_startup
 def _():
-    logger.info("Kiba Kernel -> Load \"Maimai DX Plugin\" successfully")
+    logger.info("Kiba Kernel -> Load \"Driver\" successfully")
 
 def song_txt(music: Music):
     return Message([
@@ -87,7 +87,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     await inner_level.finish(s.strip())
 
 
-pandora_list = ['我觉得您打潘多拉不如先去打一下白茄子，嗯....是这样的。', '别潘了，别潘了，滴蜡熊快被潘跑了。', '没有精神！！转圈掉的那么多还想打15!!', '在您玩白潘之前，请您先想一下：截止2021/9，国内SSS+ 4人，SSS 18人，SS 69人。这和您有关吗？不，一点关系都没有。', '潘你🐎', '机厅老板笑着管你收砸坏键子的损失费。', '潘小鬼是吧？']
+pandora_list = ['我觉得您打白潘不如先去打一下白茄子。', '别潘了，别潘了，滴蜡熊快被潘跑了。', '没有精神！！转圈掉的那么多还想打15!!', '在您玩白潘之前，请您先想一下：截止2021/9，国内SSS+ 4人，SSS 18人，SS 69人。这和您有关吗？不，一点关系都没有。', '潘你🐎', '机厅老板笑着管你收砸坏键子的损失费。', '潘小鬼是吧？', '你不许潘了！']
 spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
 
 
@@ -112,9 +112,9 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(music_data) == 0:
             rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？'
         else:
-            rand_result = f'To {nickname} | Track →\n' + song_txt(music_data.random())
+            rand_result = f'To {nickname} | Track >>\n' + song_txt(music_data.random())
             if level == '15':
-                rand_result += "\n\n......\n" + pandora_list[random.randint(0,6)]
+                rand_result += "\n\n" + pandora_list[random.randint(0,7)]
         await spec_rand.send(rand_result)
     except Exception as e:
         print(e)
@@ -314,7 +314,7 @@ async def _(bot: Bot, event: Event, state: T_State):
 wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓绝赞', '收歌', '理论值', '打东方曲', '打索尼克曲']
 bwm_list_perfect = ['拆机:然后您被机修当场处决', '女装:怎么这么好康！（然后受到了欢迎）', '耍帅:看我耍帅还AP+', '击剑:Alea jacta est!(SSS+)', '打滴蜡熊:看我今天不仅推了分，还收了歌！', '日麻:看我三倍役满!!!你们三家全都起飞!!!', '出勤:不出则已，一出惊人，当场AP，羡煞众人。', '看手元:哦原来是这样！看了手元果真推分了。', '霸机:这么久群友都没来，霸机一整天不是梦！', '打Maipad: Maipad上收歌了，上机也收了。', '唱打: Let the bass kick! O-oooooooooo AAAAE-A-A-I-A-U- JO-oooooooooooo AAE-O-A-A-U-U-A- E-eee-ee-eee AAAAE-A-E-I-E-A- JO-ooo-oo-oo-oo EEEEO-A-AAA-AAAA O-oooooooooo AAAAE-A-A-I-A-U-......']
 bwm_list_bad = ['拆机:不仅您被机修当场处决，还被人尽皆知。', '女装:杰哥说你怎么这么好康！让我康康！！！（被堵在卫生间角落）', '耍帅:星星全都粉掉了......', '击剑:Alea jacta est!(指在线下真实击剑)', '打滴蜡熊:滴蜡熊打你。', '日麻:我居然立直放铳....等等..三倍役满??????', '出勤:当场分数暴毙，惊呆众人。', '看手元:手法很神奇，根本学不来。', '霸机:......群友曰:"霸机是吧？踢了！"', '打Maipad: 上机还是不大会......', '唱打: 被路人拍下上传到了某音。']
-tips_list = ['在游戏过程中,请您不要大力拍打或滑动机器!', '建议您常多备一副手套！如果游玩时手套破裂或许会有大用！', '游玩时注意手指安全！意外戳到边框时若引发剧烈疼痛请立刻下机以休息手指，必要时可以选择就医。', '游玩过程中注意财物安全。自己的财物远比一个SSS+要更有价值。', '底力不够？建议下埋！不要强行越级，手癖难解。', '文明游玩，游戏要排队，不要做不遵守游戏规则的玩家！', '人品值和宜忌每天0点都会刷新，不喜欢总体运势可以通过这个指令再随一次。', '疫情防护，人人有责。在游玩结束后请主动佩戴口罩！', '出勤时注意交通安全，身体安全永远在第一位！']
+tips_list = ['在游戏过程中,请您不要大力拍打或滑动机器!', '建议您常多备一副手套！如果游玩时手套破裂或许会有大用！', '游玩时注意手指安全！意外戳到边框时若引发剧烈疼痛请立刻下机以休息手指，必要时可以选择就医。', '游玩过程中注意财物安全。自己的财物远比一个SSS+要更有价值。', '底力不够？建议下埋！不要强行越级，手癖难解。', '文明游玩，游戏要排队，不要做不遵守游戏规则的玩家！', '人品值和宜忌每天0点都会刷新，不喜欢总体运势可以通过这个指令再随一次。', '疫情防护，人人有责。在游玩结束后请主动佩戴口罩！', '出勤时注意交通安全，身体安全永远在第一位！', '迪拉熊不断吃绝赞？去找机修教训它。']
 
 jrwm = on_command('今日运势', aliases={'今日舞萌'})
 
@@ -333,7 +333,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     bad_count = 0
     dwm_value_1 = random.randint(0,10)
     dwm_value_2 = random.randint(0,10)
-    tips_value = random.randint(0,8)
+    tips_value = random.randint(0,9)
     now = datetime.datetime.now()  
     for i in range(14):
         wm_value.append(h & 3)
@@ -393,7 +393,24 @@ async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
     h = hash(qq)
     rp = h % 100
-    s = f"今天的人品值是 {rp}%\n可以看看jrxp或者运势吼。"
+    luck = hash(int((h * 4) / 3)) % 100
+    ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
+    s = f"------------------------\n"
+    s += f"人品值: {rp}%\n"
+    s += f"幸运度: {luck}%"
+    if rp >= 50 and rp < 70:
+        s += "            小吉!\n"
+    elif rp >= 70 and rp < 90:
+        s += "             吉!\n"
+    elif rp >= 90:
+        s += "            大吉!\n"
+    elif rp >= 30 and rp < 50:
+        s += "            小凶!\n"
+    elif rp >= 10 and rp < 30:
+        s += "             凶!\n"
+    else:
+        s += "            大凶!\n"
+    s += f"收歌率: {ap}%\n------------------------\n"
     await jrrp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
@@ -405,7 +422,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
     h = hash(qq)
     rp = h % 100
-    s = "我算算哈...今天推荐你这首歌吧:\n"
+    s = "今天推荐你这首歌吧:\n"
     music = total_list[(h * 4) % len(total_list)]
     await jrgq.finish(Message([
         {"type": "text", "data": {"text": s}}
@@ -494,7 +511,7 @@ Tap Great 最低损失量 >\n {(total_score * reduce / 10000):.2f}个\n
 Break 数量 > {brk}\n
 具体情况的换算您可以查看帮助来帮助您换算。''')
         except Exception:
-            await query_chart.send("格式错误，输入“分数线 帮助”以查看帮助信息")
+            await query_chart.send("格式错误，输入 “分数线 帮助” 以查看帮助信息")
 
 
 best_40_pic = on_command('b40')
@@ -520,7 +537,29 @@ async def _(bot: Bot, event: Event, state: T_State):
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 
+best_50_pic = on_command('b50')
 
+@best_50_pic.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    username = str(event.get_message()).strip()
+    nickname = event.sender.nickname
+    if username == "":
+        payload = {'qq': str(event.get_user_id())}
+    else:
+        payload = {'username': username}
+    payload['b50'] = True
+    img, success = await generate(payload)
+    if success == 400:
+        await best_50_pic.send("这名玩家404或者用户名输错了....检查一下用户名和查分器中的用户名是否相同呢？\n如果在此之前需要修改查分器或确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+    elif success == 403:
+        await best_50_pic.send(f'{username}禁止了其他人获取数据。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+    else:
+        await best_50_pic.send(Message([
+            MessageSegment.reply(event.message_id),
+            MessageSegment.text(f'{nickname} 查询的 Best 50 的内容如图所示。\n您需要修改查分器数据吗？请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
+        ]))
+        
 guess_dict: Dict[Tuple[str, str], GuessObject] = {}
 guess_cd_dict: Dict[Tuple[str, str], float] = {}
 guess_music = on_command('猜歌', priority=0)
@@ -566,5 +605,5 @@ async def _(bot: Bot, event: Event, state: T_State):
     state["guess_object"] = guess
     state["cycle"] = 0
     guess_cd_dict[k] = time.time() + 600
-    await guess_music.send("-> Kiba 猜歌 (Preview) <-\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n\n**\n以下内容正在修复:\n1.目前Kiba不能回复你对错...(技术原因导致的长期问题)\n2.概率性不显示Cover。\n**\n\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
+    await guess_music.send("-> Kiba 猜歌 (Preview) <-\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n\n**\n注意:\n由于无法解决 on_command() 与 on_message() 冲突，目前Kiba不能回复你对错。\n**\n\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
     asyncio.create_task(guess_music_loop(bot, event, state))
