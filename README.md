@@ -3,7 +3,7 @@
 # Kiba
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
-_ 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot _
+基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot
 <!-- prettier-ignore-end -->
 
 <p align="center">
@@ -11,7 +11,10 @@ _ 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot _
     <img src="https://img.shields.io/github/license/Blitz-Raynor/Kiba" alt="license">
   </a>
 
-# 欢迎使用 Kiba
+<div align="left">
+
+## 欢迎使用
+
 欢迎您使用 Kiba 并搭建属于您自己的 Kiba bot！ 
 
 Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为Maimai DX/Maimai/雀魂玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 https://github.com/Diving-Fish/mai-bot。
