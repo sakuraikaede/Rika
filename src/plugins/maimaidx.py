@@ -395,7 +395,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     rp = h % 100
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
-    s = f"------------------------\n"
+    s = f"----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
@@ -410,7 +410,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶!\n"
     else:
         s += "            大凶!\n"
-    s += f"收歌率: {ap}%\n------------------------\n"
+    s += f"收歌率: {ap}%\n----------------------\n更多请查看今日运势或今日性癖。"
     await jrrp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))

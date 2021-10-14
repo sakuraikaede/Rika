@@ -1,4 +1,17 @@
-# Kiba 配置手册
+<div align="center">
+
+# Kiba
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable-next-line MD036 -->
+_ 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot _
+<!-- prettier-ignore-end -->
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/Blitz-Raynor/Kiba/main/LICENSE">
+    <img src="https://img.shields.io/github/license/Blitz-Raynor/Kiba" alt="license">
+  </a>
+
+# 欢迎使用 Kiba
 欢迎您使用 Kiba 并搭建属于您自己的 Kiba bot！ 
 
 Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为Maimai DX/Maimai/雀魂玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 https://github.com/Diving-Fish/mai-bot。
@@ -112,7 +125,7 @@ gocho <字段1> <字段2> | 输出一张gocho的图片
 投骰子[数量] | 投指定数量的骰子
 猜歌 | 开始一轮猜歌 (Preview)*<br>* 注意:目前猜歌是 Alpha Preview 阶段。<br> 已知问题:无法判断用户发布的答案的对错。
 烟我 | 随机禁言1-600秒。<br>*注意:需要Bot有管理员权限。
-
+b40 / b50 | 根据[查分器](https://www.diving-fish.com/maimaidx/prober/)数据，展示您的 Best 40 或模拟您的 Best 50。
 
 ## License
 
