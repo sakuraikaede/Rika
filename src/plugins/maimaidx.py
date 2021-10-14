@@ -22,6 +22,8 @@ import random
 from urllib import parse
 import asyncio
 
+from nonebot.rule import to_me
+
 driver = get_driver()
 @driver.on_startup
 def _():
@@ -337,7 +339,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         wm_value.append(h & 3)
         h >>= 2
     s = f"⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ | {nickname}"
-    s += f"\n\n--> 今日运势 | Daily Fortune <--\n\n运势概览 >>\n------------------------\n"
+    s += f"\n\n--> 今日运势 | Daily Fortune <--\n运势概览 >>\n------------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
@@ -352,15 +354,15 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶!\n"
     else:
         s += "            大凶!\n"
-    s += f"收歌率: {ap}%\n------------------------\n\n日常运势 >>\n"
+    s += f"收歌率: {ap}%\n------------------------\n日常运势 >>\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 | 今天总体上平平无常。向北走有财运，向南走运不佳....等一下，这句话好像在哪儿听过？\n'
     else:
         s += f'宜 | {bwm_list_perfect[dwm_value_1]}\n'
         s += f'忌 | {bwm_list_bad[dwm_value_2]}\n'
-    s += f'\n-------> Kiba Tips <-------\n\n{tips_list[tips_value]}\n\n'
-    s += "\n--> 舞萌运势 | Mai Fortune <--\n\n打歌运势 >>\n"
+    s += f'\n-------> Kiba Tips <-------\n{tips_list[tips_value]}\n'
+    s += "\n--> 舞萌运势 | Mai Fortune <--\n打歌运势 >>\n"
     for i in range(14):
         if wm_value[i] == 3:
             good_value[good_count] = i
@@ -380,23 +382,17 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n忌 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{wm_list[bad_value[i]]} '
-    s += "\n\n歌曲推荐 >>\n"
+    s += "\n歌曲推荐 >>\n"
     music = total_list[hash(qq * luck * ap * 100 * rp * 100) % len(total_list)]
     await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
 
-jrrp = on_command('jrrp', aliases={'今日人品'})
+jrrp = on_command('jrrp', aliases={'人品值'})
 
 @jrrp.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
     h = hash(qq)
     rp = h % 100
-    wm_value = []
-    dwm_value_1 = random.randint(0,6)
-    dwm_value_2 = random.randint(0,6)
-    for i in range(11):
-        wm_value.append(h & 3)
-        h >>= 2
     s = f"今天的人品值是 {rp}%\n可以看看jrxp或者运势吼。"
     await jrrp.finish(Message([
         {"type": "text", "data": {"text": s}}
@@ -410,7 +406,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     h = hash(qq)
     rp = h % 100
     s = "我算算哈...今天推荐你这首歌吧:\n"
-    music = total_list[(rp * 2) % len(total_list)]
+    music = total_list[(h * 4) % len(total_list)]
     await jrgq.finish(Message([
         {"type": "text", "data": {"text": s}}
     ] + song_txt(music)))

@@ -26,7 +26,7 @@ help = on_command('help')
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     help_str = '''==============================================
-|    Kiba by BlitzR    |    Build 2.22_patch_211012    |   测试群: 895692945   |
+|    Kiba by BlitzR    |    Build 2.22_patch_211013    |   测试群: 895692945   |
 ==============================================
 |                               License: MIT License & Anti 996                                  |
 |                    GitHub: https://github.com/Blitz-Raynor/Kiba                       |
@@ -56,6 +56,8 @@ XXXmaimaiXXX什么                                     随机一首歌
 
 分数线 <难度+歌曲id> <分数线>               详情请输入“分数线 帮助”查看
 
+jrrp/人品值                                                   查看今天的人品值。
+
 今日性癖/jrxp                                               看看你今天性什么东西捏？
 
 戳一戳                                                          来戳戳我？
@@ -81,8 +83,12 @@ gocho <str1> <str2>                                生成一张gocho图。
                                                                    可能有功能性的不稳定。
 
                                                                     这个功能可以随机禁言你1-600秒，前提Kiba是管理员。
-烟我                                                                * 注意：为防止误触发，
+烟我                                                              * 注意：为防止误触发，
                                                                     这个功能你需要at一下Kiba再说这个命令才能执行。
+
+                                                                   群里摇人。
+随个[男/女]群友                                         你也可以不带参数直接说“随个”然后后面加啥都可以。
+                                                                   当然 Kiba 容易骂你就是了。
 =============================================='''
     await help.send(Message([{
         "type": "image",
@@ -184,7 +190,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
     elif r <= 17 and r > 12:
-        await poke.send(Message(f'好的大家伙，下一次请各位戳刚刚戳我的那位。'))
+        await poke.send(Message(f'好的....大家请各位戳刚刚戳我的那位。'))
     elif r <= 19 and r > 17:
         t = random.randint(60,90)
         try:
@@ -247,6 +253,42 @@ async def _(bot: Bot, event: Event, state: T_State):
     group_id = event.group_id
     await send_poke_stat(group_id, bot)
 
+
+poke_setting = on_command("戳一戳设置")
+
+
+@poke_setting.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    db = get_driver().config.db
+    group_members = await bot.get_group_member_list(group_id=event.group_id)
+    for m in group_members:
+        if m['user_id'] == event.user_id:
+            break
+    su = get_driver().config.superusers
+    if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
+        await poke_setting.finish("这个...只有管理员可以设置戳一戳, 但是你不要去戳我....嗯..尽量别戳啦。")
+        return
+    argv = str(event.get_message()).strip().split(' ')
+    try:
+        if argv[0] == "默认":
+            c = await db.cursor()
+            await c.execute(f'update group_poke_table set disabled=0, strategy="default" where group_id={event.group_id}')
+        elif argv[0] == "限制":
+            c = await db.cursor()
+            await c.execute(
+                f'update group_poke_table set disabled=0, strategy="limited{int(argv[1])}" where group_id={event.group_id}')
+        elif argv[0] == "禁用":
+            c = await db.cursor()
+            await c.execute(
+                f'update group_poke_table set disabled=1 where group_id={event.group_id}')
+        else:
+            raise ValueError
+        await poke_setting.send("设置成功")
+        await db.commit()
+    except (IndexError, ValueError):
+        await poke_setting.finish("本命令的格式:\n戳一戳设置 <默认/限制 (秒)/禁用>\n\n - 默认:将启用默认的戳一戳设定，包括随机性抽中禁言 1 - 1 分 30 秒。\n - 限制 (秒):在戳完一次 Kiba 的指定时间内，调用戳一戳只会让 Kiba 反过来戳你。在指定时间外时，与默认相同。\n- 禁用:禁用戳一戳的相关功能。")
+    pass
+
 shuffle = on_command('shuffle')
 
 
@@ -307,3 +349,62 @@ async def _(bot: Bot, event: Event, state: T_State):
             await roll.send(s)
     except Exception:
         await roll.send("语法上可能有错哦。再检查一下试试吧！")
+
+random_person = on_regex("随个([男女]?)群友")
+
+@random_person.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    try:
+        gid = event.group_id
+        glst = await bot.get_group_member_list(group_id=gid, self_id=int(bot.self_id))
+        v = re.match("随个([男女]?)群友", str(event.get_message())).group(1)
+        if v == '男':
+            for member in glst[:]:
+                if member['sex'] != 'male':
+                    glst.remove(member)
+        elif v == '女':
+            for member in glst[:]:
+                if member['sex'] != 'female':
+                    glst.remove(member)
+        m = random.choice(glst)
+        await random_person.finish(Message([{
+            "type": "at",
+            "data": {
+                "qq": event.user_id
+            }
+        }, {
+            "type": "text",
+            "data": {
+                "text": f"\n{m['card'] if m['card'] != '' else m['nickname']}({m['user_id']})"
+            }
+        }]))
+    except AttributeError:
+        await random_person.finish("你不在群聊使用.....所以你随啥呢这是，这个要去群里用。")
+
+snmb = on_regex("随个.+", priority=50)
+
+@snmb.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    try:
+        gid = event.group_id
+        if random.random() < 0.5:
+            await snmb.finish(Message([
+                {"type": "text", "data": {"text": "随你"}},
+                {"type": "image", "data": {"file": "https://www.diving-fish.com/images/emoji/horse.png"}}
+            ]))
+        else:
+            glst = await bot.get_group_member_list(group_id=gid, self_id=int(bot.self_id))
+            m = random.choice(glst)
+            await random_person.finish(Message([{
+                "type": "at",
+                "data": {
+                    "qq": event.user_id
+                }
+            }, {
+                "type": "text",
+                "data": {
+                    "text": f"\n{m['card'] if m['card'] != '' else m['nickname']}({m['user_id']})"
+                }
+            }]))
+    except AttributeError:
+        await random_person.finish("你不在群聊使用.....所以你随啥呢这是，这个要去群里用。")
