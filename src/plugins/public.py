@@ -26,7 +26,7 @@ help = on_command('help')
 @help.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     help_str = '''===============================================================
-|           Kiba by BlitzR           |           Build 2.23_patch_211016           |           测试群: 895692945           |
+|           Kiba by BlitzR           |           Build 2.23_patch_211018           |           测试群: 895692945           |
 ===============================================================
 |                                                   License: MIT License & Anti 996                                                        |
 |                                         GitHub: https://github.com/Blitz-Raynor/Kiba                                            |

@@ -527,13 +527,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send("这名玩家404或者用户名输错了....检查一下用户名和查分器中的用户名是否相同呢？\n如果在此之前需要修改查分器或确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send("您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send(f'{username}禁止了其他人获取数据。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+        await best_40_pic.send(f'{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
     else:
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'{nickname} 查询的 Best 40 的内容如图所示。\n您需要修改查分器数据吗？请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(f'这是 {nickname} 查询的 Best 40。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 
@@ -550,19 +550,20 @@ async def _(bot: Bot, event: Event, state: T_State):
     payload['b50'] = True
     img, success = await generate(payload)
     if success == 400:
-        await best_50_pic.send("这名玩家404或者用户名输错了....检查一下用户名和查分器中的用户名是否相同呢？\n如果在此之前需要修改查分器或确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send("您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_50_pic.send(f'{username}禁止了其他人获取数据。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+        await best_50_pic.send(f'{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
     else:
         await best_50_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'{nickname} 查询的 Best 50 的内容如图所示。\n您需要修改查分器数据吗？请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(f'这是 {nickname} 查询的 Best 50。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
         
 guess_dict: Dict[Tuple[str, str], GuessObject] = {}
 guess_cd_dict: Dict[Tuple[str, str], float] = {}
 guess_music = on_command('猜歌', priority=0)
+
 
 
 async def guess_music_loop(bot: Bot, event: Event, state: T_State):
@@ -590,7 +591,7 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
     guess: GuessObject = state["guess_object"]
     if guess.is_end:
         return
-    asyncio.create_task(bot.send(event, Message([MessageSegment.text("现在揭晓答案！你猜对了吗？\n谱面 ID >>" + f"{guess.music['id']}\n{guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
+    asyncio.create_task(bot.send(event, Message([MessageSegment.text("都没有猜到吗......那现在揭晓答案！\n谱面 ID >>" + f"{guess.music['id']}\n{guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
     del guess_dict[state["k"]]
 
 
@@ -605,5 +606,25 @@ async def _(bot: Bot, event: Event, state: T_State):
     state["guess_object"] = guess
     state["cycle"] = 0
     guess_cd_dict[k] = time.time() + 600
-    await guess_music.send("-> Kiba 猜歌 (Preview) <-\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n\n**\n注意:\n由于无法解决 on_command() 与 on_message() 冲突，目前Kiba不能回复你对错。\n**\n\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
+    await guess_music.send("-----> Kiba 猜歌 <-----\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
     asyncio.create_task(guess_music_loop(bot, event, state))
+
+guess_music_solve = on_message(priority=20)
+
+@guess_music_solve.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    mt = event.message_type
+    k = (mt, event.user_id if mt == "private" else event.group_id)
+    if k not in guess_dict:
+        return
+    ans = str(event.get_message())
+    guess = guess_dict[k]
+    # await guess_music_solve.send(ans + "|" + guess.music['id'])
+    if ans == guess.music['id'] or (ans.lower() == guess.music['title'].lower()) or (len(ans) >= 5 and ans.lower() in guess.music['title'].lower()):
+        guess.is_end = True
+        del guess_dict[k]
+        await guess_music_solve.finish(Message([
+            MessageSegment.reply(event.message_id),
+            MessageSegment.text("您猜对了！答案就是：\n" + f"谱面 ID >> {guess.music['id']}\n{guess.music['title']}\n"),
+            MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")
+        ]))
