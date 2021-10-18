@@ -122,7 +122,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(music_data) == 0:
             rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？'
         else:
-            rand_result = f'To {nickname} | Track >\n' + song_txt(music_data.random())
+            rand_result = f'-> To {nickname} | Rand Track\n' + song_txt(music_data.random())
             if level == '15':
                 rand_result += "\n\n" + pandora_list[random.randint(0,7)]
         await spec_rand.send(rand_result)
@@ -156,7 +156,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 rand_result = f'WDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n 自己查 id834 去！！'
                 await spec_rand_multi.send(rand_result)
             else:
-                rand_result = f'To {nickname} | Multi Tracks >\n'
+                rand_result = f'-> To {nickname} | Rand Tracks\n'
                 for i in range(int(res.groups()[0])):
                     if res.groups()[1] == "dx":
                         tp = ["DX"]
