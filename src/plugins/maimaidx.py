@@ -22,8 +22,6 @@ import random
 from urllib import parse
 import asyncio
 
-from nonebot.rule import to_me
-
 driver = get_driver()
 @driver.on_startup
 def _():
@@ -31,6 +29,12 @@ def _():
 
 def song_txt(music: Music):
     return Message([
+        {
+            "type": "text",
+            "data": {
+                "text": f"Track ID > {music.id}"
+            }
+        },
         {
             "type": "image",
             "data": {
@@ -40,13 +44,19 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"谱面 ID > {music.id}\n{music.title}\n等级 >"
+                "text": f"{music.title}"
             }
         },
         {
             "type": "text",
             "data": {
-                "text": f" {' | '.join(music.level)}"
+                "text": f"\n等级 [当前版本定数] >\n{' | '.join(music.level)}\n"
+            }
+        },
+        {
+            "type": "text",
+            "data": {
+                "text": f"{''.join(str(music.ds))}"
             }
         }
     ])
@@ -112,7 +122,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(music_data) == 0:
             rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？'
         else:
-            rand_result = f'To {nickname} | Track >>\n' + song_txt(music_data.random())
+            rand_result = f'To {nickname} | Track >\n' + song_txt(music_data.random())
             if level == '15':
                 rand_result += "\n\n" + pandora_list[random.randint(0,7)]
         await spec_rand.send(rand_result)
@@ -146,7 +156,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 rand_result = f'WDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n 自己查 id834 去！！'
                 await spec_rand_multi.send(rand_result)
             else:
-                rand_result = f'To {nickname} | Multi Tracks >>\n'
+                rand_result = f'To {nickname} | Multi Tracks >\n'
                 for i in range(int(res.groups()[0])):
                     if res.groups()[1] == "dx":
                         tp = ["DX"]
@@ -162,7 +172,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                     if len(music_data) == 0:
                         rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣)'
                     else:
-                        rand_result += f'\n-----> Track {i + 1} / {res.groups()[0]} <-----\n' + song_txt(music_data.random())
+                        rand_result += f'\n----- Track {i + 1} / {res.groups()[0]} -----\n' + song_txt(music_data.random())
                 await spec_rand_multi.send(rand_result)
     except Exception as e:
         print(e)
@@ -182,9 +192,11 @@ async def _(bot: Bot, event: Event, state: T_State):
     if len(res) == 0:
         await search_music.send("没有找到这样的乐曲。")
     elif len(res) < 50:
-        search_result = ""
+        search_result = "搜索结果 >"
+        resultnum = 0
         for music in sorted(res, key = lambda i: int(i['id'])):
-            search_result += f"---> 搜索结果 <---\n{music['id']}. {music['title']}\n"
+            resultnum += 1
+            search_result += f"\nNo: {resultnum} | Track ID: {music['id']} > {music['title']}"
         await search_music.finish(Message([
             {"type": "text",
                 "data": {
@@ -205,7 +217,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     if groups[0] != "":
         try:
             level_index = level_labels.index(groups[0])
-            level_name = ['Basic', 'Advanced', 'Expert', 'Master', 'Re: MASTER']
+            level_name = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:Master']
             name = groups[1]
             music = total_list.by_id(name)
             chart = music['charts'][level_index]
@@ -213,8 +225,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             level = music['level'][level_index]
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             if len(chart['notes']) == 4:
-                msg = f'''Standard | {level_name[level_index]} > Lv {level}
-Base> {ds}
+                msg = f'''Standard | {level_name[level_index]} > Lv {level}({ds})
 ALL> {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3]}
 TAP> {chart['notes'][0]}
 HOLD> {chart['notes'][1]}
@@ -222,8 +233,7 @@ SLIDE> {chart['notes'][2]}
 BREAK> {chart['notes'][3]}
 Notes Designer> {chart['charter']}'''
             else:
-                msg = f'''DX | {level_name[level_index]} > Lv {level}
-Base> {ds}
+                msg = f'''DX | {level_name[level_index]} > Lv {level} ({ds})
 ALL> {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3] + chart['notes'][4]}
 TAP> {chart['notes'][0]}
 HOLD> {chart['notes'][1]}
@@ -235,7 +245,7 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"----> Note Details <----\n"
+                        "text": f"Track ID > {music['id']}\n"
                     }
                 },
                 {
@@ -247,7 +257,7 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"--------------------\n🆔 {music['id']} > {music['title']}\n"
+                        "text": f"{music['title']}\n"
                     }
                 },
                 {
@@ -268,9 +278,9 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"----> 详情 <----\n"
+                        "text": f"Track ID > {music['id']}\n"
                     }
-                },
+                }, 
                 {
                     "type": "image",
                     "data": {
@@ -280,13 +290,13 @@ Notes Designer> {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"\n谱面 ID > {music['id']}\n{music['title']}\n"
+                        "text": f"{music['title']}\n"
                     }
                 },  
                 {
                     "type": "text",
                     "data": {
-                        "text": f"---------------\nArtists> {music['basic_info']['artist']}\n分类> {music['basic_info']['genre']}\nBPM> {music['basic_info']['bpm']}\n版本> {music['basic_info']['from']}\n等级> {' | '.join(music['level'])}"
+                        "text": f"Artists > {music['basic_info']['artist']}\n分类 > {music['basic_info']['genre']}\nBPM > {music['basic_info']['bpm']}\n版本 > {music['basic_info']['from']}\n等级 [当前版本定数] >\n{' | '.join(music['level'])}\n{''.join(str(music['ds']))}"
                     }
                 }
             ]))
@@ -339,7 +349,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         wm_value.append(h & 3)
         h >>= 2
     s = f"⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ | {nickname}"
-    s += f"\n\n--> 今日运势 | Daily Fortune <--\n运势概览 >>\n------------------------\n"
+    s += f"\n\n-> 今日运势 | Daily Fortune\n\n运势概览 >>\n-----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
@@ -354,15 +364,14 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶!\n"
     else:
         s += "            大凶!\n"
-    s += f"收歌率: {ap}%\n------------------------\n日常运势 >>\n"
+    s += f"收歌率: {ap}%\n-----------------------\n日常运势 >>\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 | 今天总体上平平无常。向北走有财运，向南走运不佳....等一下，这句话好像在哪儿听过？\n'
     else:
         s += f'宜 | {bwm_list_perfect[dwm_value_1]}\n'
         s += f'忌 | {bwm_list_bad[dwm_value_2]}\n'
-    s += f'\n-------> Kiba Tips <-------\n{tips_list[tips_value]}\n'
-    s += "\n--> 舞萌运势 | Mai Fortune <--\n打歌运势 >>\n"
+    s += "\n-> 舞萌运势 | Maimai Fortune\n\n"
     for i in range(14):
         if wm_value[i] == 3:
             good_value[good_count] = i
@@ -382,7 +391,8 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n忌 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{wm_list[bad_value[i]]} '
-    s += "\n歌曲推荐 >>\n"
+    s += f'\n\n-> 犽·锦囊 | Kiba\'s Hints\n\nKiba\'s Tip >>\n{tips_list[tips_value]}\n\n'
+    s += "Fortunate Track >>\n"
     music = total_list[hash(qq * luck * ap * 100 * rp * 100) % len(total_list)]
     await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
 
@@ -504,11 +514,12 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''{music['title']} | {level_labels2[level_index]}\n 分数线: {line}% 最低要求→\n
-Tap Great 最低损失量 >\n {(total_score * reduce / 10000):.2f}个\n
-每Tap Great 损失的完成度 >\n {10000 / total_score:.4f}%\n
-每50落的损失的完成度 >\n {break_50_reduce / total_score * 100:.4f}% ，等价于 {(break_50_reduce / 100):.3f} 个 Tap Great\n
-Break 数量 > {brk}\n
+            await query_chart.send(f'''{music['title']} | {level_labels2[level_index]}\n 分数线: {line}% 最低要求 >\n
+Tap Great 最低损失量 /个 |\n {(total_score * reduce / 10000):.2f}\n
+每 Tap Great 损失的完成度 |\n {10000 / total_score:.4f}%\n
+每 50 落的损失的完成度 |\n {break_50_reduce / total_score * 100:.4f}%
+50 落等价 Tap Great 数量 /个 | {(break_50_reduce / 100):.3f}\n
+Break 数量 /个 | {brk}\n
 具体情况的换算您可以查看帮助来帮助您换算。''')
         except Exception:
             await query_chart.send("格式错误，输入 “分数线 帮助” 以查看帮助信息")
@@ -573,12 +584,12 @@ async def guess_music_loop(bot: Bot, event: Event, state: T_State):
         return
     cycle = state["cycle"]
     if cycle < 6:
-        asyncio.create_task(bot.send(event, f"{cycle + 1}/7 >> 这首歌" + guess.guess_options[cycle]))
+        asyncio.create_task(bot.send(event, f"猜歌提示 | 第 {cycle + 1} 个 / 共 7 个 >>\n这首歌" + guess.guess_options[cycle]))
     else:
         asyncio.create_task(bot.send(event, Message([
-            MessageSegment.text("7/7 >> 这首歌封面的一部分是："),
+            MessageSegment.text("猜歌提示 | 第 7 个 / 共 7 个 >>\n这首歌封面的一部分是："),
             MessageSegment.image("base64://" + str(guess.b64image, encoding="utf-8")),
-            MessageSegment.text("猜到答案了吗？快和群里的小伙伴猜一下吧！答案将在 30 秒后揭晓。")
+            MessageSegment.text("快和群里的小伙伴猜一下吧！\n提示: 30 秒内可以回答这首歌的ID、歌曲标题或歌曲标题的大于5个字的连续片段，超时我将揭晓答案。")
         ])))
         asyncio.create_task(give_answer(bot, event, state))
         return
@@ -591,7 +602,7 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
     guess: GuessObject = state["guess_object"]
     if guess.is_end:
         return
-    asyncio.create_task(bot.send(event, Message([MessageSegment.text("都没有猜到吗......那现在揭晓答案！\n谱面 ID >>" + f"{guess.music['id']}\n{guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
+    asyncio.create_task(bot.send(event, Message([MessageSegment.text("都没有猜到吗......那现在揭晓答案！\nTrack ID:" + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
     del guess_dict[state["k"]]
 
 
@@ -606,7 +617,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     state["guess_object"] = guess
     state["cycle"] = 0
     guess_cd_dict[k] = time.time() + 600
-    await guess_music.send("-----> Kiba 猜歌 <-----\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
+    await guess_music.send("Kiba 猜歌 >\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
     asyncio.create_task(guess_music_loop(bot, event, state))
 
 guess_music_solve = on_message(priority=20)
@@ -625,6 +636,6 @@ async def _(bot: Bot, event: Event, state: T_State):
         del guess_dict[k]
         await guess_music_solve.finish(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text("您猜对了！答案就是：\n" + f"谱面 ID >> {guess.music['id']}\n{guess.music['title']}\n"),
+            MessageSegment.text("您猜对了！答案就是：\n" + f"Track ID: {guess.music['id']} > {guess.music['title']}\n"),
             MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")
         ]))
