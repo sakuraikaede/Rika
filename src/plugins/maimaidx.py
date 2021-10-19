@@ -50,13 +50,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"\n等级 [当前版本定数] >\n{' | '.join(music.level)}\n"
-            }
-        },
-        {
-            "type": "text",
-            "data": {
-                "text": f"{''.join(str(music.ds))}"
+                "text": f"\n分类 > {music.genre}\n等级 > {' | '.join(music.level)}\n"
             }
         }
     ])
@@ -138,13 +132,13 @@ async def _(bot: Bot, event: Event, state: T_State):
     await mr.finish(song_txt(total_list.random()))
 
 
-spec_rand_multi = on_regex(r"^随([1-9]\d*)首(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?")
+spec_rand_multi = on_regex(r"^随([1-9]\d*)首(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?[至]?([0-9]+\+?)?")
 
 @spec_rand_multi.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     level_labels = ['绿', '黄', '红', '紫', '白']
-    regex = "随([1-9]\d*)首((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"   
+    regex = "随([1-9]\d*)首((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)([至]?)([0-9]+\+?)?"   
     res = re.match(regex, str(event.get_message()).lower())
     cf_list = [f'国行DX最多就四首，所以我们不能随{res.groups()[0]}首。', f'如果你真的想打{res.groups()[0]}首歌还不喘气的话，你应该去霓虹打超新超热去，这最多就4首，你要不要吧！╰(艹皿艹 )', f'这个指令不能对日本玩家服务....这里只能支持四首，{res.groups()[0]}真的太多了。']
     try:
@@ -152,7 +146,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             rand_result = cf_list[random.randint(0,2)]
             await spec_rand_multi.send(rand_result)
         else:
-            if res.groups()[3] == '15':
+            if res.groups()[3] == '15' and res.groups()[4] is None:
                 rand_result = f'WDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n 自己查 id834 去！！'
                 await spec_rand_multi.send(rand_result)
             else:
@@ -164,7 +158,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                         tp = ["SD"]
                     else:
                         tp = ["SD", "DX"]
-                    level = res.groups()[3]
+                    if res.groups()[4] is not None:
+                        level = [res.groups()[3], res.groups()[5]]
+                    else:
+                        level = res.groups()[3]
                     if res.groups()[2] == "":
                         music_data = total_list.filter(level=level, type=tp)
                     else:
