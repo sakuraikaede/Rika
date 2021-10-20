@@ -14,6 +14,7 @@ async def init_db():
         await config.db.executescript(
             "create table group_poke_table (group_id bigint primary key not null, last_trigger_time int, triggered int, disabled bit, strategy text);"
             "create table user_poke_table (user_id bigint, group_id bigint, triggered int);"
+            "create table waiting_table (group_id bigint, shop text, waiting int);"
             )
     except Exception:
         pass

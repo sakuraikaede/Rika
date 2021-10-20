@@ -70,7 +70,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         maj_value.append(h & 3)
         h >>= 2
     s = f"⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ | {nickname}"
-    s += f"\n\n-> 雀魂运势 | Majsoul Fortune\n\n一姬之签 >>\n---------------------\n"
+    s += f"\n\n> 雀魂运势 | Majsoul Fortune\n\n一姬之签 >>\n---------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"大和率: {luck}%"
     if rp >= 50 and rp < 70:
@@ -112,7 +112,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n次推荐 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{maj_list[bad_value[i]]} '
-    s += f"\n\n-> Kiba\'s Tip\n{majtips_list[tips_value]}"
+    s += f"\n\n> Kiba\'s Tip\n{majtips_list[tips_value]}"
     await jrmj.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
