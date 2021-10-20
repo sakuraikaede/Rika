@@ -92,7 +92,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     resultnum = 0
     for elem in result_set:
         resultnum += 1
-        s += f"No: {resultnum} | Track ID {elem[0]} >\n{elem[1]} {elem[3]} {elem[4]}({elem[2]})\n"
+        s += f"\nNo: {resultnum} | Track ID {elem[0]} >\n{elem[1]} {elem[3]} {elem[4]}({elem[2]})"
     await inner_level.finish(s.strip())
 
 
