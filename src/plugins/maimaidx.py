@@ -728,10 +728,16 @@ async def _(bot: Bot, event: Event, state: T_State):
             if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
                 await waiting.finish("只有管理员或小犽的管理者才可自定义店铺人数。")
                 return
-            else:
+            else:  
                 if int(argv[1]) <= 0:
                     await c.execute(f'delete from waiting_table where shop="{argv[0]}"')
                     await waiting.send(f"收到！当前{argv[0]}无人游玩。")
                 else:
-                    await c.execute(f'update waiting_table set waiting={int(argv[1])} where shop="{argv[0]}"')
-                    await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {int(argv[1])} 人。")
+                    await c.execute(f'select * from waiting_table where shop="{argv[0]}"')
+                    data = await c.fetchone()
+                    if data is None:
+                        await c.execute(f'insert into waiting_table values ({event.group_id}, "{argv[0]}", {int(argv[1])})')
+                        await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {int(argv[1])} 人。")
+                    else:
+                        await c.execute(f'update waiting_table set waiting={int(argv[1])} where shop="{argv[0]}"')
+                        await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {int(argv[1])} 人。")
