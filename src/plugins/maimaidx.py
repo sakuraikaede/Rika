@@ -316,8 +316,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
-    xp = random.randint(0,22)
-    s += f"{nickname}今天的XP是{xp_list[xp]}，人品值是{rp}%.\n不满意XP的话再随一个吧！"
+    xp = random.randint(0,23)
+    s = f"{nickname}今天的XP是{xp_list[xp]}，人品值是{rp}%.\n不满意XP的话再随一个吧！"
     await jrxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
