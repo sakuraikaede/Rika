@@ -305,7 +305,7 @@ Notes Designer> {chart['charter']}'''
         except Exception:
             await query_chart.send("啊这...我没有找到这个歌。\n换一个试试吧。")
 
-xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫']
+xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动']
 
 jrxp = on_command('jrxp', aliases={'今日性癖'})
 
@@ -313,11 +313,11 @@ jrxp = on_command('jrxp', aliases={'今日性癖'})
 @jrxp.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
+    nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
     xp = random.randint(0,22)
-    s = f"今天你的人品大约是 {rp}% !\n"
-    s += f"容我算一下.....\n你今天的XP是{xp_list[xp]}! \n不满意的话再随一个也是没有问题的。"
+    s += f"{nickname}今天的XP是{xp_list[xp]}，人品值是{rp}%.\n不满意XP的话再随一个吧！"
     await jrxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
