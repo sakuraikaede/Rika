@@ -187,6 +187,57 @@ class DrawBest(object):
             pic = 'MST_Re'
         return f'UI_PFC_MS_Info02_{pic}.png' 
 
+    def rank (self)-> str:
+        ranker = '初学者'
+        if self.rankRating == 250:
+            ranker = '实习生'
+        elif self.rankRating == 500:
+            ranker = '初出茅庐'
+        elif self.rankRating == 750:
+            ranker = '修行中'
+        elif self.rankRating == 1000:
+            ranker = '初段'
+        elif self.rankRating == 1200:
+            ranker = '二段'
+        elif self.rankRating == 1400:
+            ranker = '三段'
+        elif self.rankRating == 1500:
+            ranker = '四段'
+        elif self.rankRating == 1600:
+            ranker = '五段'
+        elif self.rankRating == 1700:
+            ranker = '六段'
+        elif self.rankRating == 1800:
+            ranker = '七段'
+        elif self.rankRating == 1850:
+            ranker = '八段'
+        elif self.rankRating == 1900:
+            ranker = '九段'
+        elif self.rankRating == 1950:
+            ranker = '十段'
+        elif self.rankRating == 2000:
+            ranker = '真传'
+        elif self.rankRating == 2010:
+            ranker = '真传壹段'
+        elif self.rankRating == 2020:
+            ranker = '真传贰段'
+        elif self.rankRating == 2030:
+            ranker = '真传叁段'
+        elif self.rankRating == 2040:
+            ranker = '真传肆段'
+        elif self.rankRating == 2050:
+            ranker = '真传伍段'
+        elif self.rankRating == 2060:
+            ranker = '真传陆段'
+        elif self.rankRating == 2070:
+            ranker = '真传柒段'
+        elif self.rankRating == 2080:
+            ranker = '真传捌段'
+        elif self.rankRating == 2090:
+            ranker = '真传玖段'
+        elif self.rankRating == 2100:
+            ranker = '真传拾段'
+        return ranker
 
     def _findRaPic(self) -> str:
         num = '10'
@@ -248,16 +299,22 @@ class DrawBest(object):
             tempDraw = ImageDraw.Draw(temp)
             
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
-            diffImg = self._resizePic(diffImg, 0.75 if not self.b50 else 0.5)
-            temp.paste(diffImg, (85 if not self.b50 else 75, 8), diffImg.split()[3])
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 13 if not self.b50 else 12, encoding='utf-8')
-            tempDraw.text((8, 8), f'Best #{num + 1}/{len(sdBest)}', 'white', font)
+            diffImg = self._resizePic(diffImg, 0.75 if not self.b50 else 0.55)
+            temp.paste(diffImg, (85 if not self.b50 else 73, 8), diffImg.split()[3])
+            if chartInfo.tp == 'SD':
+                sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
+                sdImg = self._resizePic(sdImg, 0.6 if not self.b50 else 0.5)
+                temp.paste(sdImg, (8, 8), sdImg.split()[3])
+            elif chartInfo.tp == 'DX':
+                dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
+                dxImg = self._resizePic(dxImg, 0.6 if not self.b50 else 0.5)
+                temp.paste(dxImg, (8, 8), dxImg.split()[3])
             font = ImageFont.truetype(titleFontName, 16 if not self.b50 else 14, encoding='utf-8')
             title = chartInfo.title
             if self._coloumWidth(title) > 15 if not self.b50 else 13:
                 title = self._changeColumnWidth(title, 14 if not self.b50 else 12) + '...'
             tempDraw.text((8, 28), title, 'white', font)
-            font = ImageFont.truetype(titleFontName, 14 if not self.b50 else 12, encoding='utf-8')
+            font = ImageFont.truetype('src/static/msyh.ttc', 14 if not self.b50 else 12, encoding='utf-8')
             tempDraw.text((7, 50), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.3)
@@ -266,8 +323,8 @@ class DrawBest(object):
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (119 if not self.b50 else 103, 49), comboImg.split()[3])
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
-            tempDraw.text((8, 70), f'定数: {chartInfo.ds} 底分: {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+            tempDraw.text((8, 70), f'#{num + 1}/{len(sdBest)} | {chartInfo.ds} -> {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
@@ -298,17 +355,22 @@ class DrawBest(object):
 
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
-            diffImg = self._resizePic(diffImg, 0.75 if not self.b50 else 0.5)
-            temp.paste(diffImg, (85 if not self.b50 else 75, 8), diffImg.split()[3])
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 13 if not self.b50 else 12, encoding='utf-8')
-            tempDraw.text((8, 8), f'Best #{num + 1}/{len(dxBest)}', 'white', font)
+            diffImg = self._resizePic(diffImg, 0.75 if not self.b50 else 0.55)
+            temp.paste(diffImg, (85 if not self.b50 else 73, 8), diffImg.split()[3])
+            if chartInfo.tp == 'SD':
+                sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
+                sdImg = self._resizePic(sdImg, 0.6 if not self.b50 else 0.5)
+                temp.paste(sdImg, (8, 8), sdImg.split()[3])
+            elif chartInfo.tp == 'DX':
+                dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
+                dxImg = self._resizePic(dxImg, 0.6 if not self.b50 else 0.5)
+                temp.paste(dxImg, (8, 8), dxImg.split()[3])
             font = ImageFont.truetype(titleFontName, 16 if not self.b50 else 14, encoding='utf-8')
             title = chartInfo.title
             if self._coloumWidth(title) > 15 if not self.b50 else 13:
                 title = self._changeColumnWidth(title, 14 if not self.b50 else 12) + '...'
             tempDraw.text((8, 28), title, 'white', font)
-            font = ImageFont.truetype(titleFontName, 14 if not self.b50 else 12, encoding='utf-8')
-
+            font = ImageFont.truetype('src/static/msyh.ttc', 14 if not self.b50 else 12, encoding='utf-8')
             tempDraw.text((7, 50), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.3)
@@ -317,8 +379,8 @@ class DrawBest(object):
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
                 temp.paste(comboImg, (119 if not self.b50 else 103, 49), comboImg.split()[3])
-            font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
-            tempDraw.text((8, 70), f'定数: {chartInfo.ds} 底分: {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+            tempDraw.text((8, 70), f'#{num + 1}/{len(dxBest)} | {chartInfo.ds} -> {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
@@ -379,7 +441,7 @@ class DrawBest(object):
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype('src/static/msyh.ttc', 14, encoding='utf-8')
-        playCountInfo = f'Rating: {self.musicRating}   |   段位: {self.rankRating}' if not self.b50 else 'Splash Plus 底分模拟模式'
+        playCountInfo = f'{self.rank()} | 段位: {self.rankRating} | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Splash Plus 底分模拟模式'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)

@@ -46,7 +46,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"{music.title}"
+                "text": f"{music.type} | {music.title}"
             }
         },
         {
@@ -305,7 +305,7 @@ Notes Designer> {chart['charter']}'''
         except Exception:
             await query_chart.send("啊这...我没有找到这个歌。\n换一个试试吧。")
 
-xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动']
+xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动', '鼓动(红)']
 
 jrxp = on_command('jrxp', aliases={'今日性癖'})
 
@@ -316,7 +316,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
-    xp = random.randint(0,23)
+    xp = random.randint(0,24)
     s = f"{nickname}今天的XP是{xp_list[xp]}，人品值是{rp}%.\n不满意XP的话再随一个吧！"
     await jrxp.finish(Message([
         {"type": "text", "data": {"text": s}}
@@ -459,7 +459,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     regex = "(.+)是什么歌"
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
     if name not in music_aliases:
-        await find_song.finish("可能这个别称太新了.....我找不到这首歌啦。")
+        await find_song.finish("可能这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
         return
     result_set = music_aliases[name]
     if len(result_set) == 1:
