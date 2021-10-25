@@ -32,12 +32,6 @@ def _():
 def song_txt(music: Music):
     return Message([
         {
-            "type": "text",
-            "data": {
-                "text": f"Track ID > {music.id}"
-            }
-        },
-        {
             "type": "image",
             "data": {
                 "file": f"https://www.diving-fish.com/covers/{music.id}.jpg"
@@ -46,7 +40,13 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"{music.type} | {music.title}"
+                "text": f"Track ID: {music.id} | Type: {music.type} >\n"
+            }
+        },
+        {
+            "type": "text",
+            "data": {
+                "text": f"{music.title}"
             }
         },
         {
@@ -227,7 +227,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             level = music['level'][level_index]
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             if len(chart['notes']) == 4:
-                msg = f'''Standard | {level_name[level_index]} > Lv {level}({ds})
+                msg = f'''Standard >\n{level_name[level_index]} > Lv {level} Base -> {ds}
 ALL> {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3]}
 TAP> {chart['notes'][0]}
 HOLD> {chart['notes'][1]}
@@ -235,7 +235,7 @@ SLIDE> {chart['notes'][2]}
 BREAK> {chart['notes'][3]}
 Notes Designer> {chart['charter']}'''
             else:
-                msg = f'''DX | {level_name[level_index]} > Lv {level} ({ds})
+                msg = f'''DX >\n{level_name[level_index]} > Lv {level} Base -> {ds}
 ALL> {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3] + chart['notes'][4]}
 TAP> {chart['notes'][0]}
 HOLD> {chart['notes'][1]}
@@ -244,12 +244,6 @@ TOUCH> {chart['notes'][3]}
 BREAK> {chart['notes'][4]}
 Notes Designer> {chart['charter']}'''
             await query_chart.send(Message([
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"Track ID > {music['id']}\n"
-                    }
-                },
                 {
                     "type": "image",
                     "data": {
@@ -260,6 +254,12 @@ Notes Designer> {chart['charter']}'''
                     "type": "text",
                     "data": {
                         "text": f"{music['title']}\n"
+                    }
+                },
+                {
+                    "type": "text",
+                    "data": {
+                        "text": f"Track ID: {music['id']} | Type: "
                     }
                 },
                 {
@@ -278,17 +278,17 @@ Notes Designer> {chart['charter']}'''
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             await query_chart.send(Message([
                 {
-                    "type": "text",
-                    "data": {
-                        "text": f"Track ID > {music['id']}\n"
-                    }
-                }, 
-                {
                     "type": "image",
                     "data": {
                         "file": f"{file}"
                     }
                 },
+                {
+                    "type": "text",
+                    "data": {
+                        "text": f"Track ID: {music['id']} | Type: {music['type']} >\n"
+                    }
+                }, 
                 {
                     "type": "text",
                     "data": {
@@ -317,7 +317,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     h = hash(qq)
     rp = h % 100
     xp = random.randint(0,24)
-    s = f"{nickname}今天的XP是{xp_list[xp]}，人品值是{rp}%.\n不满意XP的话再随一个吧！"
+    s = f"> 今日性癖\n{nickname}今天的性癖是{xp_list[xp]}，人品值是{rp}%.\n不满意的话再随一个吧！"
     await jrxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
@@ -350,30 +350,30 @@ async def _(bot: Bot, event: Event, state: T_State):
     for i in range(14):
         wm_value.append(h & 3)
         h >>= 2
-    s = f"⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ | {nickname}"
-    s += f"\n\n> 今日运势 | Daily Fortune\n\n运势概览 >>\n-----------------------\n"
-    s += f"人品值: {rp}%\n"
-    s += f"幸运度: {luck}%"
+    s = f"> 👨 {nickname} | 舞萌运势\n⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n"
+    s += f"\n-> 运势概览 | Overview\n"
     if rp >= 50 and rp < 70:
-        s += "            小吉!\n"
+        s += "末吉"
     elif rp >= 70 and rp < 90:
-        s += "             吉!\n"
+        s += "吉"
     elif rp >= 90:
-        s += "            大吉!\n"
+        s += "大吉"
     elif rp >= 30 and rp < 50:
-        s += "            小凶!\n"
+        s += "小凶"
     elif rp >= 10 and rp < 30:
-        s += "             凶!\n"
+        s += "凶"
     else:
-        s += "            大凶!\n"
-    s += f"收歌率: {ap}%\n-----------------------\n日常运势 >>\n"
+        s += "大凶"
+    s += f" | 人品值: {rp}%"
+    s += f" | 幸运度: {luck}%\n"
+    s += f"\n-> 日常运势 | Daily\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 | 今天总体上平平无常。向北走有财运，向南走运不佳....等一下，这句话好像在哪儿听过？\n'
     else:
         s += f'宜 | {bwm_list_perfect[dwm_value_1]}\n'
         s += f'忌 | {bwm_list_bad[dwm_value_2]}\n'
-    s += "\n> 舞萌运势 | Maimai Fortune\n\n"
+    s += f"\n-> 舞萌运势 | Maimai\n今日收歌指数 -> {ap}%\n"
     for i in range(14):
         if wm_value[i] == 3:
             good_value[good_count] = i
@@ -393,8 +393,8 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n忌 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{wm_list[bad_value[i]]} '
-    s += f'\n\n> 犽·锦囊 | Kiba\'s Hints\n\nKiba\'s Tip >>\n{tips_list[tips_value]}\n\n'
-    s += "Fortunate Track >>\n"
+    s += f'\n\n-> 犽之锦囊 | Kiba\'s Hints\n游玩提示:\n{tips_list[tips_value]}\n\n'
+    s += "运势歌曲:\n"
     music = total_list[hash(qq * luck * ap * 100 * rp * 100) % len(total_list)]
     await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
 
@@ -403,11 +403,12 @@ jrrp = on_command('jrrp', aliases={'人品值'})
 @jrrp.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
+    nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
-    s = f"----------------------\n"
+    s = f"> For {nickname} | 人品签\n----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70:
@@ -427,14 +428,15 @@ async def _(bot: Bot, event: Event, state: T_State):
         {"type": "text", "data": {"text": s}}
     ]))
 
-jrgq = on_command('今日推荐')
+jrgq = on_command('今天打什么歌')
 
 @jrgq.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     qq = int(event.get_user_id())
+    nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
-    s = "今天推荐你这首歌吧:\n"
+    s = f"> To {nickname} | 推荐\n来打这个吧：\n"
     music = total_list[(h * 4) % len(total_list)]
     await jrgq.finish(Message([
         {"type": "text", "data": {"text": s}}
@@ -458,16 +460,17 @@ find_song = on_regex(r".+是什么歌")
 async def _(bot: Bot, event: Event, state: T_State):
     regex = "(.+)是什么歌"
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
+    nickname = event.sender.nickname
     if name not in music_aliases:
-        await find_song.finish("可能这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
+        await find_song.finish(f"> To {nickname} | 别名查歌: 错误\n这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
         return
     result_set = music_aliases[name]
     if len(result_set) == 1:
         music = total_list.by_title(result_set[0])
-        await find_song.finish(Message([{"type": "text", "data": {"text": "我猜您说的是：\n"}}] + song_txt(music)))
+        await find_song.finish(Message([{"type": "text", "data": {"text": f"> To {nickname} | 别名查歌\n您说的应该是：\n"}}] + song_txt(music)))
     else:
         s = '\n'.join(result_set)
-        await find_song.finish(f"您要找的可能是以下歌曲中的其中一首：\n{ s }")
+        await find_song.finish(f"> To {nickname} | 别名查歌: 多个结果\n您要找的可能是以下歌曲中的其中一首：\n{ s }")
 
 
 query_score = on_command('分数线')
@@ -478,7 +481,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     r = "([绿黄红紫白])(id)?([0-9]+)"
     argv = str(event.get_message()).strip().split(" ")
     if len(argv) == 1 and argv[0] == '帮助':
-        s = '''这个功能为你提供达到某首歌分数线的最低标准而设计的~~~
+        s = '''> 分数线 帮助
+这个功能为你提供达到某首歌分数线的最低标准而设计的~~~
 命令格式：分数线 <难度+歌曲id> <分数线>
 例如：分数线 紫799 100
 命令将返回分数线允许的 TAP GREAT 容错以及 BREAK 50落等价的 TAP GREAT 数。
@@ -516,7 +520,7 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''{music['title']} | {level_labels2[level_index]}\n 分数线: {line}% 最低要求 >\n
+            await query_chart.send(f'''> 分数线\n{music['title']} | {level_labels2[level_index]}\n 分数线: {line}% 最低要求 >\n
 Tap Great 最低损失量 /个 |\n {(total_score * reduce / 10000):.2f}\n
 每 Tap Great 损失的完成度 |\n {10000 / total_score:.4f}%\n
 每 50 落的损失的完成度 |\n {break_50_reduce / total_score * 100:.4f}%
@@ -540,13 +544,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send("您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f"> To {nickname} | Best 40: 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send(f'{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+        await best_40_pic.send(f'> To {nickname} | Best 40: 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
     else:
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'这是 {nickname} 查询的 Best 40。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(f'> To {nickname} | Best 40\n找到了您查询的 ID，Best 40 如图所示。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 
@@ -563,13 +567,13 @@ async def _(bot: Bot, event: Event, state: T_State):
     payload['b50'] = True
     img, success = await generate(payload)
     if success == 400:
-        await best_50_pic.send("您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send(f"> To {nickname} | Best 50 Simulator: 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_50_pic.send(f'{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+        await best_50_pic.send(f'> To {nickname} | Best 50 Simulator: 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
     else:
         await best_50_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'这是 {nickname} 查询的 Best 50。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(f'> To {nickname} | Best 50 Simulator\n找到了您查询的 ID，Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
         
@@ -619,7 +623,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     state["guess_object"] = guess
     state["cycle"] = 0
     guess_cd_dict[k] = time.time() + 600
-    await guess_music.send("Kiba 猜歌 >\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
+    await guess_music.send("> 猜歌\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
     asyncio.create_task(guess_music_loop(bot, event, state))
 
 guess_music_solve = on_message(priority=20)
@@ -741,3 +745,82 @@ async def _(bot: Bot, event: Event, state: T_State):
                     else:
                         await c.execute(f'update waiting_table set waiting={int(argv[1])} where shop="{argv[0]}"')
                         await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {int(argv[1])} 人。")
+
+rand_ranking = on_command("段位模式")
+
+@rand_ranking.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
+    argv = str(event.get_message()).strip().split(" ")
+    try:
+        if argv[0] == "帮助":
+            rand_result = "> 段位模式帮助\n命令是:\n段位模式 <Expert/Master> <初级/中级/上级/超上级*>\n* 注意:超上级选项只对Master有效。"
+        else:
+            rand_result = f'> To {nickname} | Rand-Rank Tracks\nRank: {argv[0]} {argv[1]}\n'
+            if argv[0] == "Expert" or argv[0] == "expert" or argv[0] == "EXPERT":
+                if argv[1] == "初级":
+                    level = ['7', '9']
+                    life = 700
+                    gr = -2
+                    gd = -2
+                    miss = -5
+                    clear = 50
+                elif argv[1] == "中级":
+                    level = ['8', '10']
+                    life = 600
+                    gr = -2
+                    gd = -2
+                    miss = -5
+                    clear = 50
+                elif argv[1] == "上级":
+                    level = ['10+', '12+']
+                    life = 500
+                    gr = -2
+                    gd = -2
+                    miss = -5
+                    clear = 50
+                else:
+                    rand_ranking.send(f"> To {nickname} | Rand-Rank Tracks 错误\n寄，Expert 等级只有初级、中级、上级！")
+                    return
+            elif argv[0] == "Master" or argv[0] == "master" or argv[0] == "MASTER":
+                if argv[1] == "初级":
+                    level = ["10", "12"]
+                    life = 700
+                    gr = -2
+                    gd = -2
+                    miss = -5
+                    clear = 50
+                elif argv[1] == "中级":
+                    level = ["12", "13"]
+                    life = 500
+                    gr = -2
+                    gd = -2
+                    miss = -5
+                    clear = 50
+                elif argv[1] == "上级":
+                    level = ['13', '14']
+                    life = 300
+                    gr = -2
+                    gd = -2
+                    miss = -5
+                    clear = 20
+                elif argv[1] == "超上级":
+                    level = ['14', '14+']
+                    life = 100
+                    gr = -2
+                    gd = -3
+                    miss = -5
+                    clear = 10
+                else:
+                    rand_ranking.send(f"> To {nickname} | Rand-Rank Tracks 错误\n寄，Master 等级只有初级、中级、上级、超上级！")
+                    return
+            else:
+                rand_ranking.send(f"> To {nickname} | Rand-Rank Tracks 错误\n寄，大等级只有Master、Expert！")
+                return
+            rand_result += f"\n本段位血量规则如下:\nLife: {life} -> Clear: +{clear}\nGreat: {gr} Good: {gd} Miss: {miss}\n\n"
+            for i in range(4):
+                music_data = total_list.filter(level=level, type=["SD", "DX"])
+                rand_result += f'\n----- Track {i + 1} / 4 -----\n' + song_txt(music_data.random())
+        await rand_ranking.send(rand_result)
+    except Exception as e:
+        await rand_ranking.finish("语法有错。如果您需要帮助请对我说‘段位模式 帮助’。")

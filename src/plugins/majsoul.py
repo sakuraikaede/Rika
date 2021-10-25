@@ -36,12 +36,9 @@ mjxp = on_command('mjxp', aliases={'麻将性癖'})
 
 @mjxp.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    qq = int(event.get_user_id())
-    h = hash(qq)
-    rp = h % 100
+    nickname = event.sender.nickname
     xp = random.randint(0,35)
-    s = f"今天你人品大约是 {rp}% !\n"
-    s += f"你今天打麻将的癖好是做{maj_list[xp]}! 不满意的话再随一个吧。"
+    s = f"> To {nickname} | 麻将癖好\n你今天打麻将的癖好是做{maj_list[xp]}! 不满意的话再随一个吧。"
     await mjxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
@@ -69,8 +66,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     for i in range(36):
         maj_value.append(h & 3)
         h >>= 2
-    s = f"⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n👨‍ | {nickname}"
-    s += f"\n\n> 雀魂运势 | Majsoul Fortune\n\n一姬之签 >>\n---------------------\n"
+    s = f"> 👨‍ {nickname} | 雀魂运势\n⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n"
+    s += f"\n-> 一姬之签 | Drawing\n---------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"大和率: {luck}%"
     if rp >= 50 and rp < 70:
@@ -85,14 +82,14 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += "             凶\n"
     else:
         s += "            大凶\n"
-    s += f"役满率: {ap}%\n---------------------\n\n打牌运势 >>\n"
+    s += f"役满率: {ap}%\n---------------------\n\n-> 打牌运势 | Fortune\n"
 
     if dwm_value_1 == dwm_value_2:
         s += f'平 | 今天总体上平平无常。那就正常打麻将吧？\n'
     else:
         s += f'宜 | {maj_list_perfect[dwm_value_1]}\n'
         s += f'忌 | {maj_list_bad[dwm_value_2]}\n'
-    s += "\n牌型推荐 >>\n"
+    s += "\n-> 牌型推荐 | Keywords\n"
     for i in range(36):
         if maj_value[i] == 3:
             good_value[good_count] = i
@@ -112,7 +109,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n次推荐 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{maj_list[bad_value[i]]} '
-    s += f"\n\n> Kiba\'s Tip\n{majtips_list[tips_value]}"
+    s += f"\n\n-> 犽之锦囊 | Kiba \'s Hints\n{majtips_list[tips_value]}"
     await jrmj.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
