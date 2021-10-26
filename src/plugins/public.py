@@ -27,7 +27,7 @@ help = on_command('help')
 async def _(bot: Bot, event: Event, state: T_State):
     help_str = '''> 关于 | About
 ------------------------------------------------------------------------------------------------------------------------------
-                 犽 (Kiba) By BlitzR                     |           Build 2.3 Patch: Leangle           |             测试群: 895692945                   
+                 犽 (Kiba) By BlitzR                     |     Build 2.31 Patch: Leangle Plus +     |             测试群: 895692945                   
 ------------------------------------------------------------------------------------------------------------------------------
                                                                        License: MIT License & Anti 996                                                        
                                                             GitHub: https://github.com/Blitz-Raynor/Kiba                                            
@@ -96,7 +96,8 @@ b40 / b50                                                                       
 人数 <店铺名/帮助> <加一/减一/+1/-1/清空/任意数字>    详情请输入“人数 帮助”查看
 
 段位模式 <Expert/Master> <初级/中级/上级/超上级>        模拟Splash Plus的随机段位模式。
-                                                                                                详情请输入“段位模式 帮助”查看
+                                                                                        详情请输入“段位模式 帮助”查看
+帮选                                                                                       帮你选 
 ------------------------------------------------------------------------------------------------------------------------------'''
     await help.send(Message([{
         "type": "image",
@@ -388,7 +389,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     except AttributeError:
         await random_person.finish("你不在群聊使用.....所以你随啥呢这是，这个要去群里用。")
 
-snmb = on_regex("随个.+", priority=50)
+snmb = on_regex(r"随个.*", priority=50)
 
 @snmb.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -415,3 +416,20 @@ async def _(bot: Bot, event: Event, state: T_State):
             }]))
     except AttributeError:
         await random_person.finish("你不在群聊使用.....所以你随啥呢这是，这个要去群里用。")
+
+
+select = on_command("帮选", aliases={"帮我选"})
+@select.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
+    argv = str(event.get_message()).strip().split(" ")
+    if len(argv) == 1:
+        await select.finish("选你🐎。")
+        return
+    elif len(argv) is not None:
+        result = random.randint(0, len(argv) - 1)
+        await select.finish(f"我选 {argv[result]}。")
+        return
+    else:
+        await select.finish("选你🐎。")
+        return

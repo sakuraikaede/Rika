@@ -531,7 +531,7 @@ Break 数量 /个 | {brk}\n
             await query_chart.send("格式错误，输入 “分数线 帮助” 以查看帮助信息")
 
 
-best_40_pic = on_command('b40')
+best_40_pic = on_command('b40', aliases={'B40'})
 
 
 @best_40_pic.handle()
@@ -544,17 +544,21 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
     img, success = await generate(payload)
     if success == 400:
-        await best_40_pic.send(f"> To {nickname} | Best 40: 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f"> To {nickname} | Best 40: 错误\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send(f'> To {nickname} | Best 40: 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+        await best_40_pic.send(f'> To {nickname} | Best 40: 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
+        if username == "":
+            text = f'> To {nickname} | Best 40\n您的 Best 40 如图所示。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
+        else:
+            text = f'> To {nickname} | Best 40\n您查询的 ID: {username} 已找到。此 ID 的 Best 40 如图所示。\n'
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'> To {nickname} | Best 40\n找到了您查询的 ID，Best 40 如图所示。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(text),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
 
-best_50_pic = on_command('b50')
+best_50_pic = on_command('b50', aliases={'B50'})
 
 @best_50_pic.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -567,13 +571,17 @@ async def _(bot: Bot, event: Event, state: T_State):
     payload['b50'] = True
     img, success = await generate(payload)
     if success == 400:
-        await best_50_pic.send(f"> To {nickname} | Best 50 Simulator: 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅: https://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send(f"> To {nickname} | Best 50 Simulator: 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_50_pic.send(f'> To {nickname} | Best 50 Simulator: 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅: https://www.diving-fish.com/maimaidx/prober/')
+        await best_50_pic.send(f'> To {nickname} | Best 50 Simulator: 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
+        if username == "":
+            text = f'> To {nickname} | Best 50 Simulator\n您的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
+        else:
+            text = f'> To {nickname} | Best 50 Simulator\n您查询的 ID: {username} 已找到。此 ID 的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。'
         await best_50_pic.send(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text(f'> To {nickname} | Best 50 Simulator\n找到了您查询的 ID，Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您的帐户需要修改查分器数据，请参阅: https://www.diving-fish.com/maimaidx/prober/'),
+            MessageSegment.text(text),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
         
@@ -652,32 +660,40 @@ async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
     db = get_driver().config.db
     c = await db.cursor()
+    err = 0
     if len(argv) == 1 and argv[0] == "":
         await c.execute(f"select * from waiting_table")
         data = await c.fetchone()
         if data is None:
             await waiting.send("当前没有任何店铺被添加，无法获取当前人数。")
         else:
-            s = f"> 当前所有店铺情况\n{data[1]} 人数:{data[2]}"
+            s = f"> 所有店铺出勤情况"
             while True:
+                s += f"\n{data[1]} 出勤人数:{data[2]}"
                 data = await c.fetchone()
                 if data is None:
                     break
-                else:
-                    s += f"\n{data[1]} 人数:{data[2]}"
             await waiting.send(s)
             return
     elif len(argv) == 1 and argv[0] == "帮助":
-        help_str = "人数 [店铺名/帮助] [加一/+1/减一/-1/清空/任意数字]\n- 帮助:显示此帮助文本\n- 加一/+1:需要在前面加店铺名。操作后此店铺的游玩人数记录+1。\n- 减一/-1:需要在前面加店铺名。操作后此店铺的游玩人数记录-1。\n- 清空:需要管理员才能进行的操作，需要在前面家店铺名。操作后此店铺游玩人数纪录将重置。\n- 任意数字:需要管理员才能进行的操作，需要在前面加店铺名。操作后此店铺游玩人数为自定义的人数。\n注意！所有店铺在 Kiba 加入的所有群之间是共享状态的，请不要轻易执行后两者操作。"
+        help_str = "人数 [店铺名/帮助] [加一/+1/减一/-1/清空/任意数字]\n- 帮助:显示此帮助文本\n- 加一/+1:需要在前面加店铺名。操作后此店铺的游玩人数记录+1。\n- 减一/-1:需要在前面加店铺名。操作后此店铺的游玩人数记录-1。\n- 清空:需要在前面家店铺名。操作后此店铺游玩人数纪录将重置。\n- 任意数字:需要在前面加店铺名。操作后此店铺游玩人数为自定义的人数。\n注意！所有店铺在 Kiba 加入的所有群之间是共享状态的，请不要轻易执行后两者操作。"
         await waiting.send(help_str)
         return
+    elif len(argv) == 1 and argv[0] == "初始化":
+        if str(event.get_user_id()) == Config.superuser:
+            await c.execute(f'delete from waiting_table')
+            await waiting.finish("店铺出勤人数的全部信息已重置。")
+            return
+        else:
+            await waiting.finish("只有犽(Kiba)的运营者才可以执行此命令。")
+            return
     elif len(argv) == 1:
         await c.execute(f'select * from waiting_table where shop="{argv[0]}"')
         data = await c.fetchone()
         if data is None:
-            await waiting.send("当前店铺没有被添加，无法获取当前人数。")
+            await waiting.send("当前店铺没有被添加，无法获取当前人数。如果是在店铺后面直接加了人数的话，您需要在它俩之间加个空格。")
         else:
-            s = f"此店铺当前游玩人数：{data[2]} 人。"
+            s = f"此店铺有 {data[2]} 人出勤。"
             await waiting.send(s)
             return
     elif len(argv) == 2:
@@ -687,12 +703,13 @@ async def _(bot: Bot, event: Event, state: T_State):
             if data is None:
                 try:
                     await c.execute(f'insert into waiting_table values ({event.group_id}, "{argv[0]}", 1)')
-                    await waiting.send(f"收到！当前{argv[0]}的游玩人数是 1 人。")
+                    await waiting.send(f"收到！当前 {argv[0]} 有 1 人出勤。")
                 except Exception:
-                    await waiting.send("现在没有店铺信息，需要您先在群内再发布一次才能添加店铺信息。")
+                    err = 1
+                    await waiting.finish("现在没有店铺信息，需要您先在群内再发布一次才能添加店铺信息。")
             else:
                 await c.execute(f'update waiting_table set waiting={data[2] + 1} where shop="{argv[0]}"')
-                await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {data[2] + 1} 人。")
+                await waiting.send(f"收到！当前 {argv[0]} 有 {data[2] + 1} 人出勤。")
         elif argv[1] == "减一" or argv[1] == "-1":
             await c.execute(f'select * from waiting_table where shop="{argv[0]}"')
             data = await c.fetchone()
@@ -701,50 +718,36 @@ async def _(bot: Bot, event: Event, state: T_State):
             else:
                 if data[2] - 1 <= 0:
                     await c.execute(f'delete from waiting_table where shop="{argv[0]}"')
-                    await waiting.send(f"收到！当前{argv[0]}无人游玩。")
+                    await waiting.send(f"收到！当前 {argv[0]} 无人出勤。")
                 else:
                     await c.execute(f'update waiting_table set waiting={data[2] - 1} where shop="{argv[0]}"')
-                    await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {data[2] - 1} 人。")
+                    await waiting.send(f"收到！当前 {argv[0]} 有 {data[2] - 1} 人出勤。")
         elif argv[1] == "清空":
-            try:
-                group_members = await bot.get_group_member_list(group_id=event.group_id)
-            except Exception:
-                await waiting.send("重置记录的店铺玩家人数的危险操作不能在私聊内处理，您需要在群内操作。")
-                return
-            for m in group_members:
-                if m['user_id'] == event.user_id:
-                    break
-            if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in Config.superuser:
-                await waiting.finish("只有管理员或小犽的管理者才可清空记录的店铺人数。")
-                return
-            else:
-                await c.execute(f'delete from waiting_table where shop="{argv[0]}"')
-                await waiting.send(f"收到！{argv[0]}的玩家数量已重置。\n警告:店铺的玩家数量在所有群之间是通用的。")
+            await c.execute(f'delete from waiting_table where shop="{argv[0]}"')
+            await waiting.send(f"收到！{argv[0]}的出勤人数已重置完成。\n警告:店铺的玩家数量在所有群之间是通用的。")
         else:
             try:
-                group_members = await bot.get_group_member_list(group_id=event.group_id)
-            except Exception:
-                await waiting.send("自定义店铺的玩家人数的危险操作不能在私聊内处理，您需要在群内操作。")
-                return
-            for m in group_members:
-                if m['user_id'] == event.user_id:
-                    break
-            if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
-                await waiting.finish("只有管理员或小犽的管理者才可自定义店铺人数。")
-                return
-            else:  
                 if int(argv[1]) <= 0:
                     await c.execute(f'delete from waiting_table where shop="{argv[0]}"')
-                    await waiting.send(f"收到！当前{argv[0]}无人游玩。")
+                    await waiting.send(f"收到！当前 {argv[0]} 无人出勤。")
                 else:
                     await c.execute(f'select * from waiting_table where shop="{argv[0]}"')
                     data = await c.fetchone()
                     if data is None:
-                        await c.execute(f'insert into waiting_table values ({event.group_id}, "{argv[0]}", {int(argv[1])})')
-                        await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {int(argv[1])} 人。")
+                        try:
+                            await c.execute(f'insert into waiting_table values ({event.group_id}, "{argv[0]}", {int(argv[1])})')
+                            await waiting.send(f"收到！当前 {argv[0]} 有 {int(argv[1])} 人出勤。")
+                        except Exception:
+                            err = 2
+                            await waiting.finish("现在没有店铺信息，需要您先在群内再发布一次才能添加店铺信息。")
                     else:
                         await c.execute(f'update waiting_table set waiting={int(argv[1])} where shop="{argv[0]}"')
-                        await waiting.send(f"收到！当前{argv[0]}的游玩人数是 {int(argv[1])} 人。")
+                        await waiting.send(f"收到！当前 {argv[0]} 有 {int(argv[1])} 人出勤。")
+            except Exception:
+                if err == 1 or err == 2:
+                    return
+                else:
+                    await waiting.finish("出勤人数需要使用纯数字，不要掺杂或者完全使用一些奇奇怪怪的汉字秋梨膏！")
 
 rand_ranking = on_command("段位模式")
 

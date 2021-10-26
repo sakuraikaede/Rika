@@ -278,11 +278,11 @@ class DrawBest(object):
         itemW = 164 if not self.b50 else 131
         itemH = 88
         Color = [(69, 193, 36), (255, 186, 1), (255, 90, 102), (134, 49, 200), (217, 197, 233)]
-        levelTriagle = [(itemW, 0), (itemW - 27, 0), (itemW, 27)]
+        levelTriagle = [(itemW, 0), (itemW - 12, 0), (itemW, 12)]
         rankPic = 'D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp'.split(' ')
         comboPic = ' FC FCp AP APp'.split(' ')
         imgDraw = ImageDraw.Draw(img)
-        titleFontName = 'src/static/adobe_simhei.otf'
+        titleFontName = 'src/static/msyhbd.ttc'
         for num in range(0, len(sdBest)):
             i = num // 5 if not self.b50 else num // 7
             j = num % 5 if not self.b50 else num % 7
@@ -297,7 +297,7 @@ class DrawBest(object):
             temp = temp.point(lambda p: p * 0.72)
 
             tempDraw = ImageDraw.Draw(temp)
-            
+            tempDraw.polygon(levelTriagle, Color[chartInfo.diff])
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.75 if not self.b50 else 0.55)
             temp.paste(diffImg, (85 if not self.b50 else 73, 8), diffImg.split()[3])
@@ -318,11 +318,11 @@ class DrawBest(object):
             tempDraw.text((7, 50), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.3)
-            temp.paste(rankImg, (88 if not self.b50 else 72, 50), rankImg.split()[3])
+            temp.paste(rankImg, (88 if not self.b50 else 72, 52), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119 if not self.b50 else 103, 49), comboImg.split()[3])
+                temp.paste(comboImg, (119 if not self.b50 else 103, 50), comboImg.split()[3])
             font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
             tempDraw.text((8, 70), f'#{num + 1}/{len(sdBest)} | {chartInfo.ds} -> {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
 
@@ -354,6 +354,7 @@ class DrawBest(object):
             temp = temp.point(lambda p: p * 0.72)
 
             tempDraw = ImageDraw.Draw(temp)
+            tempDraw.polygon(levelTriagle, Color[chartInfo.diff])
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.75 if not self.b50 else 0.55)
             temp.paste(diffImg, (85 if not self.b50 else 73, 8), diffImg.split()[3])
@@ -374,11 +375,11 @@ class DrawBest(object):
             tempDraw.text((7, 50), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.3)
-            temp.paste(rankImg, (88 if not self.b50 else 72, 50), rankImg.split()[3])
+            temp.paste(rankImg, (88 if not self.b50 else 72, 52), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119 if not self.b50 else 103, 49), comboImg.split()[3])
+                temp.paste(comboImg, (119 if not self.b50 else 103, 50), comboImg.split()[3])
             font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
             tempDraw.text((8, 70), f'#{num + 1}/{len(dxBest)} | {chartInfo.ds} -> {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
 
@@ -441,7 +442,8 @@ class DrawBest(object):
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype('src/static/msyh.ttc', 14, encoding='utf-8')
-        playCountInfo = f'{self.rank()} | 段位: {self.rankRating} | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Splash Plus 底分模拟模式'
+        font3 = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
+        playCountInfo = f'{self.rank()} (Rank: {self.rankRating}) | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Best 50 模拟模式'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
@@ -462,7 +464,7 @@ class DrawBest(object):
         authorBoardImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_MiniDialog_01.png')).convert('RGBA')
         authorBoardImg = self._resizePic(authorBoardImg, 0.35)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
-        authorBoardDraw.text((17, 15), f' Credit to:\n Xyb & Diving-Fish\n Generated: Kiba', 'black', font2)
+        authorBoardDraw.text((17, 16), f' B40: Xyb & DF\n B50: BlueDeer233\n Generate: Kiba', 'black', font3)
         self.img.paste(authorBoardImg, (1224, 19), mask=authorBoardImg.split()[3])
 
         dxImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_01.png')).convert('RGBA')
