@@ -20,49 +20,18 @@ driver = get_driver()
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 
-help = on_command('help')
+helper = on_command('help', aliases={'about'})
 
-
-@help.handle()
+@helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    help_str = '''※> 关于 | About
+    await helper.send("※> 关于\n犽(Kiba) By BlitzR | V2.32_A\nLeangle Universe\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Blitz-Raynor/Kiba\n感谢:\n@Diving-Fish\n@BlueDeer233\n----------------------\n※> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+   
+help_others = on_command('others.help')
+
+@help_others.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    help_str = '''※> 其它模块可用命令 | Commands For Others                                              
 ------------------------------------------------------------------------------------------------------------------------------
-                 犽 (Kiba) By BlitzR                     |     Build 2.31_A (Leangle Pro)     |             测试群: 895692945                   
-------------------------------------------------------------------------------------------------------------------------------
-                                                                       License: MIT License & Anti 996                                                        
-                                                            GitHub: https://github.com/Blitz-Raynor/Kiba                                            
-------------------------------------------------------------------------------------------------------------------------------
-                                                   Mai-Bot Github: https://github.com/Diving-Fish/mai-bot                                   
-                                                Chiyuki Github: https://github.com/Diving-Fish/Chiyuki-bot
-                                                                  Best 50 Code Author: @BlueDeer233                               
-------------------------------------------------------------------------------------------------------------------------------
-
-
-※> 可用命令 | Commands                                               
-------------------------------------------------------------------------------------------------------------------------------
-今日舞萌/今日运势                                                               查看今天的舞萌运势
-
-XXXmaimaiXXX什么                                                           随机一首歌
-
-随个[dx/标准][绿黄红紫白]<难度>                                      随机一首指定条件的乐曲
-
-随<数量>个[dx/标准][绿黄红紫白]<难度1>                       随机指定首指定条件的乐曲（不超过4个）
-[至]<难度2>                                                                        可以设置两个难度，会从其中随机歌曲
-
-查歌<乐曲标题的一部分>                                                    查询符合条件的乐曲
-
-[绿黄红紫白]id<歌曲编号>                                                  查询乐曲信息或谱面信息
-
-<歌曲别名>是什么歌                                                            查询乐曲别名对应的乐曲
-
-定数查歌 <定数下限> <定数上限>                                      查询定数对应的乐曲
-
-分数线 <难度+歌曲id> <分数线>                                       详情请输入“分数线 帮助”查看
-
-jrrp/人品值                                                                           查看今天的人品值。
-
-今日性癖/jrxp                                                                       看看你今天性什么东西捏？
-
 戳一戳                                                                                  来戳戳我？
 
 本群戳一戳情况                                                                    查看一下群里有几位杰出的无聊人
@@ -81,8 +50,6 @@ gocho <str1> <str2>                                                         生�
 投骰子<数量>                                                                       在线投骰子(?)
 投百面骰子<数量>                                                             * 可以选择六面/百面
 
-猜歌                                                                                       开始一轮猜歌                                                         
-
                                                                                               这个功能可以随机禁言你1-600秒，前提小犽是管理员。
 烟我                                                                                    * 注意：为防止误触发，
                                                                                               这个功能你需要at一下小犽再说这个命令才能执行。
@@ -91,16 +58,9 @@ gocho <str1> <str2>                                                         生�
 随个[男/女]群友                                                                      你也可以不带参数直接说“随个”然后后面加啥都可以。
                                                                                                当然小犽容易骂你就是了。
 
-b40 / b50                                                                              根据查分器数据生成你的 Best 40 /Best 50。
-
-人数 <店铺名/帮助> <加一/减一/+1/-1/清空/任意数字>    详情请输入“人数 帮助”查看
-
-段位模式 <Expert/Master> <初级/中级/上级/超上级>        模拟Splash Plus的随机段位模式。
-                                                                                            详情请输入“段位模式 帮助”查看
-
 帮选                                                                                      帮你选 
 ------------------------------------------------------------------------------------------------------------------------------'''
-    await help.send(Message([{
+    await help_others.send(Message([{
         "type": "image",
         "data": {
             "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"

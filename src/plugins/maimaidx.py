@@ -25,9 +25,55 @@ import asyncio
 from src.libraries.config import Config
 
 driver = get_driver()
+
 @driver.on_startup
 def _():
-    logger.info("Kiba Kernel -> Load \"Driver\" successfully")
+    logger.info("Kiba Kernel -> Load \"DX\" successfully")
+
+help_mai = on_command('maimai.help')
+
+@help_mai.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    help_str = '''※> 舞萌模块可用命令 | Commands For Maimai                                               
+------------------------------------------------------------------------------------------------------------------------------
+今日舞萌/今日运势                                                               查看今天的舞萌运势
+
+XXXmaimaiXXX什么                                                           随机一首歌
+
+随个[dx/标准][绿黄红紫白]<难度>                                      随机一首指定条件的乐曲
+
+随<数量>个[dx/标准][绿黄红紫白]<难度1>                       随机指定首指定条件的乐曲（不超过4个）
+[至]<难度2>                                                                        可以设置两个难度，会从其中随机歌曲
+
+查歌<乐曲标题的一部分>                                                    查询符合条件的乐曲
+
+[绿黄红紫白]id<歌曲编号>                                                  查询乐曲信息或谱面信息
+
+<歌曲别名>是什么歌                                                            查询乐曲别名对应的乐曲
+
+定数查歌 <定数下限> <定数上限>                                      查询定数对应的乐曲
+
+分数线 <难度+歌曲id> <分数线>                                       详情请输入“分数线 帮助”查看
+
+jrrp/人品值                                                                           查看今天的人品值。
+
+今日性癖/jrxp                                                                       看看你今天性什么东西捏？
+
+猜歌                                                                                       开始一轮猜歌                                                         
+
+b40 / b50                                                                              根据查分器数据生成你的 Best 40 /Best 50。
+
+人数 <店铺名/帮助> <加一/减一/+1/-1/清空/任意数字>    详情请输入“人数 帮助”查看
+
+段位模式 <Expert/Master> <初级/中级/上级/超上级>        模拟Splash Plus的随机段位模式。
+                                                                                            详情请输入“段位模式 帮助”查看
+------------------------------------------------------------------------------------------------------------------------------'''
+    await help_mai.send(Message([{
+        "type": "image",
+        "data": {
+            "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
+        }
+    }]))
 
 def song_txt(music: Music):
     return Message([
@@ -596,7 +642,42 @@ async def _(bot: Bot, event: Event, state: T_State):
             MessageSegment.text(text),
             MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}")
         ]))
-        
+
+disable_guess_music = on_command('猜歌设置', priority=0)
+
+
+@disable_guess_music.handle()
+async def _(bot: Bot, event: Event):
+    if event.message_type != "group":
+        return
+    arg = str(event.get_message())
+    group_members = await bot.get_group_member_list(group_id=event.group_id)
+    for m in group_members:
+        if m['user_id'] == event.user_id:
+            break
+    su = Config.superuser
+    if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
+        await disable_guess_music.finish("❌> 猜歌 - 设置 - 无权限\n抱歉，只有群管理员/小犽管理者才有权调整猜歌设置。")
+        return
+    db = get_driver().config.db
+    c = await db.cursor()
+    if arg == '启用':
+        try:
+            await c.execute(f'update guess_table set enabled=1 where group_id={event.group_id}')
+        except Exception:
+            await disable_guess_music.finish(f"❌> 猜歌 - 设置\n您需要运行一次猜歌才可进行设置！")
+    elif arg == '禁用':
+        try:
+            await c.execute(f'update guess_table set enabled=0 where group_id={event.group_id}')
+        except Exception:
+            await disable_guess_music.finish(f"❌> 猜歌 - 设置\n您需要运行一次猜歌才可进行设置！")
+    else:
+        await disable_guess_music.finish("※> 猜歌 - 设置\n请输入 猜歌设置 启用/禁用")
+        return
+    await db.commit()
+    await disable_guess_music.finish(f"✔️> 猜歌 - 设置\n设置成功并已即时生效。\n当前群设置为: {arg}")
+    
+            
 guess_dict: Dict[Tuple[str, str], GuessObject] = {}
 guess_cd_dict: Dict[Tuple[str, str], float] = {}
 guess_music = on_command('猜歌', priority=0)
@@ -636,14 +717,37 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
 async def _(bot: Bot, event: Event, state: T_State):
     mt = event.message_type
     k = (mt, event.user_id if mt == "private" else event.group_id)
-    whitelists = get_driver().config.whitelists
+    if mt == "group":
+        gid = event.group_id
+        db = get_driver().config.db
+        c = await db.cursor()
+        await c.execute(f"select * from guess_table where group_id={gid}")
+        data = await c.fetchone()
+        if data is None:
+            await c.execute(f'insert into guess_table values ({gid}, 1)')
+        elif data[1] == 0:
+            await guess_music.send("❌> 猜歌 - 被禁用\n抱歉，本群的管理员设置已设置已禁用猜歌。")
+            return
+        if k in guess_dict:
+            if k in guess_cd_dict and time.time() > guess_cd_dict[k] - 400:
+                # 如果已经过了 200 秒则自动结束上一次
+                del guess_dict[k]
+            else:
+                await guess_music.send("❌> 猜歌 - 正在进行中\n当前已有正在进行的猜歌，要不要来参与一下呀？")
+                return
+    if len(guess_dict) >= 5:
+        await guess_music.finish("❌> 猜歌 - 同时进行的群过多\n小犽有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
+        return
+    if k in guess_cd_dict and time.time() < guess_cd_dict[k]:
+        await guess_music.finish(f"❌> 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢")
+        return
     guess = GuessObject()
     guess_dict[k] = guess
     state["k"] = k
     state["guess_object"] = guess
     state["cycle"] = 0
     guess_cd_dict[k] = time.time() + 600
-    await guess_music.send("※> 猜歌\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏。")
+    await guess_music.send("※> 猜歌\n我将从热门乐曲中选择一首歌，并描述它的一些特征。大家可以猜一下！\n知道答案的话，可以告诉我谱面ID、歌曲标题或者标题中连续5个以上的片段来向我阐述答案！\n猜歌时查歌等其他命令依然可用，这个命令可能会很刷屏，管理员可以根据情况通过【猜歌设置】命令设置猜歌是否启用。")
     asyncio.create_task(guess_music_loop(bot, event, state))
 
 guess_music_solve = on_message(priority=20)
