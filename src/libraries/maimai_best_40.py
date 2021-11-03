@@ -448,20 +448,13 @@ class DrawBest(object):
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype('src/static/msyh.ttc', 14, encoding='utf-8')
+        font2s = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
         font3 = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
         playCountInfo = f'{self.rank()} (Rank: {self.rankRating}) | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Best 50 模拟模式'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
-        shougouDraw.text((textPos[0] - 1, textPos[1]), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0] + 1, textPos[1]), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0], textPos[1] - 1), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0], textPos[1] + 1), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0] - 1, textPos[1] - 1), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0] + 1, textPos[1] - 1), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0] - 1, textPos[1] + 1), playCountInfo, 'black', font2)
-        shougouDraw.text((textPos[0] + 1, textPos[1] + 1), playCountInfo, 'black', font2)
-        shougouDraw.text(textPos, playCountInfo, 'white', font2)
+        shougouDraw.text(textPos, playCountInfo, 'black', font2)
         shougouImg = self._resizePic(shougouImg, 1.05)
         self.img.paste(shougouImg, (240 if not self.qqId else 140, 83), mask=shougouImg.split()[3])
 
@@ -470,13 +463,12 @@ class DrawBest(object):
         authorBoardImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_MiniDialog_01.png')).convert('RGBA')
         authorBoardImg = self._resizePic(authorBoardImg, 0.35)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
-        authorBoardDraw.text((17, 16), f' B40: Xyb & DF\n B50: BlueDeer233\n Generate: Kiba', 'black', font3)
+        authorBoardDraw.text((17, 16), f' Feature Credit →\n B40: Xyb & DF\n B50: BlueDeer233\n Generate: Kiba', 'black', font2s)
         self.img.paste(authorBoardImg, (1224, 19), mask=authorBoardImg.split()[3])
 
         dxImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_01.png')).convert('RGBA')
-        self.img.paste(dxImg, (887 if not self.b50 else 988, 65), mask=dxImg.split()[3])
-        sdImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_02.png')).convert('RGBA')
-        self.img.paste(sdImg, (758 if not self.b50 else 865, 65), mask=sdImg.split()[3])
+        dxImg = self._resizePic(dxImg, 0.45)
+        self.img.paste(dxImg, (892 if not self.b50 else 992, 90), mask=dxImg.split()[3])
 
         # self.img.show()
 

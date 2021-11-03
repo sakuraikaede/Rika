@@ -12,6 +12,8 @@ import asyncio
 from src.libraries.image import image_to_base64, path, draw_text, get_jlpx, text_to_image
 from src.libraries.tool import hash
 
+from nonebot.rule import to_me
+
 import time
 from collections import defaultdict
 from src.libraries.config import Config
@@ -24,7 +26,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("※> 关于\n犽(Kiba) By BlitzR | V2.32_A\nLeangle Universe\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Blitz-Raynor/Kiba\n感谢:\n@Diving-Fish\n@BlueDeer233\n----------------------\n※> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("※> 关于\n犽(Kiba) By Killua.Btz | V2.33\nLeangle Universe Plus\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233 @Yuri-YuzuChaN\n----------------------\n※> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -59,6 +61,10 @@ gocho <str1> <str2>                                                         生�
                                                                                                当然小犽容易骂你就是了。
 
 帮选                                                                                      帮你选 
+
+扔瓶子                                                                                   扔个瓶子给犽。说不定会被别人读到哦。
+
+捞瓶子                                                                                    捞一个瓶子，看看上面留言什么了？
 ------------------------------------------------------------------------------------------------------------------------------'''
     await help_others.send(Message([{
         "type": "image",
@@ -410,3 +416,44 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         await select.finish("❌> 帮选 - 错误\n选你🐎。")
         return
+
+plp_insert = on_command("扔瓶子", rule=to_me())
+
+@plp_insert.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    argv = str(event.get_message()).strip().split(" ")
+    db = get_driver().config.db
+    c = await db.cursor()
+    mess = {}
+    try:
+        if len(argv) > 1:
+            await plp_insert.send("❌> 扔瓶子 - 错误\n请不要在发送内容中加空格。")
+            return
+        elif argv[0] == "":
+            await plp_insert.send("※> 扔瓶子 - 帮助\n格式为：@犽(at我) 扔瓶子 瓶子内容.\n禁止发送黄赌毒、个人收款码等不允许发送的内容。否则将禁止个人使用此功能。\n目前如果扔图片的话，会转换成图片链接。")
+            return
+        else:
+            await c.execute(f'insert into plp_table values ({event.user_id}, "{argv[0]}")')
+            await plp_insert.finish("✔️> 扔瓶子 - 完成\n已经扔出去啦！")
+            return
+    except Exception as e:
+        print(e)
+
+plp_find = on_command("捞瓶子", rule=to_me())
+
+@plp_find.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    db = get_driver().config.db
+    c = await db.cursor()
+    mess = {}
+    try:
+        await c.execute(f'select * from plp_table order by random() limit 1')
+        data = await c.fetchone()
+        if data is None:
+            await plp_find.finish("❌> 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
+            return
+        else:
+            await plp_insert.finish(f"※> 瓶子 - 来自QQ:{data[0]}\n内容:\n{data[1]}")
+            return
+    except Exception as e:
+        print(e)
