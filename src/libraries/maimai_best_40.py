@@ -262,7 +262,7 @@ class DrawBest(object):
         return f'UI_CMN_DXRating_S_{num}.png'
 
     def _drawRating(self, ratingBaseImg: Image.Image):
-        COLOUMS_RATING = [74, 92, 110, 128, 146]
+        COLOUMS_RATING = [74, 92, 110, 129, 147]
         theRa = self.playerRating
         i = 4
         while theRa:
