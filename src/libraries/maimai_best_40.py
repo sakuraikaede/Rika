@@ -287,7 +287,6 @@ class DrawBest(object):
             i = num // 5 if not self.b50 else num // 7
             j = num % 5 if not self.b50 else num % 7
             chartInfo = sdBest[num]
-            diftab = Image.open(os.path.join(self.pic_dir, self.diffpic_tab(chartInfo.diff))).convert('RGBA')
             pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.jpg')
             if not os.path.exists(pngPath):
                 pngPath = os.path.join(self.cover_dir, '1000.png')
