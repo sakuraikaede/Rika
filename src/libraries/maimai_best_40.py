@@ -187,6 +187,20 @@ class DrawBest(object):
             pic = 'MST_Re'
         return f'UI_PFC_MS_Info02_{pic}.png' 
 
+    def diffpic_tab(self, diff: str) -> str:
+        pic = ''
+        if diff == 0:
+            pic = 'BSC'
+        elif diff == 1:
+            pic = 'ADV'
+        elif diff == 2:
+            pic = 'EXP'
+        elif diff == 3:
+            pic = 'MST'
+        elif diff == 4:
+            pic = 'MST_Re'
+        return f'UI_TST_MBase_{pic}_Tab.png'
+
     def rank (self)-> str:
         ranker = '初学者'
         if self.rankRating == 250:
@@ -262,15 +276,15 @@ class DrawBest(object):
         return f'UI_CMN_DXRating_S_{num}.png'
 
     def _drawRating(self, ratingBaseImg: Image.Image):
-        COLOUMS_RATING = [86, 100, 115, 130, 145]
+        COLOUMS_RATING = [74, 92, 110, 128, 146]
         theRa = self.playerRating
         i = 4
         while theRa:
             digit = theRa % 10
             theRa = theRa // 10
             digitImg = Image.open(os.path.join(self.pic_dir, f'UI_NUM_Drating_{digit}.png')).convert('RGBA')
-            digitImg = self._resizePic(digitImg, 0.6)
-            ratingBaseImg.paste(digitImg, (COLOUMS_RATING[i] - 2, 9), mask=digitImg.split()[3])
+            digitImg = self._resizePic(digitImg, 0.7)
+            ratingBaseImg.paste(digitImg, (COLOUMS_RATING[i] - 2, 14), mask=digitImg.split()[3])
             i -= 1
         return ratingBaseImg
 
@@ -287,6 +301,7 @@ class DrawBest(object):
             i = num // 5 if not self.b50 else num // 7
             j = num % 5 if not self.b50 else num % 7
             chartInfo = sdBest[num]
+            diftab = Image.open(os.path.join(self.pic_dir, self.diffpic_tab(chartInfo.diff))).convert('RGBA')
             pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.jpg')
             if not os.path.exists(pngPath):
                 pngPath = os.path.join(self.cover_dir, '1000.png')
@@ -299,35 +314,58 @@ class DrawBest(object):
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.65 if not self.b50 else 0.55)
-            temp.paste(diffImg, (6, 8), diffImg.split()[3])
+            temp.paste(diffImg, (6, 5), diffImg.split()[3])
             if chartInfo.tp == 'SD':
                 sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
                 sdImg = self._resizePic(sdImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(sdImg, (98 if not self.b50 else 83, 9), sdImg.split()[3])
+                temp.paste(sdImg, (98 if not self.b50 else 83, 6), sdImg.split()[3])
             elif chartInfo.tp == 'DX':
                 dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
                 dxImg = self._resizePic(dxImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(dxImg, (98 if not self.b50 else 83, 9), dxImg.split()[3])
-            font = ImageFont.truetype(titleFontName, 15 if not self.b50 else 14, encoding='utf-8')
+                temp.paste(dxImg, (98 if not self.b50 else 83, 6), dxImg.split()[3])
+            font = ImageFont.truetype(titleFontName, 13 if not self.b50 else 12, encoding='utf-8')
             title = chartInfo.title
-            if self._coloumWidth(title) > 15 if not self.b50 else 13:
-                title = self._changeColumnWidth(title, 14 if not self.b50 else 12) + '...'
-            tempDraw.text((8, 32), title, 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 14 if not self.b50 else 12, encoding='utf-8')
-            tempDraw.text((7, 50), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
-            rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-            rankImg = self._resizePic(rankImg, 0.3)
-            temp.paste(rankImg, (88 if not self.b50 else 72, 52), rankImg.split()[3])
+            if self._coloumWidth(title) > 12 if not self.b50 else 10:
+                title = self._changeColumnWidth(title, 11 if not self.b50 else 9) + '...'
+            tempDraw.text((8, 26), title, 'white', font)
+            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
+            tempDraw.text((8, 40), f'ACHIEVEMENT', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 13 if not self.b50 else 12, encoding='utf-8')
+            tempDraw.text((8, 47), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            if rankPic[chartInfo.scoreId] == 'SSSp' or rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
+                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+                rankImg = self._resizePic(rankImg, 0.5)
+                temp.paste(rankImg, (107 if not self.b50 else 83, 35), rankImg.split()[3])
+            elif rankPic[chartInfo.scoreId] == 'SSp' or rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
+                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+                rankImg = self._resizePic(rankImg, 0.5)
+                temp.paste(rankImg, (113 if not self.b50 else 85, 35), rankImg.split()[3])
+            else:
+                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+                rankImg = self._resizePic(rankImg, 0.5)
+                temp.paste(rankImg, (121 if not self.b50 else 96, 35), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119 if not self.b50 else 103, 50), comboImg.split()[3])
+                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
             else:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119 if not self.b50 else 103, 50), comboImg.split()[3])
+                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
+            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
+            tempDraw.text((8, 63), f'BASE', 'white', font)
             font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
-            tempDraw.text((8, 70), f'#{num + 1}/{len(sdBest)} | {chartInfo.ds} -> {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            tempDraw.text((7, 70), f'{chartInfo.ds}', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
+            tempDraw.text((36, 66), f'→', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
+            tempDraw.text((52, 63), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            if num > 10:
+                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
+                tempDraw.text((112 if not self.b50 else 87, 73), f'#{num + 1}/{len(sdBest)}', 'white', font)
+            else:
+                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
+                tempDraw.text((114 if not self.b50 else 89, 73), f'#{num + 1}/{len(sdBest)}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
@@ -359,35 +397,58 @@ class DrawBest(object):
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.6 if not self.b50 else 0.5)
-            temp.paste(diffImg, (6, 8), diffImg.split()[3])
+            temp.paste(diffImg, (6, 5), diffImg.split()[3])
             if chartInfo.tp == 'SD':
                 sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
                 sdImg = self._resizePic(sdImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(sdImg, (98 if not self.b50 else 83, 9), sdImg.split()[3])
+                temp.paste(sdImg, (98 if not self.b50 else 83, 6), sdImg.split()[3])
             elif chartInfo.tp == 'DX':
                 dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
                 dxImg = self._resizePic(dxImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(dxImg, (98 if not self.b50 else 83, 9), dxImg.split()[3])
-            font = ImageFont.truetype(titleFontName, 15 if not self.b50 else 14, encoding='utf-8')
+                temp.paste(dxImg, (98 if not self.b50 else 83, 6), dxImg.split()[3])
+            font = ImageFont.truetype(titleFontName, 13 if not self.b50 else 12, encoding='utf-8')
             title = chartInfo.title
-            if self._coloumWidth(title) > 15 if not self.b50 else 13:
-                title = self._changeColumnWidth(title, 14 if not self.b50 else 12) + '...'
-            tempDraw.text((8, 32), title, 'white', font)
+            if self._coloumWidth(title) > 12 if not self.b50 else 10:
+                title = self._changeColumnWidth(title, 11 if not self.b50 else 9) + '...'
+            tempDraw.text((8, 26), title, 'white', font)
+            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
+            tempDraw.text((8, 40), f'ACHIEVEMENT', 'white', font)
             font = ImageFont.truetype('src/static/msyhbd.ttc', 14 if not self.b50 else 12, encoding='utf-8')
-            tempDraw.text((7, 50), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
-            rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-            rankImg = self._resizePic(rankImg, 0.3)
-            temp.paste(rankImg, (88 if not self.b50 else 72, 52), rankImg.split()[3])
+            tempDraw.text((7, 47), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            if rankPic[chartInfo.scoreId] == 'SSSp' or rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
+                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+                rankImg = self._resizePic(rankImg, 0.5)
+                temp.paste(rankImg, (107 if not self.b50 else 83, 35), rankImg.split()[3])
+            elif rankPic[chartInfo.scoreId] == 'SSp' or rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
+                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+                rankImg = self._resizePic(rankImg, 0.5)
+                temp.paste(rankImg, (113 if not self.b50 else 85, 35), rankImg.split()[3])
+            else:
+                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+                rankImg = self._resizePic(rankImg, 0.5)
+                temp.paste(rankImg, (121 if not self.b50 else 96, 35), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119 if not self.b50 else 103, 50), comboImg.split()[3])
+                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
             else:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (119 if not self.b50 else 103, 50), comboImg.split()[3])
+                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
+            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
+            tempDraw.text((8, 63), f'BASE', 'white', font)
             font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
-            tempDraw.text((8, 70), f'#{num + 1}/{len(dxBest)} | {chartInfo.ds} -> {chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            tempDraw.text((7, 70), f'{chartInfo.ds}', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
+            tempDraw.text((36, 66), f'→', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
+            tempDraw.text((52, 63), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            if num > 10:
+                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
+                tempDraw.text((112 if not self.b50 else 87, 73), f'#{num + 1}/{len(dxBest)}', 'white', font)
+            else:
+                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
+                tempDraw.text((114 if not self.b50 else 89, 73), f'#{num + 1}/{len(dxBest)}', 'white', font)
 
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
@@ -423,48 +484,48 @@ class DrawBest(object):
             borderImg1.paste(borderImg2, (0, 0), mask=borderImg2.split()[3])
             borderImg = borderImg1.resize((108, 108))
             borderImg.paste(qqLogo, (4, 4))
-            borderImg = self._resizePic(borderImg, 0.926)
-            self.img.paste(borderImg, (22, 10), mask=borderImg.split()[3])
+            borderImg = self._resizePic(borderImg, 0.995)
+            self.img.paste(borderImg, (9, 5), mask=borderImg.split()[3])
         else:
             splashLogo = Image.open(os.path.join(self.pic_dir, 'UI_CMN_TabTitle_MaimaiTitle_Ver214.png')).convert('RGBA')
             splashLogo = self._resizePic(splashLogo, 0.65)
-            self.img.paste(splashLogo, (10, 10), mask=splashLogo.split()[3])
+            self.img.paste(splashLogo, (10, 15), mask=splashLogo.split()[3])
 
         ratingBaseImg = Image.open(os.path.join(self.pic_dir, self._findRaPic())).convert('RGBA')
         ratingBaseImg = self._drawRating(ratingBaseImg)
-        ratingBaseImg = self._resizePic(ratingBaseImg, 0.85)
-        self.img.paste(ratingBaseImg, (240 if not self.qqId else 140, 8), mask=ratingBaseImg.split()[3])
+        ratingBaseImg = self._resizePic(ratingBaseImg, 0.8)
+        self.img.paste(ratingBaseImg, (240 if not self.qqId else 131, 0), mask=ratingBaseImg.split()[3])
 
         namePlateImg = Image.open(os.path.join(self.pic_dir, 'UI_TST_PlateMask.png')).convert('RGBA')
         namePlateImg = namePlateImg.resize((285, 40))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
         font1 = ImageFont.truetype('src/static/msyh.ttc', 28, encoding='unic')
-        namePlateDraw.text((12, 4), ' '.join(list(self.userName)), 'black', font1)
+        namePlateDraw.text((12, 4), ''.join(list(self.userName)), 'black', font1)
         nameDxImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Name_DX.png')).convert('RGBA')
         nameDxImg = self._resizePic(nameDxImg, 0.9)
         namePlateImg.paste(nameDxImg, (230, 4), mask=nameDxImg.split()[3])
-        self.img.paste(namePlateImg, (240 if not self.qqId else 140, 40), mask=namePlateImg.split()[3])
+        self.img.paste(namePlateImg, (240 if not self.qqId else 131, 40), mask=namePlateImg.split()[3])
 
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype('src/static/msyh.ttc', 14, encoding='utf-8')
         font2s = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
         font3 = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
-        playCountInfo = f'{self.rank()} (Rank: {self.rankRating}) | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Best 50 模拟模式'
+        playCountInfo = f'{self.rank()} | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Best 50 模拟'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
         shougouDraw.text(textPos, playCountInfo, 'black', font2)
         shougouImg = self._resizePic(shougouImg, 1.05)
-        self.img.paste(shougouImg, (240 if not self.qqId else 140, 83), mask=shougouImg.split()[3])
+        self.img.paste(shougouImg, (240 if not self.qqId else 131, 83), mask=shougouImg.split()[3])
 
         self._drawBestList(self.img, self.sdBest, self.dxBest)
 
         authorBoardImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_MiniDialog_01.png')).convert('RGBA')
-        authorBoardImg = self._resizePic(authorBoardImg, 0.35)
+        authorBoardImg = self._resizePic(authorBoardImg, 0.43)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
-        authorBoardDraw.text((17, 16), f' Feature Credit →\n B40: Xyb & DF\n B50: BlueDeer233\n Generate: Kiba', 'black', font2s)
-        self.img.paste(authorBoardImg, (1224, 19), mask=authorBoardImg.split()[3])
+        authorBoardDraw.text((19, 18), f' Feature Credits →\n Best 40: Xyb & Diving-Fish\n Best 50: BlueDeer233\n Design: Killua Blitz\n       Generated By Kiba', 'black', font2s)
+        self.img.paste(authorBoardImg, (1195, 0), mask=authorBoardImg.split()[3])
 
         dxImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_01.png')).convert('RGBA')
         dxImg = self._resizePic(dxImg, 0.45)

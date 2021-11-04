@@ -26,7 +26,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("※> 关于\n犽(Kiba) By Killua.Btz | V2.33\nLeangle Universe Plus\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233 @Yuri-YuzuChaN\n----------------------\n※> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("※> 关于\n犽(Kiba) By Killua | V2.33_B\nLeangle Universe Plus\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233 @Yuri-YuzuChaN\n----------------------\n※> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
