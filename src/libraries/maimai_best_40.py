@@ -187,20 +187,6 @@ class DrawBest(object):
             pic = 'MST_Re'
         return f'UI_PFC_MS_Info02_{pic}.png' 
 
-    def diffpic_tab(self, diff: str) -> str:
-        pic = ''
-        if diff == 0:
-            pic = 'BSC'
-        elif diff == 1:
-            pic = 'ADV'
-        elif diff == 2:
-            pic = 'EXP'
-        elif diff == 3:
-            pic = 'MST'
-        elif diff == 4:
-            pic = 'MST_Re'
-        return f'UI_TST_MBase_{pic}_Tab.png'
-
     def rank (self)-> str:
         ranker = '初学者'
         if self.rankRating == 250:
@@ -500,7 +486,7 @@ class DrawBest(object):
         namePlateImg = namePlateImg.resize((285, 40))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
         font1 = ImageFont.truetype('src/static/msyh.ttc', 28, encoding='unic')
-        namePlateDraw.text((12, 4), ''.join(list(self.userName)), 'black', font1)
+        namePlateDraw.text((12, 4), ' '.join(list(self.userName)), 'black', font1)
         nameDxImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Name_DX.png')).convert('RGBA')
         nameDxImg = self._resizePic(nameDxImg, 0.9)
         namePlateImg.paste(nameDxImg, (230, 4), mask=nameDxImg.split()[3])
