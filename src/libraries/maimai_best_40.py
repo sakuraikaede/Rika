@@ -299,20 +299,20 @@ class DrawBest(object):
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.65 if not self.b50 else 0.55)
-            temp.paste(diffImg, (6, 5), diffImg.split()[3])
+            temp.paste(diffImg, (6, 3), diffImg.split()[3])
             if chartInfo.tp == 'SD':
                 sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
                 sdImg = self._resizePic(sdImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(sdImg, (98 if not self.b50 else 83, 6), sdImg.split()[3])
+                temp.paste(sdImg, (98 if not self.b50 else 83, 4), sdImg.split()[3])
             elif chartInfo.tp == 'DX':
                 dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
                 dxImg = self._resizePic(dxImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(dxImg, (98 if not self.b50 else 83, 6), dxImg.split()[3])
+                temp.paste(dxImg, (98 if not self.b50 else 83, 4), dxImg.split()[3])
             font = ImageFont.truetype(titleFontName, 13 if not self.b50 else 12, encoding='utf-8')
             title = chartInfo.title
-            if self._coloumWidth(title) > 12 if not self.b50 else 10:
-                title = self._changeColumnWidth(title, 11 if not self.b50 else 9) + '...'
-            tempDraw.text((8, 26), title, 'white', font)
+            if self._coloumWidth(title) > 20 if not self.b50 else 14:
+                title = self._changeColumnWidth(title, 19 if not self.b50 else 13) + '...'
+            tempDraw.text((8, 21), title, 'white', font)
             font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
             tempDraw.text((8, 40), f'ACHIEVEMENT', 'white', font)
             font = ImageFont.truetype('src/static/msyhbd.ttc', 13 if not self.b50 else 12, encoding='utf-8')
@@ -320,11 +320,11 @@ class DrawBest(object):
             if rankPic[chartInfo.scoreId] == 'SSSp' or rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
                 rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (107 if not self.b50 else 83, 35), rankImg.split()[3])
+                temp.paste(rankImg, (108 if not self.b50 else 83, 35), rankImg.split()[3])
             elif rankPic[chartInfo.scoreId] == 'SSp' or rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
                 rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (113 if not self.b50 else 85, 35), rankImg.split()[3])
+                temp.paste(rankImg, (113 if not self.b50 else 88, 35), rankImg.split()[3])
             else:
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
                 rankImg = self._resizePic(rankImg, 0.5)
@@ -382,20 +382,20 @@ class DrawBest(object):
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.6 if not self.b50 else 0.5)
-            temp.paste(diffImg, (6, 5), diffImg.split()[3])
+            temp.paste(diffImg, (6, 3), diffImg.split()[3])
             if chartInfo.tp == 'SD':
                 sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
                 sdImg = self._resizePic(sdImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(sdImg, (98 if not self.b50 else 83, 6), sdImg.split()[3])
+                temp.paste(sdImg, (98 if not self.b50 else 83, 4), sdImg.split()[3])
             elif chartInfo.tp == 'DX':
                 dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
                 dxImg = self._resizePic(dxImg, 0.5 if not self.b50 else 0.4)
-                temp.paste(dxImg, (98 if not self.b50 else 83, 6), dxImg.split()[3])
+                temp.paste(dxImg, (98 if not self.b50 else 83, 4), dxImg.split()[3])
             font = ImageFont.truetype(titleFontName, 13 if not self.b50 else 12, encoding='utf-8')
             title = chartInfo.title
-            if self._coloumWidth(title) > 12 if not self.b50 else 10:
-                title = self._changeColumnWidth(title, 11 if not self.b50 else 9) + '...'
-            tempDraw.text((8, 26), title, 'white', font)
+            if self._coloumWidth(title) > 20 if not self.b50 else 14:
+                title = self._changeColumnWidth(title, 19 if not self.b50 else 13) + '...'
+            tempDraw.text((8, 21), title, 'white', font)
             font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
             tempDraw.text((8, 40), f'ACHIEVEMENT', 'white', font)
             font = ImageFont.truetype('src/static/msyhbd.ttc', 14 if not self.b50 else 12, encoding='utf-8')
@@ -403,11 +403,11 @@ class DrawBest(object):
             if rankPic[chartInfo.scoreId] == 'SSSp' or rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
                 rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (107 if not self.b50 else 83, 35), rankImg.split()[3])
+                temp.paste(rankImg, (108 if not self.b50 else 83, 35), rankImg.split()[3])
             elif rankPic[chartInfo.scoreId] == 'SSp' or rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
                 rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (113 if not self.b50 else 85, 35), rankImg.split()[3])
+                temp.paste(rankImg, (113 if not self.b50 else 88, 35), rankImg.split()[3])
             else:
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
                 rankImg = self._resizePic(rankImg, 0.5)
