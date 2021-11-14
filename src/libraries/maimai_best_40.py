@@ -218,25 +218,25 @@ class DrawBest(object):
         elif self.rankRating == 2000:
             ranker = '真传'
         elif self.rankRating == 2010:
-            ranker = '真传壹段'
+            ranker = '真传·壹段'
         elif self.rankRating == 2020:
-            ranker = '真传贰段'
+            ranker = '真传·贰段'
         elif self.rankRating == 2030:
-            ranker = '真传叁段'
+            ranker = '真传·叁段'
         elif self.rankRating == 2040:
-            ranker = '真传肆段'
+            ranker = '真传·肆段'
         elif self.rankRating == 2050:
-            ranker = '真传伍段'
+            ranker = '真传·伍段'
         elif self.rankRating == 2060:
-            ranker = '真传陆段'
+            ranker = '真传·陆段'
         elif self.rankRating == 2070:
-            ranker = '真传柒段'
+            ranker = '真传·柒段'
         elif self.rankRating == 2080:
-            ranker = '真传捌段'
+            ranker = '真传·捌段'
         elif self.rankRating == 2090:
-            ranker = '真传玖段'
+            ranker = '真传·玖段'
         elif self.rankRating == 2100:
-            ranker = '真传拾段'
+            ranker = '真传·拾段'
         return ranker
 
     def _findRaPic(self) -> str:
@@ -282,6 +282,12 @@ class DrawBest(object):
         rankPic = 'D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp'.split(' ')
         comboPic = ' FC FCp AP APp'.split(' ')
         imgDraw = ImageDraw.Draw(img)
+        rankDraw = ImageDraw.Draw(img)
+        font = ImageFont.truetype('src/static/pmcst.ttf', 22, encoding='utf-8')
+        font2 = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
+        rankDraw.text((390 if not self.qqId else 281, 1), f'RANK', 'black', font2)
+        rankDraw.text((390 if not self.qqId else 281, 8), f'{self.rank()}', 'black', font)
+
         titleFontName = 'src/static/adobe_simhei.otf'
         for num in range(0, len(sdBest)):
             i = num // 5 if not self.b50 else num // 7
@@ -295,7 +301,6 @@ class DrawBest(object):
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(3))
             temp = temp.point(lambda p: p * 0.72)
-
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.65 if not self.b50 else 0.55)
@@ -496,7 +501,7 @@ class DrawBest(object):
         font2 = ImageFont.truetype('src/static/msyh.ttc', 14, encoding='utf-8')
         font2s = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
         font3 = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
-        playCountInfo = f'{self.rank()} | Rating: {self.musicRating}' if not self.b50 else f'{self.rank()} | Best 50 模拟'
+        playCountInfo = f'Rank Score: {self.rankRating} | Rating: {self.musicRating}' if not self.b50 else f'Best 50 Rating'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
