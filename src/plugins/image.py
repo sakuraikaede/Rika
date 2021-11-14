@@ -17,7 +17,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     left = groups[0].strip()
     right = groups[1].strip()
     if len(left) > 15 or len(right) > 15:
-        await high_eq.send("❌> 图片生成 - 文字过多\n为了图片质量，请不要多于15个字符嗷。")
+        await high_eq.send("❌>> 图片生成 - 文字过多\n为了图片质量，请不要多于15个字符嗷。")
         return
     img_p = Image.open(path)
     draw_text(img_p, left, 0)
@@ -37,7 +37,7 @@ jlpx = on_command('金龙盘旋')
 async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(' ')
     if len(argv) != 3:
-        await jlpx.send("❌> 图片生成 - 参数不足\n金龙盘旋需要三个参数！")
+        await jlpx.send("❌>> 图片生成 - 参数不足\n金龙盘旋需要三个参数！")
     url = await get_jlpx(argv[0], argv[1], argv[2])
     await jlpx.send(Message([{
         "type": "image",
@@ -54,7 +54,7 @@ gocho = on_command('gocho')
 async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(' ')
     if len(argv) != 2:
-        await jlpx.send("❌> 图片生成 - 参数不足\ngocho 需要两个参数！")
+        await jlpx.send("❌>> 图片生成 - 参数不足\ngocho 需要两个参数！")
     i = generate(argv[0], argv[1])
     await gocho.send(Message([{
         "type": "image",

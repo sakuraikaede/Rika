@@ -15,6 +15,7 @@ from src.libraries.tool import hash
 from nonebot.rule import to_me
 
 import time
+import datetime
 from collections import defaultdict
 from src.libraries.config import Config
 
@@ -26,7 +27,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("☆>> 关于\n犽(Kiba) By Killua | V2.41\nCodename: Zoldyck Plus\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233\n部分项目支持:@Yuri-YuzuChaN\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("☆>> 关于\n犽(Kiba) By Killua | V2.42\nCodename: Zoldyck Plus Enhanced\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233\n部分项目支持:@Yuri-YuzuChaN\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -422,9 +423,10 @@ plp_insert = on_command("扔瓶子", rule=to_me())
 @plp_insert.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
+    now = datetime.datetime.now() 
     db = get_driver().config.db
     c = await db.cursor()
-    mess = {}
+    plpid = now.year * random.randint(1,72) + now.month * random.randint(1,48) + now.day * random.randint(1,24) + now.hour * random.randint(1,12)+ now.minute * random.randint(1,6) + now.second * random.randint(1,3) + random.randint(1,99999)
     try:
         if len(argv) > 1:
             await plp_insert.send("❌>> 扔瓶子 - 错误\n请不要在发送内容中加空格。")
@@ -433,8 +435,9 @@ async def _(bot: Bot, event: Event, state: T_State):
             await plp_insert.send("☆>> 扔瓶子 - 帮助\n格式为：@犽(at我) 扔瓶子 瓶子内容.\n禁止发送黄赌毒、个人收款码等不允许发送的内容。否则将禁止个人使用此功能。\n目前如果扔图片的话，会转换成图片链接。")
             return
         else:
-            await c.execute(f'insert into plp_table values ({event.user_id}, "{argv[0]}")')
-            await plp_insert.finish("✔️>> 扔瓶子 - 完成\n已经扔出去啦！")
+            await c.execute(f'insert into plp_table values ({plpid},{event.user_id}, "{argv[0]}")')
+            await db.commit()
+            await plp_insert.finish(f"✔️>> 扔瓶子 - 完成\n您的漂流瓶(ID: {plpid})已经扔出去啦")
             return
     except Exception as e:
         print(e)
@@ -443,17 +446,46 @@ plp_find = on_command("捞瓶子", rule=to_me())
 
 @plp_find.handle()
 async def _(bot: Bot, event: Event, state: T_State):
+    argv = str(event.get_message()).strip().split(" ")
     db = get_driver().config.db
     c = await db.cursor()
-    mess = {}
     try:
-        await c.execute(f'select * from plp_table order by random() limit 1')
-        data = await c.fetchone()
-        if data is None:
-            await plp_find.finish("❌>> 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
-            return
+        if len(argv) > 1:
+            await plp_find.finish("❌>> 捞瓶子 - 错误\n只能输入QQ号查找。您输入了好多条分段数据.....")
+        elif argv[0] == "":
+            await c.execute(f'select * from plp_table order by random() limit 1')
+            data = await c.fetchone()
+            if data is None:
+                await plp_find.finish("❌>> 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
+                return
+            else:
+                await plp_find.finish(f"☆>> 瓶子\n漂流瓶 ID: {data[0]}\n来自 QQ: {data[1]}\n内容: {data[2]}")
+                return
         else:
-            await plp_insert.finish(f"☆>> 瓶子\n来自 QQ: {data[0]}\n内容:\n{data[1]}")
-            return
+            await c.execute(f'select * from plp_table where user_id={argv[0]}')
+            data = await c.fetchall()
+            if len(data) == 0:
+                await plp_find.finish("❌>> 捞瓶子 - 错误\n您输入的号码没有扔瓶子。")
+                return
+            else:
+                msg = f"☆>> 瓶子 | 定向查找: {argv[0]}"
+                for i in range(len(data)):
+                    msg += f"\n漂流瓶 ID: {data[i][0]}\n内容：{data[i][2]}"
+                await plp_find.finish(msg)
     except Exception as e:
         print(e)
+
+plp_clean = on_command("洗瓶子")
+
+@plp_clean.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    db = get_driver().config.db
+    c = await db.cursor()
+    if str(event.user_id) != Config.superuser:
+        await plp_clean.finish("❌>> 洗瓶子 - 没有权限\n这个...只有小犽的管理员才可以清空瓶子。")
+        return
+    else:
+        await c.execute(f'delete from plp_table')
+        await db.commit()
+        await plp_clean.finish("✔️>> 洗瓶子\n已清空漂流瓶数据。")
+        return
