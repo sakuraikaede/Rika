@@ -18,7 +18,7 @@ async def init_db():
             "create table user_poke_table (user_id bigint, group_id bigint, triggered int);"
             "create table guess_table (group_id bigint, enabled bit);"
             "create table waiting_table (group_id bigint, shop text, waiting int);"
-            "create table plp_table (id bigint, user_id bigint, message text);"
+            "create table plp_table (id bigint, user_id bigint, nickname text, message text, is_picture bit);"
             )
         logger.info("Kiba Kernel -> Create \"Kiba Database\" successfully")
     except Exception:

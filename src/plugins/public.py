@@ -8,6 +8,7 @@ from nonebot.adapters.cqhttp import Message, Event, Bot
 from src.libraries.image import *
 from random import randint
 import asyncio
+from nonebot.adapters.cqhttp import Message, MessageSegment, GroupMessageEvent, PrivateMessageEvent
 
 from src.libraries.image import image_to_base64, path, draw_text, get_jlpx, text_to_image
 from src.libraries.tool import hash
@@ -27,7 +28,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("☆>> 关于\n犽(Kiba) By Killua | V2.42\nCodename: Zoldyck Plus Enhanced\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233\n部分项目支持:@Yuri-YuzuChaN\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("☆>> 关于\n犽(Kiba) By Killua | V2.42_A\nCodename: Zoldyck Plus Enhanced\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233\n部分项目支持:@Yuri-YuzuChaN\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -237,13 +238,16 @@ poke_setting = on_command("戳一戳设置")
 @poke_setting.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     db = get_driver().config.db
-    group_members = await bot.get_group_member_list(group_id=event.group_id)
-    for m in group_members:
-        if m['user_id'] == event.user_id:
-            break
-    if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
-        await poke_setting.finish("这个...只有管理员可以设置戳一戳, 但是你不要去戳我....嗯..尽量别戳啦。")
-        return
+    try:
+        group_members = await bot.get_group_member_list(group_id=event.group_id)
+        for m in group_members:
+            if m['user_id'] == event.user_id:
+                break
+        if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
+            await poke_setting.finish("这个...只有管理员可以设置戳一戳, 但是你不要去戳我....嗯..尽量别戳啦。")
+            return
+    except Exception as e:
+        await poke_setting.finish(f"!>> 戳一戳设置 - 现在是私聊？\n私聊设置个锤子戳一戳，你别戳不就完事了。如果不是，看下下面的错误记录。\nTechnical Information:\n{e}")
     argv = str(event.get_message()).strip().split(' ')
     try:
         if argv[0] == "默认":
@@ -424,21 +428,34 @@ plp_insert = on_command("扔瓶子", rule=to_me())
 async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
     now = datetime.datetime.now() 
+    nickname = event.sender.nickname
     db = get_driver().config.db
     c = await db.cursor()
-    plpid = now.year * random.randint(1,72) + now.month * random.randint(1,48) + now.day * random.randint(1,24) + now.hour * random.randint(1,12)+ now.minute * random.randint(1,6) + now.second * random.randint(1,3) + random.randint(1,99999)
+    plpid = now.year * random.randint(1,7200) + now.month * random.randint(1,4800) + now.day * random.randint(1,2400) + now.hour * random.randint(1,1200)+ now.minute * random.randint(1,600) + now.second * random.randint(1,300) + random.randint(1,9999999999)
     try:
         if len(argv) > 1:
-            await plp_insert.send("❌>> 扔瓶子 - 错误\n请不要在发送内容中加空格。")
+            await plp_insert.send(f"❌>> To {nickname} | 扔瓶子 - 错误\n请不要在发送内容中加空格，会干扰漂流瓶功能。")
             return
         elif argv[0] == "":
-            await plp_insert.send("☆>> 扔瓶子 - 帮助\n格式为：@犽(at我) 扔瓶子 瓶子内容.\n禁止发送黄赌毒、个人收款码等不允许发送的内容。否则将禁止个人使用此功能。\n目前如果扔图片的话，会转换成图片链接。")
+            await plp_insert.send(f"☆>> To {nickname} | 扔瓶子 - 帮助\n格式为：@犽(at我) 扔瓶子 瓶子内容.\n禁止发送黄赌毒、个人收款码等不允许发送的内容。否则将禁止个人使用此功能。")
+            return
+        elif argv[0].find("|") != -1:
+            await plp_insert.send(f"❌>> To {nickname} | 扔瓶子 - 错误\n请不要在发送内容中加'|'，会干扰漂流瓶功能。")
             return
         else:
-            await c.execute(f'insert into plp_table values ({plpid},{event.user_id}, "{argv[0]}")')
-            await db.commit()
-            await plp_insert.finish(f"✔️>> 扔瓶子 - 完成\n您的漂流瓶(ID: {plpid})已经扔出去啦")
-            return
+            if argv[0].find("CQ:image") != -1:
+                message = argv[0].split("[")
+                msg = message[0]
+                piclink = message[1][57:].split("]")
+                await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{msg}|{piclink[0]}",1)')
+                await db.commit()
+                await plp_insert.finish(f"✔️>> To {nickname} | 扔瓶子 - 完成\n您的 图片 漂流瓶(ID: {plpid})已经扔出去啦!")
+                return
+            else:
+                await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{argv[0]}",0)')
+                await db.commit()
+                await plp_insert.finish(f"✔️>> To {nickname} | 扔瓶子 - 完成\n您的 文字 漂流瓶(ID: {plpid})已经扔出去啦!")
+                return
     except Exception as e:
         print(e)
 
@@ -447,30 +464,57 @@ plp_find = on_command("捞瓶子", rule=to_me())
 @plp_find.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
+    nickname = event.sender.nickname
     db = get_driver().config.db
     c = await db.cursor()
     try:
         if len(argv) > 1:
-            await plp_find.finish("❌>> 捞瓶子 - 错误\n只能输入QQ号查找。您输入了好多条分段数据.....")
+            await plp_find.finish(f"❌>> To {nickname} | 捞瓶子 - 错误\n只能输入QQ号查找。您输入了好多条分段数据.....")
         elif argv[0] == "":
             await c.execute(f'select * from plp_table order by random() limit 1')
             data = await c.fetchone()
             if data is None:
-                await plp_find.finish("❌>> 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
+                await plp_find.finish(f"❌>> To {nickname} | 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
                 return
             else:
-                await plp_find.finish(f"☆>> 瓶子\n漂流瓶 ID: {data[0]}\n来自 QQ: {data[1]}\n内容: {data[2]}")
-                return
+                if data[4] == 0:
+                    await plp_find.finish(f"☆>> To {nickname} | 瓶子\n漂流瓶 ID: {data[0]}\n来自 {data[2]}({data[1]})\n内容: {data[3]}")
+                    return
+                else:
+                    message = data[3].split("|")
+                    await plp_find.finish(Message([
+                        MessageSegment.text(f"☆>> To {nickname} | 瓶子\n漂流瓶 ID: {data[0]}\n来自 {data[2]}({data[1]})\n内容:{message[0]}"),
+                        MessageSegment.image(f"{message[1]}")
+                    ]))
+                    return
         else:
             await c.execute(f'select * from plp_table where user_id={argv[0]}')
             data = await c.fetchall()
             if len(data) == 0:
-                await plp_find.finish("❌>> 捞瓶子 - 错误\n您输入的号码没有扔瓶子。")
-                return
+                await c.execute(f'select * from plp_table where id={argv[0]}')
+                data = await c.fetchone()
+                if data is None:
+                    await plp_find.finish(f"❌>> To {nickname} | 捞瓶子 - 错误\n您输入的 QQ 号码没有扔瓶子或您输入的漂流瓶 ID 不存在。")
+                    return
+                else:
+                    if data[4] == 0:
+                        msg1 = f"☆>> To {nickname} | 瓶子 - 定向 ID 查找: {argv[0]}\n来自 {data[2]}({data[1]})\n内容：{data[3]}"
+                        return
+                    else:
+                        message = data[3].split("|")
+                        await plp_find.finish(Message([
+                            MessageSegment.text(f"☆>> To {nickname} | 瓶子 - 定向 ID 查找: {argv[0]}\n来自 {data[2]}({data[1]})\n内容:{message[0]}"),
+                            MessageSegment.image(f"{message[1]}")
+                        ]))
+                        return
             else:
-                msg = f"☆>> 瓶子 | 定向查找: {argv[0]}"
+                msg = f"☆>> To {nickname} | 瓶子 - 定向 QQ 查找: {data[0][2]}({argv[0]})"
                 for i in range(len(data)):
-                    msg += f"\n漂流瓶 ID: {data[i][0]}\n内容：{data[i][2]}"
+                    if data[i][4] == 0:
+                        msg += f"\n--------第 {i + 1} 条--------\n漂流瓶 ID: {data[i][0]}\n内容：{data[i][3]}"
+                    else:
+                        message = data[i][3].split("|")
+                        msg += f"\n--------第 {i + 1} 条--------\n漂流瓶 ID: {data[i][0]}\n内容：{message[0]}\n[定向 QQ 查找不支持显示图片，您需要点击链接查看]\n{message[1]}"
                 await plp_find.finish(msg)
     except Exception as e:
         print(e)
@@ -479,13 +523,14 @@ plp_clean = on_command("洗瓶子")
 
 @plp_clean.handle()
 async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
     db = get_driver().config.db
     c = await db.cursor()
     if str(event.user_id) != Config.superuser:
-        await plp_clean.finish("❌>> 洗瓶子 - 没有权限\n这个...只有小犽的管理员才可以清空瓶子。")
+        await plp_clean.finish(f"❌>> To {nickname} | 洗瓶子 - 没有权限\n这个...只有小犽的管理员才可以清空瓶子。")
         return
     else:
         await c.execute(f'delete from plp_table')
         await db.commit()
-        await plp_clean.finish("✔️>> 洗瓶子\n已清空漂流瓶数据。")
+        await plp_clean.finish(f"✔️>> To {nickname} | 洗瓶子\n已清空漂流瓶数据。")
         return

@@ -16,7 +16,7 @@ driver = get_driver()
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
-selfban = on_command("烟我", rule=to_me())
+selfban = on_command("烟我", aliases={'抽奖'}, rule=to_me())
 
 @selfban.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -33,6 +33,31 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await selfban.send(f'☆>> 自助禁言\n好的！您被我烟了{t}秒（1-600秒随机），不能反悔嗷。')
             except Exception as e:
                 print(e)
-                await selfban.finish("❌>> 自助禁言 - 无权限\n我不是管理员，或者你是管理员/群主，所以....我烟个锤子。")
+                await selfban.finish(f"!>> 自助禁言 - 出现问题\n我不是管理员，或者你是管理员/群主，所以....我烟个锤子。\nTechnical Information:\n{e}")
         else:
             await selfban.finish("私聊我烟个锤子。")
+
+ban = on_command("禁言", rule=to_me())
+
+@ban.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    argv = str(event.get_message()).strip().split(" ")
+    if argv[0] == "":
+        await ban.finish("❌>> 随机时长禁言 - 无账号\n没有账号我禁个锤子。")
+    else:
+        try:
+            ids = event.get_session_id()
+        except:
+            pass
+        else:
+            if ids.startswith("group"):
+                _, group_id = event.get_session_id().split("_")
+                t = random.randint(1,900)
+                try:
+                    await bot.set_group_ban(group_id=group_id, user_id=argv[0], duration=t)
+                    await selfban.send(f'☆>> 随机时长禁言\n好的！ta已经被烟了{t}秒（1-900秒随机）。')
+                except Exception as e:
+                    print(e)
+                    await selfban.finish(f"!>> 自助禁言 - 出现问题\n我不是管理员，或者你是管理员/群主，或者这个QQ号不在这个群，所以....我烟个锤子。\nTechnical Information:\n{e}")
+            else:
+                await selfban.finish("私聊我烟个锤子。")

@@ -4,6 +4,7 @@
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot
+Version 2.42_A
 <!-- prettier-ignore-end -->
 
 <p align="center">
@@ -33,8 +34,7 @@ Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为
 
 建议使用 git 对此项目进行版本管理。您也可以直接在本界面下载代码的压缩包进行运行。
 
-在运行代码之前，您需要[点击下载](https://www.diving-fish.com/maibot/static.zip)此资源文件并解压到`src`文件夹中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
-** 注意！当前版本的 Kiba 项目的 Best 40/50 改动幅度较大，您可能需要修改 /libraries/maimai_best_40.py 的部分代码才可以正常使用 Best 40/50 功能。**
+在运行代码之前，您需要将资源文件`static.7z`解压到`src`文件夹中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
 
 在 Windows 10 / Windows Server 2016 以上的系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
 如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`命令提示符(Command Prompt)`，`Windows Powershell`以及`cd`命令的教程。
