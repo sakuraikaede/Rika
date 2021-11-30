@@ -27,7 +27,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("☆>> 关于\n犽(Kiba) | Gon\n版本: 2.6(2.60.211130)\n----------------------\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\nProject Kiba Credits:\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("☆>> 关于\n犽(Kiba) | Gon\n版本: 2.6 SP1(2.601.211130)\n----------------------\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\nProject Kiba Credits:\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -684,12 +684,12 @@ async def _(bot: Bot, event: Event, state: T_State):
                 piclink = message[1][57:].split("]")
                 await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{msg}|{piclink[0]}",1,0,0)')
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 图片 漂流瓶(ID: {plpid})已经扔出去啦!")
+                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 图片 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了 R-18 (包括擦边球）以及任何不应在漂流瓶内出现的内容，您可能会受到漂流社区的部分功能封禁或相应处置。如果需要撤回瓶子，请私戳我人工处理。\n瓶子相关人工服务时间: 12:00 - 23:00。")
                 return
             else:
                 await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{argv[0]}",0,0,0)')
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 文字 漂流瓶(ID: {plpid})已经扔出去啦!")
+                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 文字 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了不应在漂流瓶内出现的内容，您可能会受到漂流社区的部分功能封禁或相应处置。如果需要撤回瓶子，请私戳我人工处理。\n瓶子相关人工服务时间: 12:00 - 23:00。")
                 return
     except Exception as e:
         print(e)

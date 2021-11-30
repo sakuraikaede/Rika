@@ -118,10 +118,10 @@ class DrawBest(object):
         self.ROWS_IMG = [2]
         if self.b50:
             for i in range(8):
-                self.ROWS_IMG.append(116 + 144 * i)
+                self.ROWS_IMG.append(140 + 144 * i)
         else:
             for i in range(6):
-                self.ROWS_IMG.append(116 + 144 * i)
+                self.ROWS_IMG.append(140 + 144 * i)
         self.COLOUMS_IMG = []
         for i in range(6):
             self.COLOUMS_IMG.append(2 + 258 * i)
@@ -305,7 +305,7 @@ class DrawBest(object):
         font = ImageFont.truetype('src/static/pmcst.ttf', 22, encoding='utf-8')
         font2 = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
         font3 = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
-        rankDraw.text((390 if not self.qqId else 281, 6), f'{self.rank()}', 'grey', font)
+        rankDraw.text((390 if not self.qqId else 281, 15), f'{self.rank()}', 'grey', font)
         titleFontName = 'src/static/adobe_simhei.otf'
         for num in range(0, len(sdBest)):
             i = num // 5
@@ -478,9 +478,9 @@ class DrawBest(object):
                 tempDraw.text((179, 105), f'#{num + 1}/{len(dxBest)}', 'white', font)
             temp = self.circle_corner(temp, 15)
             if self.b50:
-                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 1104), mask=temp.split()[3])
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 1081), mask=temp.split()[3])
             else:
-                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 804), mask=temp.split()[3])
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 781), mask=temp.split()[3])
         for num in range(len(dxBest), dxBest.size):
             i = num // 3
             j = num % 3
@@ -490,9 +490,9 @@ class DrawBest(object):
             temp = temp.filter(ImageFilter.GaussianBlur(1))
             temp = self.circle_corner(temp, 15)
             if self.b50:
-                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 1104), mask=temp.split()[3])
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 1081), mask=temp.split()[3])
             else:
-                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 804), mask=temp.split()[3])
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 781), mask=temp.split()[3])
 
     @staticmethod
     def _drawRoundRec(im, color, x, y, w, h, r):
@@ -516,16 +516,16 @@ class DrawBest(object):
             borderImg = borderImg1.resize((108, 108))
             borderImg.paste(qqLogo, (4, 4))
             borderImg = self._resizePic(borderImg, 0.995)
-            self.img.paste(borderImg, (9, 5), mask=borderImg.split()[3])
+            self.img.paste(borderImg, (9, 15), mask=borderImg.split()[3])
         else:
             splashLogo = Image.open(os.path.join(self.pic_dir, 'UI_CMN_TabTitle_MaimaiTitle_Ver214.png')).convert('RGBA')
             splashLogo = self._resizePic(splashLogo, 0.65)
-            self.img.paste(splashLogo, (10, 15), mask=splashLogo.split()[3])
+            self.img.paste(splashLogo, (10, 33), mask=splashLogo.split()[3])
 
         ratingBaseImg = Image.open(os.path.join(self.pic_dir, self._findRaPic())).convert('RGBA')
         ratingBaseImg = self._drawRating(ratingBaseImg)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.8)
-        self.img.paste(ratingBaseImg, (240 if not self.qqId else 131, 0), mask=ratingBaseImg.split()[3])
+        self.img.paste(ratingBaseImg, (240 if not self.qqId else 131, 10), mask=ratingBaseImg.split()[3])
 
         namePlateImg = Image.open(os.path.join(self.pic_dir, 'UI_TST_PlateMask.png')).convert('RGBA')
         namePlateImg = namePlateImg.resize((285, 40))
@@ -535,7 +535,7 @@ class DrawBest(object):
         nameDxImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Name_DX.png')).convert('RGBA')
         nameDxImg = self._resizePic(nameDxImg, 0.9)
         namePlateImg.paste(nameDxImg, (230, 4), mask=nameDxImg.split()[3])
-        self.img.paste(namePlateImg, (240 if not self.qqId else 131, 40), mask=namePlateImg.split()[3])
+        self.img.paste(namePlateImg, (240 if not self.qqId else 131, 50), mask=namePlateImg.split()[3])
 
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
@@ -548,7 +548,11 @@ class DrawBest(object):
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
         shougouDraw.text(textPos, playCountInfo, 'black', font2)
         shougouImg = self._resizePic(shougouImg, 1.05)
-        self.img.paste(shougouImg, (240 if not self.qqId else 131, 83), mask=shougouImg.split()[3])
+        self.img.paste(shougouImg, (240 if not self.qqId else 131, 93), mask=shougouImg.split()[3])
+        
+        splashImg = Image.open(os.path.join(self.pic_dir, 'Splash.png')).convert('RGBA')
+        splashImg = self._resizePic(splashImg, 0.2)
+        self.img.paste(splashImg, (685, 2), mask=splashImg.split()[3])
 
         self._drawBestList(self.img, self.sdBest, self.dxBest)
         ratingsl = self.sdBest[24].ra if not self.b50 else computeRa(self.sdBest[34].ds, self.sdBest[34].achievement, True)
@@ -559,11 +563,11 @@ class DrawBest(object):
         authorBoardImg = self._resizePic(authorBoardImg, 0.43)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
         authorBoardDraw.text((19, 18), f' ☆>> Rating 分析\n 最高 Rating 如下：\n SD:{ratingsh}       DX:{ratingdh}\n 最低 Rating 如下:\n SD:{ratingsl}       DX:{ratingdl}\n', 'black', font2s)
-        self.img.paste(authorBoardImg, (1070, 0), mask=authorBoardImg.split()[3])
+        self.img.paste(authorBoardImg, (1070, 10), mask=authorBoardImg.split()[3])
 
         dxImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_01.png')).convert('RGBA')
         dxImg = self._resizePic(dxImg, 0.45)
-        self.img.paste(dxImg, (4, 1185 if self.b50 else 890), mask=dxImg.split()[3])
+        self.img.paste(dxImg, (8, 1187 if self.b50 else 890), mask=dxImg.split()[3])
 
         # self.img.show()
 
