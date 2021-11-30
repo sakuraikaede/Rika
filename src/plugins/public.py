@@ -27,7 +27,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("☆>> 关于\n犽(Kiba) By Killua | V2.51\nCodename: Killua Plus\n----------------------\n本软件为开源软件。\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\n感谢:\nMaibot 项目:@Diving-Fish\nBest 50 项目:@BlueDeer233\n部分项目支持:@Yuri-YuzuChaN\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("☆>> 关于\n犽(Kiba) | Gon\n版本: 2.6(2.60.211130)\n----------------------\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\nProject Kiba Credits:\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -76,6 +76,7 @@ gocho <str1> <str2>                                                         生�
  
 看回复 <漂流瓶 ID>                                                             查看漂流瓶下面的回复！
 
+当前瓶子数量                                                                        查询社区当前漂流瓶子数量，此命令不受社区限制。
 ------------------------------------------------------------------------------------------------------------------------------
 
 ☆>> 管理员模块控制 | Administrative
@@ -907,3 +908,15 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await plp_reply_view.finish(msg)
     except Exception as e:
         print(e)
+
+plp_num = on_command("当前瓶子数量")
+
+@plp_num.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
+    db = get_driver().config.db
+    c = await db.cursor()
+    argv = str(event.get_message()).strip().split(" ")
+    await c.execute(f'select * from plp_table')
+    data = await c.fetchall()
+    await plp_num.finish(f"☆>> To {nickname} | 漂流社区\n现在全社区共有 {len(data)} 个漂流瓶。")

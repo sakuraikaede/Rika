@@ -37,7 +37,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         else:
             await selfban.finish("私聊我烟个锤子。")
 
-ban = on_command("禁言", rule=to_me())
+ban = on_command("禁言", rule=to_me(),  priority=17)
 
 @ban.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -51,7 +51,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             pass
         else:
             if ids.startswith("group"):
-                _, group_id = event.get_session_id().split("_")
+                _, group_id, user_id = event.get_session_id().split("_")
                 t = random.randint(1,900)
                 try:
                     await bot.set_group_ban(group_id=group_id, user_id=argv[0], duration=t)

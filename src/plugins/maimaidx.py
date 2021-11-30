@@ -109,7 +109,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"Track ID: {music.id}-{music.type}\n"
+                "text": f"Track ID: [{music.type}] {music.id}\n"
             }
         },
         {
@@ -197,7 +197,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     except Exception as e:
         print(e)
         await spec_rand.finish(f"!>> Bug Check\n随机命令出现了问题。\nTechnical Information:\n{e}")
-
+        
 mr = on_regex(r".*maimai.*什么")
 
 
@@ -297,8 +297,8 @@ async def _(bot: Bot, event: Event, state: T_State):
             stats = music['stats'][level_index]
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             if len(chart['notes']) == 4:
-                msg = f'''Standard >\n{level_name[level_index]} > Lv {level} Base -> {ds}
-相对难易度: {stats['tag']}
+                msg = f'''{level_name[level_index]} > Lv {level} | Base: {ds}
+Difficulty level: {stats['tag']}
 All: {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3]}
 Tap: {chart['notes'][0]}
 Hold: {chart['notes'][1]}
@@ -306,8 +306,8 @@ Slide: {chart['notes'][2]}
 Break: {chart['notes'][3]}
 Notes Designer: {chart['charter']}'''
             else:
-                msg = f'''DX >\n{level_name[level_index]} > Lv {level} Base -> {ds}
-相对难易度: {stats['tag']}
+                msg = f'''{level_name[level_index]} > Lv {level} | Base: {ds}
+Difficulty level: {stats['tag']}
 All: {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3] + chart['notes'][4]}
 Tap: {chart['notes'][0]}
 Hold: {chart['notes'][1]}
@@ -331,13 +331,13 @@ Notes Designer: {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"{music['title']}\n"
+                        "text": f"Track ID: [{music['type']}] {music['id']}\n"
                     }
                 },
                 {
                     "type": "text",
                     "data": {
-                        "text": f"ID: {music['id']} | Type: "
+                        "text": f"{music['title']}\n"
                     }
                 },
                 {
@@ -370,7 +370,7 @@ Notes Designer: {chart['charter']}'''
                 {
                     "type": "text",
                     "data": {
-                        "text": f"Track ID: {music['id']}-{music['type']}\n"
+                        "text": f"Track ID: [{music['type']}] {music['id']}\n"
                     }
                 }, 
                 {
@@ -565,6 +565,7 @@ query_score = on_command('分数线')
 async def _(bot: Bot, event: Event, state: T_State):
     r = "([绿黄红紫白])(id)?([0-9]+)"
     argv = str(event.get_message()).strip().split(" ")
+    nickname = event.sender.nickname
     if len(argv) == 1 and argv[0] == '帮助':
         s = '''☆>> 分数线 - 帮助
 这个功能为你提供达到某首歌分数线的最低标准而设计的~~~
@@ -605,13 +606,39 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''☆>> 分数线\n{music['title']} | {level_labels2[level_index]}\n{line}% 最低要求 ->\n
-Tap Great 最低损失量 /个: {(total_score * reduce / 10000):.2f}\n
-每 Tap Great 损失的完成度: {10000 / total_score:.4f}%\n
-每 50 落的损失的完成度: {break_50_reduce / total_score * 100:.4f}%\n
-50 落等价 Tap Great 数量 /个: {(break_50_reduce / 100):.3f}\n
-Break 数量 /个: {brk}\n
-具体情况的换算您可以查看帮助来帮助您换算。''')
+            await query_chart.send(f'''☆>> To {nickname} | 分数线详情
+Track ID: [{music['type']}] {music['id'] } | {level_labels2[level_index]}
+{music['title']}
+分数线 {line}% 参照表:
+----------------------
+此表格遵循的格式为:
+类型 | ACHV.损失/个 | 最多损失数
+----------------------
+Great 评价:
+Tap & Touch | {10000 / total_score:.4f}% | {(total_score * reduce / 10000):.2f}
+Hold | {(10000 / total_score)* 2:.4f}% | {((total_score * reduce / 10000)/ 2):.2f}
+Slide | {(10000 / total_score)* 3:.4f}% | {((total_score * reduce / 10000)/ 3):.2f}
+Good 评价:
+Tap & Touch | {(10000 / total_score)* 2.5:.4f}% | {((total_score * reduce / 10000)/ 2.5):.2f}
+Hold | {(10000 / total_score)* 5:.4f}% | {((total_score * reduce / 10000)/ 5):.2f}
+Slide | {(10000 / total_score)* 7.5:.4f}% | {((total_score * reduce / 10000)/ 7.5):.2f}
+Miss 评价:
+Tap & Touch | {(10000 / total_score)*5:.4f}% | {((total_score * reduce / 10000)/5):.2f}
+Hold | {(10000 / total_score)* 10:.4f}% | {((total_score * reduce / 10000)/ 10):.2f}
+Slide | {(10000 / total_score)* 15:.4f}% | {((total_score * reduce / 10000)/ 15):.2f}
+
+Break 各评价损失:
+注意: Break 的 Great 与 Perfect 评价都有细分等级，此表格的 Break Great 不做细分，仅为大约数供您参考。
+本谱面每个 Break Perfect 2600 的达成率是 {((10000 / total_score) * 25 + (break_50_reduce / total_score * 100)* 4):.4f}%,谱面共 {brk} 个 Break。
+----------------------
+此表格遵循的格式为:
+类型 | ACHV.损失/个 | Tap Great 等价数
+----------------------
+Perfect 2550 | {break_50_reduce / total_score * 100:.4f}% | {(break_50_reduce / 100):.3f}
+Perfect 2500 | {(break_50_reduce / total_score * 100)* 2:.4f}% | {(break_50_reduce / 100)* 2:.3f}
+Great | ≈{((10000 / total_score) * 5 + (break_50_reduce / total_score * 100)* 4):.4f}% | ≈{5 + (break_50_reduce / 100)* 4:.3f}
+Good | {((10000 / total_score) * 12.5 + (break_50_reduce / total_score * 100)* 4):.4f}% | {12.5 + (break_50_reduce / 100)* 4:.3f}
+Miss | {((10000 / total_score) * 25 + (break_50_reduce / total_score * 100)* 4):.4f}% | {25 + (break_50_reduce / 100)* 4:.3f}''')
         except Exception:
             await query_chart.send("格式错误，输入 “分数线 帮助” 以查看帮助信息")
 
@@ -636,7 +663,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if username == "":
             text = f'☆>> To {nickname} | Best 40\n您的 Best 40 如图所示。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
         else:
-            text = f'☆>> To {nickname} | Best 40\n您查询的 ID: {username} 已找到。此 ID 的 Best 40 如图所示。\n'
+            text = f'☆>> To {nickname} | Best 40 - 其他 ID 查询\n您查询的 ID: {username} 已找到。此 ID 的 Best 40 如图所示。\n'
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text(text),
@@ -663,7 +690,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if username == "":
             text = f'☆>> To {nickname} | Best 50\n您的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
         else:
-            text = f'☆>> To {nickname} | Best 50\n您查询的 ID: {username} 已找到。此 ID 的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。'
+            text = f'☆>> To {nickname} | Best 50 - 其他 ID 查询\n您查询的 ID: {username} 已找到。此 ID 的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。'
         await best_50_pic.send(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text(text),
@@ -839,7 +866,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await waiting_set.finish(f"☆>> 出勤大数据\n已成功设置店铺。\n店铺名: {argv[0]}\n出勤人数: 0\n修改时间: {time}")
             await db.commit()
 
-waiting = on_regex(r'(.+) ([0-9]?几?\+?\-?1?)人?', rule=to_me())
+waiting = on_regex(r'(.+) ([0-9]?几?\+?\-?1?)人?', rule=to_me(), priority=18)
 @waiting.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     regex = "(.+) ([0-9]?几?\+?\-?1?)人?"
@@ -864,9 +891,9 @@ async def _(bot: Bot, event: Event, state: T_State):
             await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
             return
         else:
-            await c.execute(f'update waiting_table set wait={data[2] + 1} where shop="{res.groups()[0]}"')
+            await c.execute(f'update waiting_table set wait={data[2] + 1}, updated="{time}" where shop="{res.groups()[0]}"')
             await db.commit()
-            await waiting.finish(f"☆>> 出勤大数据\n更新完成！\n{data[0]} 有 {data[2] + 1} 人出勤。最后更新时间:{data[3]}")
+            await waiting.finish(f"☆>> 出勤大数据\n更新完成！\n{data[0]} 有 {data[2] + 1} 人出勤。最后更新时间:{time}")
             return
     elif res.groups()[1] == "-1":
         await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
@@ -878,9 +905,9 @@ async def _(bot: Bot, event: Event, state: T_State):
             if data[2] - 1 < 0:
                 await waiting.finish("❌>> 出勤大数据\n不能再减了，再减就变成灵异事件了！")
                 return
-            await c.execute(f'update waiting_table set wait={data[2] - 1} where shop="{res.groups()[0]}"')
+            await c.execute(f'update waiting_table set wait={data[2] - 1}, updated="{time}" where shop="{res.groups()[0]}"')
             await db.commit()
-            await waiting.finish(f"☆>> 出勤大数据\n更新完成！\n{data[0]} 有 {data[2] - 1} 人出勤。最后更新时间:{data[3]}")
+            await waiting.finish(f"☆>> 出勤大数据\n更新完成！\n{data[0]} 有 {data[2] - 1} 人出勤。最后更新时间:{time}")
             return
     else:
         await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
@@ -889,9 +916,9 @@ async def _(bot: Bot, event: Event, state: T_State):
             await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
             return
         else:
-            await c.execute(f'update waiting_table set wait={res.groups()[1]} where shop="{res.groups()[0]}"')
+            await c.execute(f'update waiting_table set wait={res.groups()[1]}, updated="{time}" where shop="{res.groups()[0]}"')
             await db.commit()
-            await waiting.finish(f"☆>> 出勤大数据\n更新完成！\n{res.groups()[0]} 有 {res.groups()[1]} 人出勤。最后更新时间:{data[3]}")
+            await waiting.finish(f"☆>> 出勤大数据\n更新完成！\n{res.groups()[0]} 有 {res.groups()[1]} 人出勤。最后更新时间:{time}")
             return
 
 location = on_regex(r'.+位置', rule=to_me())
@@ -1070,7 +1097,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             music = total_list.by_id(str(song[0]))
             if music.ds[song[1]] > 13.6:
                 song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
-        msg = f'''☆>> To {nickname} | {res.groups()[0]}{res.groups()[1]}当前进度\n{"您" if not res.groups()[2] else res.groups()[2]}的剩余进度如下：
+        msg = f'''☆>> To {nickname} | {res.groups()[0]}{res.groups()[1]}当前进度\n{"您" if not res.groups()[2] else res.groups()[2]}的剩余歌曲数量如下：
 Expert > 剩余 {len(song_remain_expert)} 首
 Master > 剩余 {len(song_remain_master)} 首
 '''
@@ -1093,8 +1120,10 @@ Master > 剩余 {len(song_remain_master)} 首
                         elif res.groups()[1] == '舞舞':
                             if player_data['verlist'][record_index]['fs']:
                                 self_record = syncRank[sync_rank.index(player_data['verlist'][record_index]['fs'])].upper()
-                    msg += f'ID: {s[0]} > {s[1]} {s[2]} 定数: {s[3]} 相对难度: {s[4]} {self_record}'.strip() + '\n'
-            else: msg += f'还有 {len(song_remain_difficult)} 首大于13.6定数的曲目，加油推分捏！\n'
+                    if self_record == "":
+                        self_record = "暂无"
+                    msg += f'ID: {s[0]} > {s[1]} | {s[2]} 定数: {s[3]} 相对难度: {s[4]} 当前达成率: {self_record}'.strip() + '\n'
+            else: msg += f'还有 {len(song_remain_difficult)} 首定数大于 13.6 的曲目，加油推分捏！\n'
         elif len(song_remain) > 0:
             if len(song_remain) < 11:
                 msg += '剩余曲目：\n'
@@ -1111,9 +1140,11 @@ Master > 剩余 {len(song_remain_master)} 首
                         elif res.groups()[1] == '舞舞':
                             if player_data['verlist'][record_index]['fs']:
                                 self_record = syncRank[sync_rank.index(player_data['verlist'][record_index]['fs'])].upper()
-                    msg += f'ID: {m.id} > {m.title} {diffs[s[1]]} 定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} {self_record}'.strip() + '\n'
+                    if self_record == "":
+                        self_record = "暂无"
+                    msg += f'ID: {m.id} > {m.title} | {diffs[s[1]]} 定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} 当前达成率: {self_record}'.strip() + '\n'
             else:
-                msg += '已经没有定数大于13.6的曲目了,加油清谱吧！\n'
+                msg += '已经没有定数大于 13.6 的曲目了,加油清谱吧！\n'
         else: msg += f'✔️>> To {nickname} | 已完成{res.groups()[0]}{res.groups()[1]}\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 完成了 {res.groups()[0]}{res.groups()[1]} 成就！'
         await plate.send(msg.strip())
 
@@ -1197,7 +1228,9 @@ async def _(bot: Bot, event: Event, state: T_State):
                         elif res.groups()[1].lower() in syncRank:
                             if player_data['verlist'][record_index]['fs']:
                                 self_record = syncRank[sync_rank.index(player_data['verlist'][record_index]['fs'])].upper()
-                    msg += f'ID: {s[0]} > {s[1]} | {s[2]} Base: {s[3]} 相对难度: {s[4]} {self_record}'.strip() + '\n'
+                    if self_record == "":
+                        self_record = "暂无"
+                    msg += f'ID: {s[0]} > {s[1]} | {s[2]} Base: {s[3]} 相对难度: {s[4]} 当前达成率: {self_record}'.strip() + '\n'
             else:
                 await levelprogress.finish(f'☆>> To {nickname} | 清谱进度\n{"您" if not res.groups()[2] else res.groups()[2]} 还有 {len(song_remain)} 首 Lv.{res.groups()[0]} 的曲目还没有达成 {res.groups()[1].upper()},加油推分吧！')
         else:
@@ -1285,15 +1318,17 @@ async def _(bot: Bot, event: Event, state: T_State):
                                 music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
         if len(music_dx_list) == 0 and len(music_sd_list) == 0:
             await rise_score.send(f"❌>> To {nickname} | 犽的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
+            return
         elif len(music_dx_list) + len(music_sd_list) > 60:
             await rise_score.send(f"!>> To {nickname} | 犽的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
+            return
         msg = f'☆>> To {nickname} | 犽的锦囊 - 升 {res.groups()[1]} 分攻略\n'
         if len(music_sd_list) != 0:
             msg += f'推荐以下标准乐曲：\n'
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):
-                msg += f'ID: {music["id"]}> {music["title"]} {diff} 定数: {ds} 要求的达成率: {achievement} 要求的分数线: {rank} 分数线 Rating: {ra} 相对难度: {difficulty}\n'
+                msg += f'ID: {music["id"]}> {music["title"]} {diff} 定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {difficulty}\n'
         if len(music_dx_list) != 0:
-            msg += f'\n为您推荐以下2021乐曲：\n'
+            msg += f'\n为您推荐以下新版本乐曲：\n'
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_dx_list, key=lambda i: int(i[0]['id'])):
-                msg += f'{music["id"]}. {music["title"]} {diff} {ds} {achievement} {rank} {ra} {difficulty}\n'
+                msg += f'{music["id"]}. {music["title"]} {diff} 定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {difficulty}\n'
         await rise_score.send(MessageSegment.image(f"base64://{image_to_base64(text_to_image(msg.strip())).decode()}"))

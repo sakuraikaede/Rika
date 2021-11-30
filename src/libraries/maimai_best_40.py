@@ -19,7 +19,7 @@ diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
 
 class ChartInfo(object):
     def __init__(self, idNum: str, diff: int, tp: str, achievement: float, ra: int, comboId: int, scoreId: int,
-                 title: str, ds: float, lv: str):
+                 syncId: int, title: str, ds: float, lv: str):
         self.idNum = idNum
         self.diff = diff
         self.tp = tp
@@ -27,6 +27,7 @@ class ChartInfo(object):
         self.ra = ra
         self.comboId = comboId
         self.scoreId = scoreId
+        self.syncId = syncId
         self.title = title
         self.ds = ds
         self.lv = lv
@@ -45,7 +46,9 @@ class ChartInfo(object):
         rate = ['d', 'c', 'b', 'bb', 'bbb', 'a', 'aa', 'aaa', 's', 'sp', 'ss', 'ssp', 'sss', 'sssp']
         ri = rate.index(data["rate"])
         fc = ['', 'fc', 'fcp', 'ap', 'app']
+        fs = ['', 'fs', 'fsp', 'fsd', 'fsdp']
         fi = fc.index(data["fc"])
+        fsi = fs.index(data["fs"])
         return cls(
             idNum=total_list.by_title(data["title"]).id,
             title=data["title"],
@@ -53,6 +56,7 @@ class ChartInfo(object):
             ra=data["ra"],
             ds=data["ds"],
             comboId=fi,
+            syncId=fsi,
             scoreId=ri,
             lv=data["level"],
             achievement=data["achievements"],
@@ -107,22 +111,22 @@ class DrawBest(object):
                 self.playerRating += computeRa(dx.ds, dx.achievement, True)
         self.pic_dir = 'src/static/mai/pic/'
         self.cover_dir = 'src/static/mai/cover/'
-        self.img = Image.open(self.pic_dir + 'UI_TTR_BG_Base_Plus.png').convert('RGBA')
-        self.ROWS_IMG = [2]
-        for i in range(6):
-            self.ROWS_IMG.append(116 + 96 * i)
         if self.b50:
-            self.COLOUMS_IMG = []
-            for i in range(8):
-                self.COLOUMS_IMG.append(2 + 138 * i)
-            for i in range(4):
-                self.COLOUMS_IMG.append(988 + 138 * i)
+            self.img = Image.open(self.pic_dir + 'b50.png').convert('RGBA')
         else:
-            self.COLOUMS_IMG = []
+            self.img = Image.open(self.pic_dir + 'b40.png').convert('RGBA')
+        self.ROWS_IMG = [2]
+        if self.b50:
+            for i in range(8):
+                self.ROWS_IMG.append(116 + 144 * i)
+        else:
             for i in range(6):
-                self.COLOUMS_IMG.append(2 + 172 * i)
-            for i in range(4):
-                self.COLOUMS_IMG.append(888 + 172 * i)
+                self.ROWS_IMG.append(116 + 144 * i)
+        self.COLOUMS_IMG = []
+        for i in range(6):
+            self.COLOUMS_IMG.append(2 + 258 * i)
+        for i in range(4):
+            self.COLOUMS_IMG.append(2 + 258 * i)
         self.draw()
 
     def _Q2B(self, uchar):
@@ -261,6 +265,20 @@ class DrawBest(object):
             num = '09'
         return f'UI_CMN_DXRating_S_{num}.png'
 
+    def circle_corner(self, img, radii):  
+        circle = Image.new('L', (radii * 2, radii * 2), 0)
+        draw = ImageDraw.Draw(circle)
+        draw.ellipse((0, 0, radii * 2, radii * 2), fill=255)
+        img = img.convert("RGBA")
+        w, h = img.size
+        alpha = Image.new('L', img.size, 255)
+        alpha.paste(circle.crop((0, 0, radii, radii)), (0, 0))
+        alpha.paste(circle.crop((radii, 0, radii * 2, radii)), (w - radii, 0))
+        alpha.paste(circle.crop((radii, radii, radii * 2, radii * 2)), (w - radii, h - radii))
+        alpha.paste(circle.crop((0, radii, radii, radii * 2)), (0, h - radii))
+        img.putalpha(alpha)
+        return img
+
     def _drawRating(self, ratingBaseImg: Image.Image):
         COLOUMS_RATING = [74, 92, 110, 129, 147]
         theRa = self.playerRating
@@ -275,104 +293,115 @@ class DrawBest(object):
         return ratingBaseImg
 
     def _drawBestList(self, img: Image.Image, sdBest: BestList, dxBest: BestList):
-        itemW = 164 if not self.b50 else 131
-        itemH = 88
+        itemW = 246
+        itemH = 132
         Color = [(69, 193, 36), (255, 186, 1), (255, 90, 102), (134, 49, 200), (217, 197, 233)]
         levelTriagle = [(itemW, 0), (itemW - 12, 0), (itemW, 12)]
         rankPic = 'D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp'.split(' ')
         comboPic = ' FC FCp AP APp'.split(' ')
+        syncPic = ' FS FSp FSD FSDp'.split(' ')
         imgDraw = ImageDraw.Draw(img)
         rankDraw = ImageDraw.Draw(img)
         font = ImageFont.truetype('src/static/pmcst.ttf', 22, encoding='utf-8')
         font2 = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
-        rankDraw.text((390 if not self.qqId else 281, 1), f'RANK', 'black', font2)
-        rankDraw.text((390 if not self.qqId else 281, 8), f'{self.rank()}', 'black', font)
-
+        font3 = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+        rankDraw.text((390 if not self.qqId else 281, 6), f'{self.rank()}', 'grey', font)
         titleFontName = 'src/static/adobe_simhei.otf'
         for num in range(0, len(sdBest)):
-            i = num // 5 if not self.b50 else num // 7
-            j = num % 5 if not self.b50 else num % 7
+            i = num // 5
+            j = num % 5
             chartInfo = sdBest[num]
             pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.jpg')
             if not os.path.exists(pngPath):
                 pngPath = os.path.join(self.cover_dir, '1000.png')
             temp = Image.open(pngPath).convert('RGB')
-            temp = self._resizePic(temp, itemW / temp.size[0])
+            temp = self._resizePic(temp, itemW / temp.size[0]) 
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(3))
             temp = temp.point(lambda p: p * 0.72)
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
-            diffImg = self._resizePic(diffImg, 0.65 if not self.b50 else 0.55)
+            diffImg = self._resizePic(diffImg, 0.8)
             temp.paste(diffImg, (6, 4), diffImg.split()[3])
             if chartInfo.tp == 'SD':
                 sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
-                sdImg = self._resizePic(sdImg, 0.55 if not self.b50 else 0.4)
-                temp.paste(sdImg, (98 if not self.b50 else 83, 5 if not self.b50 else 6), sdImg.split()[3])
+                sdImg = self._resizePic(sdImg, 0.75)
+                temp.paste(sdImg, (155, 5), sdImg.split()[3])
             elif chartInfo.tp == 'DX':
                 dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
-                dxImg = self._resizePic(dxImg, 0.55 if not self.b50 else 0.4)
-                temp.paste(dxImg, (98 if not self.b50 else 83, 5 if not self.b50 else 6), dxImg.split()[3])
-            font = ImageFont.truetype(titleFontName, 13 if not self.b50 else 12, encoding='utf-8')
+                dxImg = self._resizePic(dxImg, 0.75)
+                temp.paste(dxImg, (155, 5), dxImg.split()[3])
+            font = ImageFont.truetype(titleFontName, 18, encoding='utf-8')
             title = chartInfo.title
-            if self._coloumWidth(title) > 12 if not self.b50 else 10:
-                title = self._changeColumnWidth(title, 11 if not self.b50 else 9) + '...'
-            tempDraw.text((8, 24), title, 'white', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
-            tempDraw.text((8, 40), f'ACHIEVEMENT', 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 13 if not self.b50 else 12, encoding='utf-8')
-            tempDraw.text((8, 47), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            if self._coloumWidth(title) > 12:
+                title = self._changeColumnWidth(title, 11) + '...'
+            tempDraw.text((8, 28), title, 'white', font)
+            font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+            tempDraw.text((8, 50), f'ACHIEVEMENT', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 23, encoding='utf-8')
+            tempDraw.text((8, 60), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             if rankPic[chartInfo.scoreId] == 'SSSp' or rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (108 if not self.b50 else 83, 35), rankImg.split()[3])
+                rankImg = self._resizePic(rankImg, 0.8)
+                temp.paste(rankImg, (168, 43), rankImg.split()[3])
             elif rankPic[chartInfo.scoreId] == 'SSp' or rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (113 if not self.b50 else 88, 35), rankImg.split()[3])
+                rankImg = self._resizePic(rankImg, 0.8)
+                temp.paste(rankImg, (175, 43), rankImg.split()[3])
             else:
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (121 if not self.b50 else 96, 35), rankImg.split()[3])
+                rankImg = self._resizePic(rankImg, 0.8)
+                temp.paste(rankImg, (185, 43), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
-                comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
+                comboImg = self._resizePic(comboImg, 0.6)
+                temp.paste(comboImg, (170, 80), comboImg.split()[3])
             else:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
-                comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
-            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
-            tempDraw.text((8, 63), f'BASE', 'white', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
-            tempDraw.text((7, 70), f'{chartInfo.ds}', 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
-            tempDraw.text((36, 66), f'→', 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
-            tempDraw.text((52, 63), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
-            if num > 10:
-                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
-                tempDraw.text((112 if not self.b50 else 87, 73), f'#{num + 1}/{len(sdBest)}', 'white', font)
+                comboImg = self._resizePic(comboImg, 0.6)
+                temp.paste(comboImg, (172, 80), comboImg.split()[3])
+            if chartInfo.syncId:
+                syncImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{syncPic[chartInfo.syncId]}_S.png')).convert('RGBA')
+                syncImg = self._resizePic(syncImg, 0.6)
+                temp.paste(syncImg, (202, 80), syncImg.split()[3])
             else:
-                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
-                tempDraw.text((114 if not self.b50 else 89, 73), f'#{num + 1}/{len(sdBest)}', 'white', font)
-
-            recBase = Image.new('RGBA', (itemW, itemH), 'black')
-            recBase = recBase.point(lambda p: p * 0.8)
-            img.paste(recBase, (self.COLOUMS_IMG[j] + 5, self.ROWS_IMG[i + 1] + 5))
-            img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
+                syncImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
+                syncImg = self._resizePic(syncImg, 0.6)
+                temp.paste(syncImg, (202, 80), syncImg.split()[3])
+            font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+            tempDraw.text((8, 90), f'BASE', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
+            tempDraw.text((7, 105), f'{chartInfo.ds}', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
+            tempDraw.text((51, 96), f'→', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 27, encoding='utf-8')
+            tempDraw.text((74, 88), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            if num > 10:
+                font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+                tempDraw.text((177, 105), f'#{num + 1}/{len(sdBest)}', 'white', font)
+            else:
+                font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+                tempDraw.text((179, 105), f'#{num + 1}/{len(sdBest)}', 'white', font)
+            temp = self.circle_corner(temp, 15)
+            img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4), mask=temp.split()[3])
         for num in range(len(sdBest), sdBest.size):
-            i = num // 5 if not self.b50 else num // 7
-            j = num % 5 if not self.b50 else num % 7
+            i = num // 5
+            j = num % 5
             temp = Image.open(os.path.join(self.cover_dir, f'1000.png')).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(1))
-            img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4))
+            temp = self.circle_corner(temp, 15)
+            img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 4), mask=temp.split()[3])
+
         for num in range(0, len(dxBest)):
-            i = num // 3
-            j = num % 3
+            i = num // 5 
+            j = num % 5
             chartInfo = dxBest[num]
+            if num == 0:
+                self.sd_highestrating = chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)
+            elif num == len(sdBest):
+                self.sd_lowestrating = chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)
             pngPath = os.path.join(self.cover_dir, f'{int(chartInfo.idNum)}.jpg')
             if not os.path.exists(pngPath):
                 pngPath = os.path.join(self.cover_dir, f'{int(chartInfo.idNum)}.png')
@@ -386,64 +415,72 @@ class DrawBest(object):
 
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
-            diffImg = self._resizePic(diffImg, 0.65 if not self.b50 else 0.5)
+            diffImg = self._resizePic(diffImg, 0.8)
             temp.paste(diffImg, (6, 4), diffImg.split()[3])
             if chartInfo.tp == 'SD':
                 sdImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
-                sdImg = self._resizePic(sdImg, 0.55 if not self.b50 else 0.4)
-                temp.paste(sdImg, (98 if not self.b50 else 83, 5 if not self.b50 else 6), sdImg.split()[3])
+                sdImg = self._resizePic(sdImg, 0.75)
+                temp.paste(sdImg, (155, 5), sdImg.split()[3])
             elif chartInfo.tp == 'DX':
                 dxImg = Image.open(os.path.join(self.pic_dir, 'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
-                dxImg = self._resizePic(dxImg, 0.55 if not self.b50 else 0.4)
-                temp.paste(dxImg, (98 if not self.b50 else 83, 5 if not self.b50 else 6), dxImg.split()[3])
-            font = ImageFont.truetype(titleFontName, 13 if not self.b50 else 12, encoding='utf-8')
+                dxImg = self._resizePic(dxImg, 0.75)
+                temp.paste(dxImg, (155, 5), dxImg.split()[3])
+            font = ImageFont.truetype(titleFontName, 18, encoding='utf-8')
             title = chartInfo.title
-            if self._coloumWidth(title) > 12 if not self.b50 else 10:
-                title = self._changeColumnWidth(title, 11 if not self.b50 else 9) + '...'
-            tempDraw.text((8, 24), title, 'white', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
-            tempDraw.text((8, 40), f'ACHIEVEMENT', 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 14 if not self.b50 else 12, encoding='utf-8')
-            tempDraw.text((7, 47), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            if self._coloumWidth(title) > 12:
+                title = self._changeColumnWidth(title, 11) + '...'
+            tempDraw.text((8, 28), title, 'white', font)
+            font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+            tempDraw.text((8, 50), f'ACHIEVEMENT', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 23, encoding='utf-8')
+            tempDraw.text((8, 60), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             if rankPic[chartInfo.scoreId] == 'SSSp' or rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (108 if not self.b50 else 83, 35), rankImg.split()[3])
+                rankImg = self._resizePic(rankImg, 0.8)
+                temp.paste(rankImg, (168, 43), rankImg.split()[3])
             elif rankPic[chartInfo.scoreId] == 'SSp' or rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (113 if not self.b50 else 88, 35), rankImg.split()[3])
+                rankImg = self._resizePic(rankImg, 0.8)
+                temp.paste(rankImg, (175, 43), rankImg.split()[3])
             else:
                 rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.5)
-                temp.paste(rankImg, (121 if not self.b50 else 96, 35), rankImg.split()[3])
+                rankImg = self._resizePic(rankImg, 0.8)
+                temp.paste(rankImg, (185, 43), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
-                comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
+                comboImg = self._resizePic(comboImg, 0.6)
+                temp.paste(comboImg, (170, 80), comboImg.split()[3])
             else:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
-                comboImg = self._resizePic(comboImg, 0.45)
-                temp.paste(comboImg, (120 if not self.b50 else 95, 58), comboImg.split()[3])
-            font = ImageFont.truetype('src/static/msyh.ttc', 8, encoding='utf-8')
-            tempDraw.text((8, 63), f'BASE', 'white', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
-            tempDraw.text((7, 70), f'{chartInfo.ds}', 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 13, encoding='utf-8')
-            tempDraw.text((36, 66), f'→', 'white', font)
-            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
-            tempDraw.text((52, 63), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
-            if num > 10:
-                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
-                tempDraw.text((112 if not self.b50 else 87, 73), f'#{num + 1}/{len(dxBest)}', 'white', font)
+                comboImg = self._resizePic(comboImg, 0.6)
+                temp.paste(comboImg, (172, 80), comboImg.split()[3])
+            if chartInfo.syncId:
+                syncImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{syncPic[chartInfo.syncId]}_S.png')).convert('RGBA')
+                syncImg = self._resizePic(syncImg, 0.6)
+                temp.paste(syncImg, (202, 80), syncImg.split()[3])
             else:
-                font = ImageFont.truetype('src/static/msyh.ttc', 9, encoding='utf-8')
-                tempDraw.text((114 if not self.b50 else 89, 73), f'#{num + 1}/{len(dxBest)}', 'white', font)
-
-            recBase = Image.new('RGBA', (itemW, itemH), 'black')
-            recBase = recBase.point(lambda p: p * 0.8)
-            img.paste(recBase, (self.COLOUMS_IMG[j + (6 if not self.b50 else 8)] + 5, self.ROWS_IMG[i + 1] + 5))
-            img.paste(temp, (self.COLOUMS_IMG[j + (6 if not self.b50 else 8)] + 4, self.ROWS_IMG[i + 1] + 4))
+                syncImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
+                syncImg = self._resizePic(syncImg, 0.6)
+                temp.paste(syncImg, (202, 80), syncImg.split()[3])
+            font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+            tempDraw.text((8, 90), f'BASE', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
+            tempDraw.text((7, 105), f'{chartInfo.ds}', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 16, encoding='utf-8')
+            tempDraw.text((51, 96), f'→', 'white', font)
+            font = ImageFont.truetype('src/static/msyhbd.ttc', 27, encoding='utf-8')
+            tempDraw.text((74, 88), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
+            if num > 10:
+                font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+                tempDraw.text((177, 105), f'#{num + 1}/{len(dxBest)}', 'white', font)
+            else:
+                font = ImageFont.truetype('src/static/msyh.ttc', 12, encoding='utf-8')
+                tempDraw.text((179, 105), f'#{num + 1}/{len(dxBest)}', 'white', font)
+            temp = self.circle_corner(temp, 15)
+            if self.b50:
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 1104), mask=temp.split()[3])
+            else:
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 804), mask=temp.split()[3])
         for num in range(len(dxBest), dxBest.size):
             i = num // 3
             j = num % 3
@@ -451,7 +488,11 @@ class DrawBest(object):
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(1))
-            img.paste(temp, (self.COLOUMS_IMG[j + (6 if not self.b50 else 8)] + 4, self.ROWS_IMG[i + 1] + 4))
+            temp = self.circle_corner(temp, 15)
+            if self.b50:
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 1104), mask=temp.split()[3])
+            else:
+                img.paste(temp, (self.COLOUMS_IMG[j] + 4, self.ROWS_IMG[i + 1] + 804), mask=temp.split()[3])
 
     @staticmethod
     def _drawRoundRec(im, color, x, y, w, h, r):
@@ -510,16 +551,19 @@ class DrawBest(object):
         self.img.paste(shougouImg, (240 if not self.qqId else 131, 83), mask=shougouImg.split()[3])
 
         self._drawBestList(self.img, self.sdBest, self.dxBest)
-
+        ratingsl = self.sdBest[24].ra if not self.b50 else computeRa(self.sdBest[34].ds, self.sdBest[34].achievement, True)
+        ratingsh = self.sdBest[0].ra if not self.b50 else computeRa(self.sdBest[0].ds, self.sdBest[0].achievement, True)
+        ratingdh = self.dxBest[0].ra if not self.b50 else computeRa(self.dxBest[0].ds, self.dxBest[0].achievement, True)
+        ratingdl = self.dxBest[14].ra if not self.b50 else computeRa(self.dxBest[14].ds, self.dxBest[14].achievement, True)
         authorBoardImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_MiniDialog_01.png')).convert('RGBA')
         authorBoardImg = self._resizePic(authorBoardImg, 0.43)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
-        authorBoardDraw.text((19, 18), f' Feature Credits →\n Best 40: Xyb & Diving-Fish\n Best 50: BlueDeer233\n Design: Killua Blitz\n       Generated By Kiba', 'black', font2s)
-        self.img.paste(authorBoardImg, (1195, 0), mask=authorBoardImg.split()[3])
+        authorBoardDraw.text((19, 18), f' ☆>> Rating 分析\n 最高 Rating 如下：\n SD:{ratingsh}       DX:{ratingdh}\n 最低 Rating 如下:\n SD:{ratingsl}       DX:{ratingdl}\n', 'black', font2s)
+        self.img.paste(authorBoardImg, (1070, 0), mask=authorBoardImg.split()[3])
 
         dxImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_01.png')).convert('RGBA')
         dxImg = self._resizePic(dxImg, 0.45)
-        self.img.paste(dxImg, (892 if not self.b50 else 992, 90), mask=dxImg.split()[3])
+        self.img.paste(dxImg, (4, 1185 if self.b50 else 890), mask=dxImg.split()[3])
 
         # self.img.show()
 
