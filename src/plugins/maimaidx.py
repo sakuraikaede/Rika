@@ -1658,6 +1658,30 @@ async def _(bot: Bot, event: Event, state: T_State):
                 min_ssp_dx = min_s_dx - 0.9
                 min_ss_dx = min_s_dx - 0.7
                 min_sp_dx = min_s_dx - 0.2
+            max_sssp = round(max_sssp, 1)
+            max_sss = round(max_sss, 1)
+            max_ssp = round(max_ssp, 1)
+            max_ss = round(max_ss, 1)
+            max_sp = round(max_sp, 1)
+            max_s = round(max_s, 1)
+            min_sssp = round(min_sssp, 1)
+            min_sss = round(min_sss, 1)
+            min_ssp = round(min_ssp, 1)
+            min_ss = round(min_ss, 1)
+            min_sp = round(min_sp, 1)
+            min_s = round(min_s, 1)
+            max_sssp_dx = round(max_sssp_dx, 1)
+            max_sss_dx = round(max_sss_dx, 1)
+            max_ssp_dx = round(max_ssp_dx, 1)
+            max_ss_dx = round(max_ss_dx, 1)
+            max_sp_dx = round(max_sp_dx, 1)
+            max_s_dx = round(max_s_dx, 1)
+            min_sssp_dx = round(min_sssp_dx, 1)
+            min_sss_dx = round(min_sss_dx, 1)
+            min_ssp_dx = round(min_ssp_dx, 1)
+            min_ss_dx = round(min_ss_dx, 1)
+            min_sp_dx = round(min_sp_dx, 1)
+            min_s_dx = round(min_s_dx, 1)
             if max_sssp > 15.0:
                 max_sssp = "--"
             if max_ssp > 15.0:
