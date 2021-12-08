@@ -66,7 +66,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     for i in range(36):
         maj_value.append(h & 3)
         h >>= 2
-    s = f"☆>> 👨‍ {nickname} | 运势 - 雀魂版\n⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n"
+    s = f"☆>> T‍o {nickname} | 运势 - 雀魂版\n⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n"
     s += f"\n★ 一姬之签 | Drawing\n---------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"大和率: {luck}%"

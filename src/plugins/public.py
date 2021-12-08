@@ -27,7 +27,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("☆>> 关于\n犽(Kiba) | Gon\n版本: 2.6 SP1(2.601.211130)\n----------------------\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\nProject Kiba Credits:\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("☆>> 关于\n犽(Kiba) | Gon Plus\n版本: 2.7 (2.70.211209)\n----------------------\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\nProject Kiba Credits:\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -54,7 +54,7 @@ gocho <str1> <str2>                                                         生�
 投百面骰子<数量>                                                             * 可以选择六面/百面
 
                                                                                               这个功能可以随机禁言你1-600秒，前提小犽是管理员。
-烟我                                                                                    * 注意：为防止误触发，
+烟我                                                                                    * 注意:为防止误触发，
                                                                                               这个功能你需要at一下小犽再说这个命令才能执行。
 
                                                                                                群里摇人。
@@ -76,16 +76,25 @@ gocho <str1> <str2>                                                         生�
  
 看回复 <漂流瓶 ID>                                                             查看漂流瓶下面的回复！
 
+
+删瓶子 <漂流瓶 ID>                                                             删除您发布的漂流瓶。
+                                                                                             * 管理员使用此指令可删除其他人瓶子。
+
 当前瓶子数量                                                                        查询社区当前漂流瓶子数量，此命令不受社区限制。
+
+我的漂流瓶                                                                           我的漂流社区情况
 ------------------------------------------------------------------------------------------------------------------------------
 
 ☆>> 管理员模块控制 | Administrative
 ------------------------------------------------------------------------------------------------------------------------------
-设置漂流社区： 漂流瓶设置 <完全启(禁)用/启(禁)用扔瓶子/启(禁)用捞瓶子/启(禁)用扔瓶子/启(禁)用回复> <QQ号(可选)> <群号(可选)>
+设置漂流社区: 漂流瓶设置 <完全启(禁)用/启(禁)用扔瓶子/启(禁)用捞瓶子/启(禁)用扔瓶子/启(禁)用回复> <QQ号(可选)> <群号(可选)>
 社区设置帮助请直接输入"漂流瓶设置"
 
-设置戳一戳： 戳一戳设置 <启用/限制 (时间-秒)/禁用>
+设置戳一戳: 戳一戳设置 <启用/限制 (时间-秒)/禁用>
 戳一戳帮助请直接输入"戳一戳设置"
+
+删瓶子: 见上表可用命令中的说明，管理员允许删除任何人的漂流瓶。
+
 ------------------------------------------------------------------------------------------------------------------------------'''
     await help_others.send(Message([{
         "type": "image",
@@ -262,7 +271,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         for m in group_members:
             if m['user_id'] == event.user_id:
                 break
-        if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
+        if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in Config.superuser:
             await poke_setting.finish("这个...只有管理员可以设置戳一戳, 但是你不要去戳我....嗯..尽量别戳啦。")
             return
     except Exception as e:
@@ -282,7 +291,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 f'update group_poke_table set disabled=1 where group_id={event.group_id}')
         else:
             raise ValueError
-        await poke_setting.send(f"✔️>> 戳一戳设置 - 成功\n戳一戳已成功设置为: {argv[0]}")
+        await poke_setting.send(f"√>> 戳一戳设置 - 成功\n戳一戳已成功设置为: {argv[0]}")
         await db.commit()
     except (IndexError, ValueError):
         await poke_setting.finish("☆>> 戳一戳设置 - 帮助\n本命令的格式:\n戳一戳设置 <默认/限制 (秒)/禁用>\n\n - 默认:将启用默认的戳一戳设定，包括随机性抽中禁言 1 - 1 分 30 秒。\n - 限制 (秒):在戳完一次 Kiba 的指定时间内，调用戳一戳只会让 Kiba 反过来戳你。在指定时间外时，与默认相同。\n- 禁用:禁用戳一戳的相关功能。")
@@ -295,7 +304,7 @@ shuffle = on_command('shuffle')
 async def _(bot: Bot, event: Event):
     argv = int(str(event.get_message()))
     if argv > 100:
-        await shuffle.finish('❌>> 随机排列 - 数字过大\n随机排列太多了会刷屏，请输入100以内的数字。')
+        await shuffle.finish('×>> 随机排列 - 数字过大\n随机排列太多了会刷屏，请输入100以内的数字。')
         return
     d = [str(i + 1) for i in range(argv)]
     random.shuffle(d)
@@ -311,7 +320,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         num = random.randint(int(groups[0]),int(groups[1]))
         await roll.send(f"☆>> 随机数\n您的随机数是{num}。")
     except Exception:
-        await roll.send("❌>> 随机数 - 错误\n语法有错哦，您是不是输入的浮点数还是落了一个？或者左面比右面的数字大？这都是不可以的。")
+        await roll.send("×>> 随机数 - 错误\n语法有错哦，您是不是输入的浮点数还是落了一个？或者左面比右面的数字大？这都是不可以的。")
 
 tz = on_regex(r"^投骰子([1-9]\d*)")
 
@@ -321,15 +330,15 @@ async def _(bot: Bot, event: Event, state: T_State):
     groups = re.match(regex, str(event.get_message())).groups()
     try:
         if int(groups[0]) > 10:
-            await roll.send("❌>> 骰子 - 过多\n骰子数量不能大于10个。你是要刷屏嘛？")
+            await roll.send("×>> 骰子 - 过多\n骰子数量不能大于10个。你是要刷屏嘛？")
         else:
-            s = "☆>> 骰子\n结果如下："
+            s = "☆>> 骰子\n结果如下:"
             for i in range(int(groups[0])):
                 num = random.randint(1,6)
                 s += f'\n第 {i + 1} 个骰子 投掷结果是: {num}点'
             await roll.send(s)
     except Exception:
-        await roll.send("❌>> 骰子 - 错误\n语法上可能有错哦。再检查一下试试吧！")
+        await roll.send("×>> 骰子 - 错误\n语法上可能有错哦。再检查一下试试吧！")
 
 tz_100 = on_regex(r"^投百面骰子([1-9]\d*)")
 
@@ -339,15 +348,15 @@ async def _(bot: Bot, event: Event, state: T_State):
     groups = re.match(regex, str(event.get_message())).groups()
     try:
         if int(groups[0]) > 10:
-            await roll.send("❌>> 百面骰子 - 过多\n骰子数量不能大于10个。你是要刷屏嘛？")
+            await roll.send("×>> 百面骰子 - 过多\n骰子数量不能大于10个。你是要刷屏嘛？")
         else:
-            s = "☆>> 百面骰子\n结果如下："
+            s = "☆>> 百面骰子\n结果如下:"
             for i in range(int(groups[0])):
                 num = random.randint(1,100)
                 s += f'\n第 {i + 1} 个骰子 投掷结果是: {num}点'
             await roll.send(s)
     except Exception:
-        await roll.send("❌>> 百面骰子 - 错误\n语法上可能有错哦。再检查一下试试吧！")
+        await roll.send("×>> 百面骰子 - 错误\n语法上可能有错哦。再检查一下试试吧！")
 
 random_person = on_regex("随个([男女]?)群友")
 
@@ -431,14 +440,14 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     argv = str(event.get_message()).strip().split(" ")
     if len(argv) == 1:
-        await select.finish("❌>> 帮选 - 参数不足\n选你🐎。")
+        await select.finish("×>> 帮选 - 参数不足\n选你🐎。")
         return
     elif len(argv) is not None:
         result = random.randint(0, len(argv) - 1)
         await select.finish(f"☆>> 帮选\n我选 {argv[result]}。")
         return
     else:
-        await select.finish("❌>> 帮选 - 无参数\n选你🐎。")
+        await select.finish("×>> 帮选 - 无参数\n选你🐎。")
         return
 
 plp_settings = on_command("漂流瓶设置")
@@ -460,7 +469,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             if success != 0:
                 await plp_settings.finish("!>> 漂流社区设置\n请检查您输入的群号，您不在此群或输错了号码。")
                 return
-            elif m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
+            elif m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in Config.superuser:
                 await plp_settings.finish("!>> 漂流社区设置\n请检查您输入的群号，您不是此群管理员或您输错了号码。")
                 return
         else:
@@ -468,7 +477,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             for m in group_members:
                 if m['user_id'] == event.user_id:
                     break
-            if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) != Config.superuser:
+            if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in Config.superuser:
                 await plp_settings.finish("!>> 漂流社区设置\n这个...只有管理员可以设置漂流社区。")
                 return
     except Exception as e:
@@ -484,7 +493,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disableinsert=0,disabletake=0,disablereply=0 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -493,7 +502,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"delete from plp_blacklist_table where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "完全禁用":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -503,7 +512,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disableinsert=1,disabletake=1,disablereply=1 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -512,7 +521,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set lastbanner={event.user_id},disableinsert=1,disabletake=1,disablereply=1 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "启用扔瓶子":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -522,7 +531,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disableinsert=0 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -531,7 +540,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set disableinsert=0 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "禁用扔瓶子":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -541,7 +550,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disableinsert=1 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -550,7 +559,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set lastbanner={event.user_id},disableinsert=1 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "启用捞瓶子":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -560,7 +569,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disabletake=0 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -569,7 +578,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set disabletake=0 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "禁用捞瓶子":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -579,7 +588,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disabletake=1 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -588,7 +597,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set lastbanner={event.user_id},disabletake=1 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "启用回复":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -598,7 +607,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disablereply=0 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -607,7 +616,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set disablereply=0 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         elif argv[0] == "禁用回复":
             if len(argv) == 1:
                 await c.execute(f'select * from group_plp_table where group_id={event.group_id}')
@@ -617,7 +626,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update group_plp_table set disablereply=1 where group_id={event.group_id}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 完成\n已成功设置为: {argv[0]}")
             else:
                 await c.execute(f'select * from plp_blacklist_table where id={argv[1]}')
                 data = await c.fetchone()
@@ -626,9 +635,9 @@ async def _(bot: Bot, event: Event, state: T_State):
                 else:
                     await c.execute(f"update plp_blacklist_table set lastbanner={event.user_id},disablereply=1 where id={argv[1]}")
                 await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
+                await plp_insert.finish(f"√>> To {nickname} | 漂流社区设置 - 限制人员功能\n对象 {argv[1]} 已成功设置为: {argv[0]}")
         else:
-            await plp_settings.send(f"☆>> To {nickname} | 漂流社区设置 - 帮助\n格式为：漂流瓶设置 <完全启（禁）用/禁（启）用扔瓶子/禁（启）用捞瓶子/禁（启）用回复> <(需要进行操作的)QQ号> <所在的群号(私聊情况下需要填写)>\n在不填写QQ号的情况下，默认是对您所在群的功能开关；填写QQ号后，转换为对此QQ号的功能开关。\n只能在处理QQ号时使用私聊。")
+            await plp_settings.send(f"☆>> To {nickname} | 漂流社区设置 - 帮助\n格式为:漂流瓶设置 <完全启（禁）用/禁（启）用扔瓶子/禁（启）用捞瓶子/禁（启）用回复> <(需要进行操作的)QQ号> <所在的群号(私聊情况下需要填写)>\n在不填写QQ号的情况下，默认是对您所在群的功能开关；填写QQ号后，转换为对此QQ号的功能开关。\n只能在处理QQ号时使用私聊。")
             return
     except Exception as e:
         print(e)
@@ -651,7 +660,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await db.commit()
         else:
             if data[1] == 1:
-                await plp_insert.send(f"❌>> To {nickname} | 漂流社区 - 扔瓶子 - 错误\n管理员已禁用扔瓶子功能，请联系群管理员获得详情。")
+                await plp_insert.send(f"×>> To {nickname} | 漂流社区 - 扔瓶子 - 错误\n管理员已禁用扔瓶子功能，请联系群管理员获得详情。")
                 return
     except Exception:
         pass
@@ -669,28 +678,29 @@ async def _(bot: Bot, event: Event, state: T_State):
     plpid = now.year * random.randint(1,7200) + now.month * random.randint(1,4800) + now.day * random.randint(1,2400) + now.hour * random.randint(1,1200)+ now.minute * random.randint(1,600) + now.second * random.randint(1,300) + random.randint(1,9999999999)
     try:
         if len(argv) > 1:
-            await plp_insert.send(f"❌>> To {nickname} | 漂流社区: 扔瓶子 - 错误\n请不要在发送内容中加空格，会干扰漂流瓶功能。")
-            return
-        elif argv[0] == "":
-            await plp_insert.send(f"☆>> To {nickname} | 漂流社区: 扔瓶子 - 帮助\n格式为：扔瓶子 瓶子内容.\n禁止发送黄赌毒、个人收款码等不允许发送的内容。否则将禁止个人使用此功能。")
+            allmsg = ""
+            for i in range(len(argv)):
+                allmsg += f"{argv[i]}"
+            argv[0] = allmsg
+        elif len(argv) == 1 and argv[0] == "":
+            await plp_insert.send(f"☆>> To {nickname} | 漂流社区: 扔瓶子 - 帮助\n格式为:扔瓶子 瓶子内容.\n禁止发送黄赌毒、个人收款码等不允许发送的内容。否则将禁止个人使用此功能。")
             return
         elif argv[0].find("|") != -1:
-            await plp_insert.send(f"❌>> To {nickname} | 漂流社区: 扔瓶子 - 错误\n请不要在发送内容中加'|'，会干扰漂流瓶功能。")
+            await plp_insert.send(f"×>> To {nickname} | 漂流社区: 扔瓶子 - 错误\n请不要在发送内容中加'|'，会干扰漂流瓶功能。")
+            return
+        if argv[0].find("CQ:image") != -1:
+            message = argv[0].split("[")
+            msg = message[0]
+            piclink = message[1][57:].split("]")
+            await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{msg}|{piclink[0]}",1,0,0)')
+            await db.commit()
+            await plp_insert.finish(f"√>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 图片 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了 R-18 (包括擦边球）以及任何不应在漂流瓶内出现的内容，您可能会受到漂流社区的部分功能封禁或相应处置。如果需要撤回瓶子，请使用 “删瓶子” 指令。")
             return
         else:
-            if argv[0].find("CQ:image") != -1:
-                message = argv[0].split("[")
-                msg = message[0]
-                piclink = message[1][57:].split("]")
-                await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{msg}|{piclink[0]}",1,0,0)')
-                await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 图片 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了 R-18 (包括擦边球）以及任何不应在漂流瓶内出现的内容，您可能会受到漂流社区的部分功能封禁或相应处置。如果需要撤回瓶子，请私戳我人工处理。\n瓶子相关人工服务时间: 12:00 - 23:00。")
-                return
-            else:
-                await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{argv[0]}",0,0,0)')
-                await db.commit()
-                await plp_insert.finish(f"✔️>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 文字 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了不应在漂流瓶内出现的内容，您可能会受到漂流社区的部分功能封禁或相应处置。如果需要撤回瓶子，请私戳我人工处理。\n瓶子相关人工服务时间: 12:00 - 23:00。")
-                return
+            await c.execute(f'insert into plp_table values ({plpid},{event.user_id},"{nickname}","{argv[0]}",0,0,0)')
+            await db.commit()
+            await plp_insert.finish(f"√>> To {nickname} | 漂流社区: 扔瓶子 - 完成\n您的 文字 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了不应在漂流瓶内出现的内容，您可能会受到漂流社区的部分功能封禁或相应处置。如果需要撤回瓶子，请使用 “删瓶子” 指令。")
+            return
     except Exception as e:
         print(e)
 
@@ -710,7 +720,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await db.commit()
         else:
             if data[2] == 1:
-                await plp_find.send(f"❌>> To {nickname} | 漂流社区: 捞瓶子 - 错误\n管理员已禁用捞瓶子功能，请联系群管理员获得详情。")
+                await plp_find.send(f"×>> To {nickname} | 漂流社区: 捞瓶子 - 错误\n管理员已禁用捞瓶子功能，请联系群管理员获得详情。")
                 return
     except Exception:
         pass
@@ -727,12 +737,12 @@ async def _(bot: Bot, event: Event, state: T_State):
         pass
     try:
         if len(argv) > 1:
-            await plp_find.finish(f"❌>> To {nickname} | 漂流社区: 捞瓶子 - 错误\n只能输入QQ号查找。您输入了好多条分段数据.....")
+            await plp_find.finish(f"×>> To {nickname} | 漂流社区: 捞瓶子 - 错误\n只能输入QQ号查找。您输入了好多条分段数据.....")
         elif argv[0] == "":
             await c.execute(f'select * from plp_table order by random() limit 1')
             data = await c.fetchone()
             if data is None:
-                await plp_find.finish(f"❌>> To {nickname} | 漂流社区: 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
+                await plp_find.finish(f"×>> To {nickname} | 漂流社区: 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
                 return
             else:
                 if data[4] == 0:
@@ -756,7 +766,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await c.execute(f'select * from plp_table where id={argv[0]}')
                 data = await c.fetchone()
                 if data is None:
-                    await plp_find.finish(f"❌>> To {nickname} | 漂流社区: 捞瓶子 - 错误\n您输入的 QQ 号码没有扔瓶子或您输入的漂流瓶 ID 不存在。")
+                    await plp_find.finish(f"×>> To {nickname} | 漂流社区: 捞瓶子 - 错误\n您输入的 QQ 号码没有扔瓶子或您输入的漂流瓶 ID 不存在。")
                     return
                 else:
                     if data[4] == 0:
@@ -776,18 +786,29 @@ async def _(bot: Bot, event: Event, state: T_State):
                         return
             else:
                 msg = f"☆>> To {nickname} | 漂流社区: 瓶子 - 定向 QQ 查找: {data[0][2]}({argv[0]})"
-                for i in range(len(data)):
-                    if data[i][4] == 0:
-                        msg += f"\n--------第 {i + 1} 条--------\nID: {data[i][0]}\n👓 {data[i][5] + 1} | 💬 {data[i][6]}\n内容：{data[i][3]}"
-                        await c.execute(f"update plp_table set view={data[i][5] + 1} where id={data[i][0]}")
-                    else:
-                        message = data[i][3].split("|")
-                        msg += f"\n--------第 {i + 1} 条--------\nID: {data[i][0]}\n👓 {data[i][5] + 1} | 💬 {data[i][6]}\n内容：{message[0]}\n[定向 QQ 查找不支持显示图片，您需要点击链接查看]\n{message[1]}"
-                        await c.execute(f"update plp_table set view={data[i][5] + 1} where id={data[i][0]}")
+                if len(data) > 5:
+                    msg += "\nta 扔的瓶子太多了，只显示最新四条消息。"
+                    for i in range(len(data) - 4, len(data)):
+                        if data[i][4] == 0:
+                            msg += f"\n--------第 {i + 1} 条--------\nID: {data[i][0]}\n👓 {data[i][5] + 1} | 💬 {data[i][6]}\n{data[i][3]}"
+                            await c.execute(f"update plp_table set view={data[i][5] + 1} where id={data[i][0]}")
+                        else:
+                            message = data[i][3].split("|")
+                            msg += f"\n--------第 {i + 1} 条--------\nID: {data[i][0]}\n👓 {data[i][5] + 1} | 💬 {data[i][6]}\n{message[0]}\n[定向 QQ 查找不支持显示图片，您需要点击链接查看]\n{message[1]}"
+                            await c.execute(f"update plp_table set view={data[i][5] + 1} where id={data[i][0]}")
+                else:
+                    for i in range(len(data)):
+                        if data[i][4] == 0:
+                            msg += f"\n--------第 {i + 1} 条--------\nID: {data[i][0]}\n👓 {data[i][5] + 1} | 💬 {data[i][6]}\n{data[i][3]}"
+                            await c.execute(f"update plp_table set view={data[i][5] + 1} where id={data[i][0]}")
+                        else:
+                            message = data[i][3].split("|")
+                            msg += f"\n--------第 {i + 1} 条--------\nID: {data[i][0]}\n👓 {data[i][5] + 1} | 💬 {data[i][6]}\n{message[0]}\n[定向 QQ 查找不支持显示图片，您需要点击链接查看]\n{message[1]}"
+                            await c.execute(f"update plp_table set view={data[i][5] + 1} where id={data[i][0]}")
                 await plp_find.send(msg)
                 await db.commit()
     except Exception as e:
-        print(e)
+        pass
 
 plp_clean = on_command("洗瓶子", rule=to_me())
 
@@ -796,14 +817,14 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     db = get_driver().config.db
     c = await db.cursor()
-    if str(event.user_id) != Config.superuser:
-        await plp_clean.finish(f"❌>> To {nickname} | 漂流社区: 洗瓶子 - 没有权限\n这个...只有小犽的管理员才可以清空瓶子。")
+    if str(event.user_id) not in Config.superuser:
+        await plp_clean.finish(f"×>> To {nickname} | 漂流社区: 洗瓶子 - 没有权限\n这个...只有小犽的管理员才可以清空瓶子。")
         return
     else:
         await c.execute(f'delete from plp_table')
         await c.execute(f'delete from plp_reply_table')
         await db.commit()
-        await plp_clean.finish(f"✔️>> To {nickname} | 漂流社区: 洗瓶子\n已清空漂流瓶数据。")
+        await plp_clean.finish(f"√>> To {nickname} | 漂流社区: 洗瓶子\n已清空漂流瓶数据。")
         return
 
 plp_reply = on_command("回复瓶子")
@@ -822,7 +843,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await db.commit()
         else:
             if data[3] == 1:
-                await plp_reply.send(f"❌>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n管理员已禁用瓶子评论回复功能，请联系群管理员获得详情。")
+                await plp_reply.send(f"×>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n管理员已禁用瓶子评论回复功能，请联系群管理员获得详情。")
                 return
     except Exception:
         pass
@@ -839,25 +860,25 @@ async def _(bot: Bot, event: Event, state: T_State):
         pass
     try:
         if len(argv) > 2 or len(argv) == 1 and argv[0] != "帮助":
-            await plp_reply.finish(f"❌>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n参数输入有误。请参阅 “回复瓶子 帮助”")
+            await plp_reply.finish(f"×>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n参数输入有误。请参阅 “回复瓶子 帮助”")
         elif argv[0] == "帮助":
-            await plp_reply.finish(f"❌>> To {nickname} | 漂流社区: 回复瓶子 - 帮助\n命令格式是：\n回复瓶子 瓶子ID 回复内容\n注意回复无法带图片。")
+            await plp_reply.finish(f"×>> To {nickname} | 漂流社区: 回复瓶子 - 帮助\n命令格式是:\n回复瓶子 瓶子ID 回复内容\n注意回复无法带图片。")
         else:
             await c.execute(f'select * from plp_table where id={argv[0]}')
             data = await c.fetchone()
             if data is None:
-                await plp_reply.finish(f"❌>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n没有这个瓶子捏。")
+                await plp_reply.finish(f"×>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n没有这个瓶子捏。")
                 return
             else:
                 if argv[1].find("CQ:image") != -1:
-                    await plp_reply.finish(f"❌>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n漂流瓶回复中不可以夹带图片！")
+                    await plp_reply.finish(f"×>> To {nickname} | 漂流社区: 回复瓶子 - 错误\n漂流瓶回复中不可以夹带图片！")
                     return
                 else:
                     replyid = int(data[0] / random.randint(1,random.randint(199,9999)) * random.randint(random.randint(1,97), random.randint(101,199)))
                     await c.execute(f'insert into plp_reply_table values ({replyid},{argv[0]},{event.user_id},"{nickname}","{argv[1]}")')
                     await c.execute(f'update plp_table set reply={data[6] + 1} where id={argv[0]}')
                     await db.commit()
-                    await plp_reply.finish(f"✔️>> To {nickname} | 漂流社区: 回复瓶子\n已成功回复 ID 是 {argv[0]} 的漂流瓶。")
+                    await plp_reply.finish(f"√>> To {nickname} | 漂流社区: 回复瓶子\n已成功回复 ID 是 {argv[0]} 的漂流瓶。")
     except Exception as e:
         print(e)
 
@@ -878,7 +899,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await db.commit()
         else:
             if data[3] == 1:
-                await plp_reply.send(f"❌>> To {nickname} | 漂流社区: 回复 - 错误\n管理员已禁用瓶子评论回复功能，请联系群管理员获得详情。")
+                await plp_reply.send(f"×>> To {nickname} | 漂流社区: 回复 - 错误\n管理员已禁用瓶子评论回复功能，请联系群管理员获得详情。")
                 return
     except Exception:
         pass
@@ -895,7 +916,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         pass
     try:
         if len(argv) > 1 or argv[0] == "":
-            await plp_reply_view.finish(f"❌>> To {nickname} | 漂流社区: 回复 - 错误\n请输入漂流瓶 ID 来查看瓶子回复。")
+            await plp_reply_view.finish(f"×>> To {nickname} | 漂流社区: 回复 - 错误\n请输入漂流瓶 ID 来查看瓶子回复。")
         else:
             await c.execute(f'select * from plp_reply_table where plpid={argv[0]}')
             data = await c.fetchall()
@@ -916,7 +937,176 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     db = get_driver().config.db
     c = await db.cursor()
-    argv = str(event.get_message()).strip().split(" ")
     await c.execute(f'select * from plp_table')
     data = await c.fetchall()
     await plp_num.finish(f"☆>> To {nickname} | 漂流社区\n现在全社区共有 {len(data)} 个漂流瓶。")
+
+delete_plp = on_command("删瓶子")
+
+@delete_plp.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
+    db = get_driver().config.db
+    c = await db.cursor()
+    argv = str(event.get_message()).strip().split(" ")
+    try:
+        try:
+            ids = event.get_session_id()
+        except:
+            pass
+        else:
+            if ids.startswith("group"):
+                group_members = await bot.get_group_member_list(group_id=event.group_id)
+                for m in group_members:
+                    if m['user_id'] == event.user_id:
+                        break
+                if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in Config.superuser:
+                    await c.execute(f'select * from plp_table where id={argv[0]}')
+                    data = await c.fetchone()
+                    if data is None:
+                        await delete_plp.finish("×>> 漂流社区\n找不到这个瓶子捏，看看您的 漂流瓶 ID 是否输入正确？")
+                        return
+                    else:
+                        if event.user_id == data[1]:
+                            await c.execute(f'delete from plp_table where id={argv[0]}')
+                            await c.execute(f'delete from plp_reply_table where plpid={argv[0]}')
+                            await db.commit()
+                            await delete_plp.finish(f"√>> 漂流社区 - 删除完成\n已删除 ID 是 {argv[0]} 的漂流瓶。")
+                            return
+                        else:
+                            await delete_plp.finish("×>> 漂流社区\n您没有相应的权限来删除此漂流瓶，您需要是管理员或您是瓶子发送者才有权限删除此瓶子。")
+                            return
+            else:
+                await c.execute(f'select * from plp_table where id={argv[0]}')
+                data = await c.fetchone()
+                if data is None:
+                    await delete_plp.finish("×>> 漂流社区\n找不到这个瓶子捏，看看您的 漂流瓶 ID 是否输入正确？")
+                    return
+                else:
+                    if event.user_id == data[1]:
+                        await c.execute(f'delete from plp_table where id={argv[0]}')
+                        await c.execute(f'delete from plp_reply_table where plpid={argv[0]}')
+                        await db.commit()
+                        await delete_plp.finish(f"√>> 漂流社区 - 删除完成\n已删除 ID 是 {argv[0]} 的漂流瓶。")
+                        return
+                    else:
+                        await delete_plp.finish("×>> 漂流社区\n您没有相应的权限来删除此漂流瓶，您需要是瓶子发送者才有权限删除此瓶子。如您是群管理员，请在群聊内使用此指令。")
+                        return
+    except Exception as e:
+        return
+    await c.execute(f'select * from plp_table where id={argv[0]}')
+    data = await c.fetchone()
+    if data is None:
+        await delete_plp.finish("×>> 漂流社区\n找不到这个瓶子捏，看看您的 漂流瓶 ID 是否输入正确？")
+        return
+    else:
+        await c.execute(f'delete from plp_table where id={argv[0]}')
+        await c.execute(f'delete from plp_reply_table where plpid={argv[0]}')
+        await db.commit()
+        await delete_plp.finish(f"√>> 漂流社区 - 删除完成\n已删除 ID 是 {argv[0]} 的漂流瓶。")
+
+my_plp = on_command("我的漂流瓶")
+
+@my_plp.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
+    db = get_driver().config.db
+    is_admin = 1
+    is_black = 1
+    baninsert = 1
+    banreply = 1
+    bantake = 1
+    msg = f"☆>> To {nickname} | 我的漂流社区主页\n"
+    c = await db.cursor()
+    try:
+        ids = event.get_session_id()
+    except:
+        pass
+    else:
+        if ids.startswith("group"):
+            group_members = await bot.get_group_member_list(group_id=event.group_id)
+            for m in group_members:
+                if m['user_id'] == event.user_id:
+                    break
+            if m['role'] != 'owner' and m['role'] != 'admin':
+                is_admin = 0
+            if str(m['user_id']) in Config.superuser:
+                is_admin = 2
+        else:
+            if str(event.user_id) in Config.superuser:
+                is_admin = 2
+            else:
+                is_admin = -1
+    await c.execute(f'select * from plp_blacklist_table where id={event.user_id}')
+    data = await c.fetchone()
+    if data is None:
+        is_black = 0
+        baninsert = 0
+        banreply = 0
+        bantake = 0
+    else:
+        if data[2] == 0:
+            baninsert = 0
+        if data[3] == 0:
+            bantake = 0
+        if data[4] == 0:
+            banreply = 0
+    if is_admin == -1:
+        if is_black == 1:
+            if baninsert == 0 and bantake == 0 and banreply == 0:
+                msg += "👤 普通成员(非群聊无法确定是否为管理员)"
+            elif baninsert == 1 and bantake == 1 and banreply == 1:
+                msg += "👤 禁止使用"
+            else:
+                msg += "👤 限制功能"
+        else:
+            msg += "👤 普通成员(非群聊无法确定是否为管理员)"
+    elif is_admin == 0:
+        if is_black == 1:
+            if baninsert == 0 and bantake == 0 and banreply == 0:
+                msg += "👤 普通成员"
+            elif baninsert == 1 and bantake == 1 and banreply == 1:
+                msg += "👤 禁止使用"
+            else:
+                msg += "👤 限制功能"
+        else:
+            msg += "👤 普通成员"
+    elif is_admin == 1:
+        if is_black == 1:
+            if baninsert == 0 and bantake == 0 and banreply == 0:
+                msg += "👤 群管理员"
+            else:
+                msg += "👤 被限制功能的群管理员(可自行解除限制)"
+        else:
+            msg += "👤 群管理员"
+    elif is_admin == 2:
+        if is_black == 1:
+            if baninsert == 0 and bantake == 0 and banreply == 0:
+                msg += "👤 超级管理员"
+            else:
+                msg += "👤 被限制功能的超级管理员(可自行解除限制)"
+        else:
+            msg += "👤 超级管理员"
+    await c.execute(f'select * from plp_table where user_id={event.user_id}')
+    data2 = await c.fetchall()
+    msg += f" | 🍾 {len(data2)}\n----------------------\n当前状态可使用以下社区功能:\n"
+    if baninsert == 0:
+        msg += "[√] 扔瓶子\n"
+    else:
+        msg += "[×] 扔瓶子\n"
+    if bantake == 0:
+        msg += "[√] 捞瓶子\n"
+    else:
+        msg += "[×] 捞瓶子\n"
+    if banreply == 0:
+        msg += "[√] 回复功能\n"
+    else:
+        msg += "[×] 回复功能\n"
+    if len(data2) != 0:
+        msg += "----------------------\n您扔过的漂流瓶的 ID 如下:"
+        for i in range(len(data2)):
+            if i == 0:
+                msg += f"\n{data2[i][0]}"
+            else:
+                msg += f" {data2[i][0]}"
+    await my_plp.finish(msg)

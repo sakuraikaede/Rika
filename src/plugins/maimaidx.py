@@ -83,6 +83,8 @@ b40 / b50                                                                       
 我要在<等级>上<分值>分                                                   犽的锦囊 - 快速推荐上分歌曲。
 
 查看排名/查看排行                                                               查看查分器网站 Rating 的 TOP50 排行榜！
+
+底分分析/rating分析 <用户名>                                           Best 40 的底分分析
 ------------------------------------------------------------------------------------------------------------------------------
 
 ☆>> 管理员设置 | Administrative                                             
@@ -196,7 +198,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await spec_rand.send(rand_result)
     except Exception as e:
         print(e)
-        await spec_rand.finish(f"!>> Bug Check\n随机命令出现了问题。\nTechnical Information:\n{e}")
+        await spec_rand.finish(f"!>> Bug Check\n随机命令出现了问题。\n[Exception Occurred]\n{e}")
         
 mr = on_regex(r".*maimai.*什么")
 
@@ -247,7 +249,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await spec_rand_multi.send(rand_result)
     except Exception as e:
         print(e)
-        await spec_rand_multi.finish(f"!>> Bug Check\n多歌曲随机命令出现了问题。\nTechnical Information:{e}")
+        await spec_rand_multi.finish(f"!>> Bug Check\n多歌曲随机命令出现了问题。\n[Exception Occurred]\n{e}")
 
 
 search_music = on_regex(r"^查歌.+")
@@ -261,7 +263,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         return
     res = total_list.filter(title_search=name)
     if len(res) == 0:
-        await search_music.send("❌>> 无匹配乐曲\n没有找到这样的乐曲。")
+        await search_music.send("×>> 无匹配乐曲\n没有找到这样的乐曲。")
     elif len(res) < 50:
         search_result = "☆>> 搜索结果"
         resultnum = 0
@@ -295,10 +297,14 @@ async def _(bot: Bot, event: Event, state: T_State):
             ds = music['ds'][level_index]
             level = music['level'][level_index]
             stats = music['stats'][level_index]
+            try:
+                tag = stats['tag']
+            except:
+                tag = "Insufficient Data"
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             if len(chart['notes']) == 4:
                 msg = f'''{level_name[level_index]} > Lv {level} | Base: {ds}
-Difficulty level: {stats['tag']}
+Difficulty: {tag}
 All: {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3]}
 Tap: {chart['notes'][0]}
 Hold: {chart['notes'][1]}
@@ -307,7 +313,7 @@ Break: {chart['notes'][3]}
 Notes Designer: {chart['charter']}'''
             else:
                 msg = f'''{level_name[level_index]} > Lv {level} | Base: {ds}
-Difficulty level: {stats['tag']}
+Difficulty: {tag}
 All: {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3] + chart['notes'][4]}
 Tap: {chart['notes'][0]}
 Hold: {chart['notes'][1]}
@@ -347,8 +353,8 @@ Notes Designer: {chart['charter']}'''
                     }
                 }
             ]))
-        except Exception:
-            await query_chart.send("啊这，我没有找到该谱面......")
+        except Exception as e:
+            await query_chart.send(f"×>> 无匹配乐曲\n我没有找到该谱面，或者当前此歌曲刚刚上线，部分数据残缺。如果是后者等等再试试吧！\n[Exception Occurred]\n{e}")
     else:
         name = groups[1]
         music = total_list.by_id(name)
@@ -386,8 +392,8 @@ Notes Designer: {chart['charter']}'''
                     }
                 }
             ]))
-        except Exception:
-            await query_chart.send("啊这...我没有找到这个歌。\n换一个试试吧。")
+        except Exception as e:
+            await query_chart.send(f"×>> 无匹配乐曲\n啊这...我没有找到这个歌。\n换一个试试吧。\n[Exception Occurred]\n{e}")
 
 xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动', '鼓动(红)']
 
@@ -473,7 +479,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         for i in range(good_count):
             s += f'{wm_list[good_value[i]]} '
     if bad_count == 0:
-        s += '\n忌 | ✔️ 无所畏忌\n'
+        s += '\n忌 | √ 无所畏忌\n'
     else:
         s += f'\n忌 | 共 {bad_count} 项:\n'
         for i in range(bad_count):
@@ -547,7 +553,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
     nickname = event.sender.nickname
     if name not in music_aliases:
-        await find_song.finish(f"❌>> To {nickname} | 别名查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
+        await find_song.finish(f"×>> To {nickname} | 别名查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
         return
     result_set = music_aliases[name]
     if len(result_set) == 1:
@@ -654,9 +660,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'qq': str(event.get_user_id())}
     else:
         payload = {'username': username}
-    img, success = await generate(payload)
+    try:
+        img, success = await generate(payload)
+    except Exception as e:
+        await best_40_pic.send(f"×>> To {nickname} | Best 40 - 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        return
     if success == 400:
-        await best_40_pic.send(f"❌>> To {nickname} | Best 40 - 错误\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f"×>> To {nickname} | Best 40 - 错误\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
         await best_40_pic.send(f'🚫>> To {nickname} | Best 40 - 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
@@ -681,9 +691,13 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         payload = {'username': username}
     payload['b50'] = True
-    img, success = await generate(payload)
+    try:
+        img, success = await generate(payload)
+    except Exception as e:
+        await best_50_pic.send(f"×>> To {nickname} | Best 50 - 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        return
     if success == 400:
-        await best_50_pic.send(f"❌>> To {nickname} | Best 50 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send(f"×>> To {nickname} | Best 50 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
         await best_50_pic.send(f'🚫>> To {nickname} | Best 50 - 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
@@ -711,7 +725,7 @@ async def _(bot: Bot, event: Event):
             break
     su = Config.superuser
     if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
-        await disable_guess_music.finish("❌>> 猜歌 - 设置 - 无权限\n抱歉，只有群管理员/小犽管理者才有权调整猜歌设置。")
+        await disable_guess_music.finish("×>> 猜歌 - 设置 - 无权限\n抱歉，只有群管理员/小犽管理者才有权调整猜歌设置。")
         return
     db = get_driver().config.db
     c = await db.cursor()
@@ -719,17 +733,17 @@ async def _(bot: Bot, event: Event):
         try:
             await c.execute(f'update guess_table set enabled=1 where group_id={event.group_id}')
         except Exception:
-            await disable_guess_music.finish(f"❌>> 猜歌 - 设置\n您需要运行一次猜歌才可进行设置！")
+            await disable_guess_music.finish(f"×>> 猜歌 - 设置\n您需要运行一次猜歌才可进行设置！")
     elif arg == '禁用':
         try:
             await c.execute(f'update guess_table set enabled=0 where group_id={event.group_id}')
         except Exception:
-            await disable_guess_music.finish(f"❌>> 猜歌 - 设置\n您需要运行一次猜歌才可进行设置！")
+            await disable_guess_music.finish(f"×>> 猜歌 - 设置\n您需要运行一次猜歌才可进行设置！")
     else:
         await disable_guess_music.finish("☆>> 猜歌 - 设置\n请输入 猜歌设置 启用/禁用")
         return
     await db.commit()
-    await disable_guess_music.finish(f"✔️>> 猜歌 - 设置\n设置成功并已即时生效。\n当前群设置为: {arg}")
+    await disable_guess_music.finish(f"√>> 猜歌 - 设置\n设置成功并已即时生效。\n当前群设置为: {arg}")
     
             
 guess_dict: Dict[Tuple[str, str], GuessObject] = {}
@@ -763,7 +777,7 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
     guess: GuessObject = state["guess_object"]
     if guess.is_end:
         return
-    asyncio.create_task(bot.send(event, Message([MessageSegment.text("❌>> 答案\n都没有猜到吗......那现在揭晓答案！\nID: " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
+    asyncio.create_task(bot.send(event, Message([MessageSegment.text("×>> 答案\n都没有猜到吗......那现在揭晓答案！\nID: " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
     del guess_dict[state["k"]]
 
 
@@ -780,20 +794,20 @@ async def _(bot: Bot, event: Event, state: T_State):
         if data is None:
             await c.execute(f'insert into guess_table values ({gid}, 1)')
         elif data[1] == 0:
-            await guess_music.send("❌>> 猜歌 - 被禁用\n抱歉，本群的管理员设置已设置已禁用猜歌。")
+            await guess_music.send("×>> 猜歌 - 被禁用\n抱歉，本群的管理员设置已设置已禁用猜歌。")
             return
         if k in guess_dict:
             if k in guess_cd_dict and time.time() > guess_cd_dict[k] - 400:
                 # 如果已经过了 200 秒则自动结束上一次
                 del guess_dict[k]
             else:
-                await guess_music.send("❌>> 猜歌 - 正在进行中\n当前已有正在进行的猜歌，要不要来参与一下呀？")
+                await guess_music.send("×>> 猜歌 - 正在进行中\n当前已有正在进行的猜歌，要不要来参与一下呀？")
                 return
     if len(guess_dict) >= 5:
-        await guess_music.finish("❌>> 猜歌 - 同时进行的群过多\n小犽有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
+        await guess_music.finish("×>> 猜歌 - 同时进行的群过多\n小犽有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
         return
     if k in guess_cd_dict and time.time() < guess_cd_dict[k]:
-        await guess_music.finish(f"❌>> 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢")
+        await guess_music.finish(f"×>> 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢")
         return
     guess = GuessObject()
     guess_dict[k] = guess
@@ -820,7 +834,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         del guess_dict[k]
         await guess_music_solve.finish(Message([
             MessageSegment.reply(event.message_id),
-            MessageSegment.text("✔️>> 答案\n您猜对了！答案就是：\n" + f"ID: {guess.music['id']} > {guess.music['title']}\n"),
+            MessageSegment.text("√>> 答案\n您猜对了！答案就是：\n" + f"ID: {guess.music['id']} > {guess.music['title']}\n"),
             MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")
         ]))
 
@@ -832,7 +846,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     now = datetime.datetime.now()
     c = await db.cursor()
     if event.message_type != "group":
-        await waiting_set.finish("❌>> 出勤大数据 - 设置\n抱歉，群管理员/小犽管理者才有权调整店铺设置，请在群内再试一次。")
+        await waiting_set.finish("×>> 出勤大数据 - 设置\n抱歉，群管理员/小犽管理者才有权调整店铺设置，请在群内再试一次。")
         return
     arg = str(event.get_message())
     group_members = await bot.get_group_member_list(group_id=event.group_id)
@@ -841,7 +855,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             break
     su = Config.superuser
     if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
-        await waiting_set.finish("❌>> 出勤大数据 - 设置\n抱歉，只有群管理员/小犽管理者才有权调整店铺设置。")
+        await waiting_set.finish("×>> 出勤大数据 - 设置\n抱歉，只有群管理员/小犽管理者才有权调整店铺设置。")
         return
     if len(argv) > 2 or argv[0] == "帮助":
         await waiting_set.finish("☆>> 出勤大数据 - 帮助\n命令格式是:\n设置店铺 [店铺名] [店铺位置]\n注意只有管理员才可以有权设置店铺信息哦。")
@@ -859,7 +873,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await waiting_set.finish(f"☆>> 出勤大数据\n已成功设置店铺。\n店铺名: {argv[0]}\n出勤人数: 0\n修改时间: {time}")
     else:
         if len(argv) == 1:
-            await waiting_set.finish("❌>> 出勤大数据 - 设置\n已存在此店铺，您可以选择修改店铺位置信息。")
+            await waiting_set.finish("×>> 出勤大数据 - 设置\n已存在此店铺，您可以选择修改店铺位置信息。")
             return
         elif len(argv) == 2:
             await c.execute(f'update waiting_table set location={argv[1]} where shop={argv[0]}')
@@ -879,7 +893,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
         data = await c.fetchone()
         if data is None:
-            await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
+            await waiting.finish("×>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
             return
         else:
             await waiting.finish(f"☆>> 出勤大数据\n{data[0]} 有 {data[2]} 人出勤。最后更新时间:{data[3]}")
@@ -888,7 +902,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
         data = await c.fetchone()
         if data is None:
-            await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
+            await waiting.finish("×>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
             return
         else:
             await c.execute(f'update waiting_table set wait={data[2] + 1}, updated="{time}" where shop="{res.groups()[0]}"')
@@ -899,11 +913,11 @@ async def _(bot: Bot, event: Event, state: T_State):
         await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
         data = await c.fetchone()
         if data is None:
-            await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
+            await waiting.finish("×>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
             return
         else:
             if data[2] - 1 < 0:
-                await waiting.finish("❌>> 出勤大数据\n不能再减了，再减就变成灵异事件了！")
+                await waiting.finish("×>> 出勤大数据\n不能再减了，再减就变成灵异事件了！")
                 return
             await c.execute(f'update waiting_table set wait={data[2] - 1}, updated="{time}" where shop="{res.groups()[0]}"')
             await db.commit()
@@ -913,7 +927,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
         data = await c.fetchone()
         if data is None:
-            await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
+            await waiting.finish("×>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
             return
         else:
             await c.execute(f'update waiting_table set wait={res.groups()[1]}, updated="{time}" where shop="{res.groups()[0]}"')
@@ -931,7 +945,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     await c.execute(f'select * from waiting_table where shop="{name}"')
     data = await c.fetchone()
     if data is None:
-        await waiting.finish("❌>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
+        await waiting.finish("×>> 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
         return
     else:
         await waiting.finish(f"☆>> 出勤大数据 - 位置\n{data[0]}: {data[1]}")
@@ -945,76 +959,127 @@ async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
     try:
         if argv[0] == "帮助":
-            rand_result = "☆>> 段位模式 - 帮助\n命令是:\n段位模式 <Expert/Master> <初级/中级/上级/超上级*>\n* 注意:超上级选项只对Master有效。"
+            rand_result = "☆>> 段位模式 - 帮助\n命令是:\n段位模式 <Expert/Master> <初级/中级/上级/超上级*1> <计算> (<Great数量> <Good数量> <Miss数量> <剩余的血量*3>)*2\n* 注意:\n*1 超上级选项只对Master有效。\n*2 只有使用计算功能的时候才需要打出括号内要求的内容。注意如果您对应的 Great 或 Good 或 Miss 的数量是0，请打0。\n *3 您可以指定剩余的血量(Life)，如果您不指定血量，默认按满血计算。"
         else:
             rand_result = f'☆>> To {nickname} | Rank Mode\nRank: {argv[0]} {argv[1]}\n'
             if argv[0] == "Expert" or argv[0] == "expert" or argv[0] == "EXPERT":
                 if argv[1] == "初级":
-                    level = ['7', '9']
+                    level = ['7', '8', '9']
                     life = 700
                     gr = -2
                     gd = -2
                     miss = -5
                     clear = 50
+                    min = 7
+                    max = 9
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若红、紫谱面难度相同，优先采用红谱。"
                 elif argv[1] == "中级":
-                    level = ['8', '10']
+                    level = ['8', '9', '10']
                     life = 600
                     gr = -2
                     gd = -2
                     miss = -5
                     clear = 50
+                    min = 8
+                    max = 10
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若红、紫谱面难度相同，优先采用红谱。"
                 elif argv[1] == "上级":
-                    level = ['10+', '12+']
+                    level = ['10+', '11', '11+', '12', '12+']
                     life = 500
                     gr = -2
                     gd = -2
                     miss = -5
                     clear = 50
+                    min = '10+'
+                    max = '12+'
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若红、紫谱面难度相同，优先采用红谱。"
                 else:
-                    rand_ranking.send(f"❌>> To {nickname} | Rank Error\n寄，Expert 等级只有初级、中级、上级！")
+                    rand_ranking.send(f"×>> To {nickname} | Rank Error\n寄，Expert 等级只有初级、中级、上级！")
                     return
             elif argv[0] == "Master" or argv[0] == "master" or argv[0] == "MASTER":
                 if argv[1] == "初级":
-                    level = ["10", "12"]
+                    level = ['10', '10+', '11', '11+', '12']
                     life = 700
                     gr = -2
                     gd = -2
                     miss = -5
                     clear = 50
+                    min = 10
+                    max = 12
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若紫、白谱面难度相同，优先采用紫谱。"
                 elif argv[1] == "中级":
-                    level = ["12", "13"]
+                    level = ['12', '12+', '13']
                     life = 500
                     gr = -2
                     gd = -2
                     miss = -5
                     clear = 50
+                    min = 12
+                    max = 13
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若紫、白谱面难度相同，优先采用紫谱。"
                 elif argv[1] == "上级":
-                    level = ['13', '14']
+                    level = ['13', '13+', '14.0', '14.1', '14.2', '14.3']
                     life = 300
                     gr = -2
                     gd = -2
                     miss = -5
                     clear = 20
+                    min = 13
+                    max = 14.3
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若紫、白谱面难度相同，优先采用紫谱。"
                 elif argv[1] == "超上级":
-                    level = ['14', '14+']
+                    level = ['14.4', '14.5', '14.6', '14+', '15']
                     life = 100
                     gr = -2
                     gd = -3
                     miss = -5
                     clear = 10
+                    min = 14.4
+                    max = 15.0
+                    msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若紫、白谱面难度相同，优先采用紫谱。"
                 else:
-                    rand_ranking.send(f"❌>> To {nickname} | Rank Error\n寄，Master 等级只有初级、中级、上级、超上级！")
+                    rand_ranking.send(f"×>> To {nickname} | Rank Error\n寄，Master 等级只有初级、中级、上级、超上级！")
                     return
             else:
-                rand_ranking.send(f"❌>> To {nickname} | Rank Error\n寄，大等级只有Master、Expert！")
+                rand_ranking.send(f"×>> To {nickname} | Rank Error\n寄，大等级只有Master、Expert！")
                 return
-            rand_result += f"\n本段位血量规则如下:\nLife: {life} -> Clear: +{clear}\nGreat: {gr} Good: {gd} Miss: {miss}\n"
-            for i in range(4):
-                music_data = total_list.filter(level=level, type=["SD", "DX"])
-                rand_result += f'\n----- Track {i + 1} / 4 -----\n' + song_txt(music_data.random())
+            if len(argv) > 3 and argv[2] == "计算":
+                if len(argv) > 7:
+                    raise ValueError
+                else:
+                    if len(argv) == 6:
+                        mylife = life + (int(argv[3]) * gr) + (int(argv[4]) * gd) + (int(argv[5]) * miss)
+                        if mylife <= 0:
+                            await rand_ranking.send(f"×>> To {nickname} | 段位闯关失败\n寄，您的血量扣光了......{argv[0]} {argv[1]}段位不合格！")
+                            return
+                        else:
+                            mylife += clear
+                            if mylife > life:
+                                mylife = life
+                            await rand_ranking.send(f"√>> To {nickname} | 段位血量\n您还剩余 {mylife} 血！如果没闯到第四首就请继续加油吧！")
+                            return
+                    elif len(argv) == 7:
+                        mylife = int(argv[6]) + (int(argv[3]) * gr) + (int(argv[4]) * gd) + (int(argv[5]) * miss)
+                        if mylife <= 0:
+                            await rand_ranking.send(f"×>> To {nickname} | 段位闯关失败\n寄，您的血量扣光了......{argv[0]} {argv[1]}段位不合格！")
+                            return
+                        else:
+                            mylife += clear
+                            if mylife > life:
+                                mylife = life
+                            await rand_ranking.send(f"√>> To {nickname} | 段位血量\n您还剩余 {mylife} 血！如果没闯到第四首就请继续加油吧！")
+                            return
+                    else:
+                        raise ValueError
+            else:
+                rand_result += f"\n段位难度区间: {min} - {max}\n段位血量规则:\nLife: {life} -> Clear: +{clear}\nGreat: {gr} Good: {gd} Miss: {miss}\n"
+                rand_result += msg
+                for i in range(4):
+                    music_data = total_list.filter(level=level, type=["SD", "DX"])
+                    rand_result += f'\n----- Track {i + 1} / 4 -----\n' + song_txt(music_data.random())
         await rand_ranking.send(rand_result)
     except Exception as e:
-        await rand_ranking.finish(f"❌>> To {nickname} | Rank Mode Error\n语法有错。如果您需要帮助请对我说‘段位模式 帮助’。")
+        await rand_ranking.finish(f"×>> To {nickname} | Rank Mode Error\n语法有错。如果您需要帮助请对我说‘段位模式 帮助’。\n[Exception Occurred]\n{e}")
 
 plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽舞霸])([極极将舞神者]舞?)进度\s?(.+)?')
 
@@ -1025,7 +1090,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
     nickname = event.sender.nickname
     if f'{res.groups()[0]}{res.groups()[1]}' == '真将':
-        await plate.finish(f"❌>> To {nickname} | Plate Error\n您查询的真系，没有真将！")
+        await plate.finish(f"×>> To {nickname} | Plate Error\n您查询的真系，没有真将！")
         return
     if not res.groups()[2]:
         payload = {'qq': str(event.get_user_id())}
@@ -1037,7 +1102,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload['version'] = [plate_to_version[res.groups()[0]]]
     player_data, success = await get_player_plate(payload)
     if success == 400:
-        await plate.send(f"❌>> To {nickname} | Plate - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await plate.send(f"×>> To {nickname} | Plate - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
         await plate.send(f'🚫>> To {nickname} | Plate - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
@@ -1145,7 +1210,7 @@ Master > 剩余 {len(song_remain_master)} 首
                     msg += f'ID: {m.id} > {m.title} | {diffs[s[1]]} 定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} 当前达成率: {self_record}'.strip() + '\n'
             else:
                 msg += '已经没有定数大于 13.6 的曲目了,加油清谱吧！\n'
-        else: msg += f'✔️>> To {nickname} | 已完成{res.groups()[0]}{res.groups()[1]}\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 完成了 {res.groups()[0]}{res.groups()[1]} 成就！'
+        else: msg += f'√>> To {nickname} | 已完成{res.groups()[0]}{res.groups()[1]}\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 完成了 {res.groups()[0]}{res.groups()[1]} 成就！'
         await plate.send(msg.strip())
 
 levelprogress = on_regex(r'^([0-9]+\+?)\s?(.+)进度\s?(.+)?')
@@ -1163,10 +1228,10 @@ async def _(bot: Bot, event: Event, state: T_State):
     achievementList = [50.0, 60.0, 70.0, 75.0, 80.0, 90.0, 94.0, 97.0, 98.0, 99.0, 99.5, 100.0, 100.5]
     nickname = event.sender.nickname
     if res.groups()[0] not in levelList:
-        await levelprogress.finish(f"❌>> To {nickname} | 参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
+        await levelprogress.finish(f"×>> To {nickname} | 参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
         return
     if res.groups()[1] not in scoreRank + comboRank + syncRank:
-        await levelprogress.finish(f"❌>> To {nickname} | 参数错误\n输入有误。\n1.请不要随便带空格。\n2.等级目前只有D/C/B/BB/BBB/A/AA/AAA/S/S+/SS/SS+/SSS/SSS+\n3.同步相关只有FS/FC/FDX/FDX+/FC/FC+/AP/AP+。")
+        await levelprogress.finish(f"×>> To {nickname} | 参数错误\n输入有误。\n1.请不要随便带空格。\n2.等级目前只有D/C/B/BB/BBB/A/AA/AAA/S/S+/SS/SS+/SSS/SSS+\n3.同步相关只有FS/FC/FDX/FDX+/FC/FC+/AP/AP+。")
         return
     if not res.groups()[2]:
         payload = {'qq': str(event.get_user_id())}
@@ -1175,7 +1240,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     payload['version'] = list(set(version for version in plate_to_version.values()))
     player_data, success = await get_player_plate(payload)
     if success == 400:
-        await levelprogress.send(f"❌>> To {nickname} | 等级清谱查询 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await levelprogress.send(f"×>> To {nickname} | 等级清谱查询 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
         await levelprogress.send(f'🚫>> To {nickname} | 等级清谱查询 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
@@ -1234,7 +1299,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             else:
                 await levelprogress.finish(f'☆>> To {nickname} | 清谱进度\n{"您" if not res.groups()[2] else res.groups()[2]} 还有 {len(song_remain)} 首 Lv.{res.groups()[0]} 的曲目还没有达成 {res.groups()[1].upper()},加油推分吧！')
         else:
-            await levelprogress.finish(f'✔️>> To {nickname} | 清谱完成\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()}！')
+            await levelprogress.finish(f'√>> To {nickname} | 清谱完成\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()}！')
         await levelprogress.send(MessageSegment.image(f"base64://{image_to_base64(text_to_image(msg.strip())).decode()}"))
 
 rankph = on_command('查看排行', aliases={'查看排名'})
@@ -1264,7 +1329,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     achievementList = [50.0, 60.0, 70.0, 75.0, 80.0, 90.0, 94.0, 97.0, 98.0, 99.0, 99.5, 100.0, 100.5]
     nickname = event.sender.nickname
     if res.groups()[0] and res.groups()[0] not in levelList:
-        await rise_score.finish(f"❌>> To {nickname} | 参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
+        await rise_score.finish(f"×>> To {nickname} | 参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
         return
     if not res.groups()[2]:
         payload = {'qq': str(event.get_user_id())}
@@ -1272,7 +1337,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': res.groups()[2].strip()}
     player_data, success = await get_player_data(payload)
     if success == 400:
-        await rise_score.send(f"❌>> To {nickname} | 犽的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await rise_score.send(f"×>> To {nickname} | 犽的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
         await rise_score.send(f'🚫>> To {nickname} | 犽的锦囊 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
@@ -1317,14 +1382,14 @@ async def _(bot: Bot, event: Event, state: T_State):
                             if music_ra - sd_ra_lowest == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_sd_list:
                                 music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
         if len(music_dx_list) == 0 and len(music_sd_list) == 0:
-            await rise_score.send(f"❌>> To {nickname} | 犽的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
+            await rise_score.send(f"×>> To {nickname} | 犽的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
             return
         elif len(music_dx_list) + len(music_sd_list) > 60:
             await rise_score.send(f"!>> To {nickname} | 犽的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
             return
         msg = f'☆>> To {nickname} | 犽的锦囊 - 升 {res.groups()[1]} 分攻略\n'
         if len(music_sd_list) != 0:
-            msg += f'推荐以下标准乐曲：\n'
+            msg += f'推荐以下旧版本乐曲：\n'
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):
                 msg += f'ID: {music["id"]}> {music["title"]} {diff} 定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {difficulty}\n'
         if len(music_dx_list) != 0:
@@ -1332,3 +1397,316 @@ async def _(bot: Bot, event: Event, state: T_State):
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_dx_list, key=lambda i: int(i[0]['id'])):
                 msg += f'{music["id"]}. {music["title"]} {diff} 定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {difficulty}\n'
         await rise_score.send(MessageSegment.image(f"base64://{image_to_base64(text_to_image(msg.strip())).decode()}"))
+
+base = on_command("底分分析", aliases={"rating分析"})
+
+@base.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    username = str(event.get_message()).strip()
+    nickname = event.sender.nickname
+    if username == "":
+        payload = {'qq': str(event.get_user_id())}
+        name = "您"
+    else:
+        payload = {'username': username}
+        name = username
+    obj, success = await get_player_data(payload)
+    if success == 400:
+        await base.send(f"×>> To {nickname} | 底分分析 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        return
+    elif success == 403:
+        await base.send(f'🚫>> To {nickname} | 底分分析 - 被禁止\n{username} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        return
+    else:
+        try:
+            sd_best = BestList(25)
+            dx_best = BestList(15)
+            dx: List[Dict] = obj["charts"]["dx"]
+            sd: List[Dict] = obj["charts"]["sd"]
+            for c in sd:
+                sd_best.push(ChartInfo.from_json(c))
+            for c in dx:
+                dx_best.push(ChartInfo.from_json(c))
+            ds_sd_best_max = sd_best[0].ds
+            ds_sd_best_min = sd_best[len(sd_best) - 1].ds
+            ds_dx_best_max = dx_best[0].ds
+            ds_dx_best_min = dx_best[len(dx_best) - 1].ds
+            maxuse = 0
+            minuse = 0
+            maxuse_dx = 0
+            minuse_dx = 0
+            if sd_best[0].achievement >= 100.5:
+                max_sssp = ds_sd_best_max
+            elif sd_best[0].achievement < 100.5 and sd_best[0].achievement >= 100:
+                max_sss = ds_sd_best_max
+                maxuse = 1
+            elif sd_best[0].achievement < 100 and sd_best[0].achievement >= 99.5:
+                max_ssp = ds_sd_best_max
+                maxuse = 2
+            elif sd_best[0].achievement < 99.5 and sd_best[0].achievement >= 99:
+                max_ss = ds_sd_best_max
+                maxuse = 3
+            elif sd_best[0].achievement < 99 and sd_best[0].achievement >= 98:
+                max_sp = ds_sd_best_max
+                maxuse = 4
+            elif sd_best[0].achievement < 98 and sd_best[0].achievement >= 97:
+                max_s = ds_sd_best_max
+                maxuse = 5
+            else:
+                raise ValueError("请您注意: 您的 Best 40 B25 中最高达成率小于 Rank S的要求。请继续加油！")
+            if sd_best[len(sd_best) - 1].achievement >= 100.5:
+                min_sssp = ds_sd_best_min
+            elif sd_best[len(sd_best) - 1].achievement < 100.5 and sd_best[len(sd_best) - 1].achievement >= 100:
+                min_sss = ds_sd_best_min
+                minuse = 1
+            elif sd_best[len(sd_best) - 1].achievement < 100 and sd_best[len(sd_best) - 1].achievement >= 99.5:
+                min_ssp = ds_sd_best_min
+                minuse = 2
+            elif sd_best[len(sd_best) - 1].achievement < 99.5 and sd_best[len(sd_best) - 1].achievement >= 99:
+                min_ss = ds_sd_best_min
+                minuse = 3
+            elif sd_best[len(sd_best) - 1].achievement < 99 and sd_best[len(sd_best) - 1].achievement >= 98:
+                min_sp = ds_sd_best_min
+                minuse = 4
+            elif sd_best[len(sd_best) - 1].achievement < 98 and sd_best[len(sd_best) - 1].achievement >= 97:
+                min_s = ds_sd_best_min
+                minuse = 5
+            else:
+                raise ValueError("请您注意: 您的 Best 40 B25 中最低达成率小于 Rank S的要求。请继续加油！")
+            if maxuse == 0:
+                max_sss = max_sssp + 0.6
+                max_ssp = max_sssp + 1
+                max_ss = max_sssp + 1.2
+                max_sp = max_sssp + 1.7
+                max_s = max_sssp + 1.9
+            elif maxuse == 1:
+                max_sssp = max_sss - 0.6
+                max_ssp = max_sss + 0.4
+                max_ss = max_sss + 0.6
+                max_sp = max_sss + 1.1
+                max_s = max_sss + 1.3
+            elif maxuse == 2:
+                max_sssp = max_ssp - 1
+                max_sss = max_ssp - 0.4
+                max_ss = max_ssp + 0.2
+                max_sp = max_ssp + 0.7
+                max_s = max_ssp + 0.9
+            elif maxuse == 3:
+                max_sssp = max_ss - 1.2
+                max_sss = max_ss - 0.6
+                max_ssp = max_ss - 0.2
+                max_sp = max_ss + 0.5
+                max_s = max_ss + 0.7
+            elif maxuse == 4:
+                max_sssp = max_sp - 1.7
+                max_sss = max_sp - 1.1
+                max_ssp = max_sp - 0.7
+                max_ss = max_sp - 0.5
+                max_s = max_sp + 0.2
+            else:
+                max_sssp = max_s - 1.9
+                max_sss = max_s - 1.3
+                max_ssp = max_s - 0.9
+                max_ss = max_s - 0.7
+                max_sp = max_s - 0.2
+            if minuse == 0:
+                min_sss = min_sssp + 0.6
+                min_ssp = min_sssp + 1
+                min_ss = min_sssp + 1.2
+                min_sp = min_sssp + 1.7
+                min_s = min_sssp + 1.9
+            elif minuse == 1:
+                min_sssp = min_sss - 0.6
+                min_ssp = min_sss + 0.4
+                min_ss = min_sss + 0.6
+                min_sp = min_sss + 1.1
+                min_s = min_sss + 1.3
+            elif minuse == 2:
+                min_sssp = min_ssp - 1
+                min_sss = min_ssp - 0.4
+                min_ss = min_ssp + 0.2
+                min_sp = min_ssp + 0.7
+                min_s = min_ssp + 0.9
+            elif minuse == 3:
+                min_sssp = min_ss - 1.2
+                min_sss = min_ss - 0.6
+                min_ssp = min_ss - 0.2
+                min_sp = min_ss + 0.5
+                min_s = min_ss + 0.7
+            elif minuse == 4:
+                min_sssp = min_sp - 1.7
+                min_sss = min_sp - 1.1
+                min_ssp = min_sp - 0.7
+                min_ss = min_sp - 0.5
+                min_s = min_sp + 0.2
+            else:
+                min_sssp = min_s - 1.9
+                min_sss = min_s - 1.3
+                min_ssp = min_s - 0.9
+                min_ss = min_s - 0.7
+                min_sp = min_s - 0.2
+
+            
+
+            if dx_best[0].achievement >= 100.5:
+                max_sssp_dx = ds_dx_best_max
+            elif dx_best[0].achievement < 100.5 and dx_best[0].achievement >= 100:
+                max_sss_dx = ds_dx_best_max
+                maxuse_dx = 1
+            elif dx_best[0].achievement < 100 and dx_best[0].achievement >= 99.5:
+                max_ssp_dx = ds_dx_best_max
+                maxuse_dx = 2
+            elif dx_best[0].achievement < 99.5 and dx_best[0].achievement >= 99:
+                max_ss_dx = ds_dx_best_max
+                maxuse_dx = 3
+            elif dx_best[0].achievement < 99 and dx_best[0].achievement >= 98:
+                max_sp_dx = ds_dx_best_max
+                maxuse_dx = 4
+            elif dx_best[0].achievement < 98 and dx_best[0].achievement >= 97:
+                max_s_dx = ds_dx_best_max
+                maxuse_dx = 5
+            else:
+                raise ValueError("请您注意: 您的 Best 40 B15 中最高达成率小于 Rank S的要求。请继续加油！")
+            if dx_best[len(dx_best) - 1].achievement >= 100.5:
+                min_sssp_dx = ds_dx_best_min
+            elif dx_best[len(dx_best) - 1].achievement < 100.5 and dx_best[len(dx_best) - 1].achievement >= 100:
+                min_sss_dx = ds_dx_best_min
+                minuse_dx = 1
+            elif dx_best[len(dx_best) - 1].achievement < 100 and dx_best[len(dx_best) - 1].achievement >= 99.5:
+                min_ssp_dx = ds_dx_best_min
+                minuse_dx = 2
+            elif dx_best[len(dx_best) - 1].achievement < 99.5 and dx_best[len(dx_best) - 1].achievement >= 99:
+                min_ss_dx = ds_dx_best_min
+                minuse_dx = 3
+            elif dx_best[len(dx_best) - 1].achievement < 99 and dx_best[len(dx_best) - 1].achievement >= 98:
+                min_sp_dx = ds_dx_best_min
+                minuse_dx = 4
+            elif dx_best[len(dx_best) - 1].achievement < 98 and dx_best[len(dx_best) - 1].achievement >= 97:
+                min_s_dx = ds_dx_best_min
+                minuse_dx = 5
+            else:
+                raise ValueError("请您注意: 您的 Best 40 B15 中最低达成率小于 Rank S 的要求。请继续加油！")
+            if maxuse_dx == 0:
+                max_sss_dx = max_sssp_dx + 0.6
+                max_ssp_dx = max_sssp_dx + 1
+                max_ss_dx = max_sssp_dx + 1.2
+                max_sp_dx = max_sssp_dx + 1.7
+                max_s_dx = max_sssp_dx + 1.9
+            elif maxuse_dx == 1:
+                max_sssp_dx = max_sss_dx - 0.6
+                max_ssp_dx = max_sss_dx + 0.4
+                max_ss_dx = max_sss_dx + 0.6
+                max_sp_dx = max_sss_dx + 1.1
+                max_s_dx = max_sss_dx + 1.3
+            elif maxuse_dx == 2:
+                max_sssp_dx = max_ssp_dx - 1
+                max_sss_dx = max_ssp_dx - 0.4
+                max_ss_dx = max_ssp_dx + 0.2
+                max_sp_dx = max_ssp_dx + 0.7
+                max_s_dx = max_ssp_dx + 0.9
+            elif maxuse_dx == 3:
+                max_sssp_dx = max_ss_dx - 1.2
+                max_sss_dx = max_ss_dx - 0.6
+                max_ssp_dx = max_ss_dx - 0.2
+                max_sp_dx = max_ss_dx + 0.5
+                max_s_dx = max_ss_dx + 0.7
+            elif maxuse_dx == 4:
+                max_sssp_dx = max_sp_dx - 1.7
+                max_sss_dx = max_sp_dx - 1.1
+                max_ssp_dx = max_sp_dx - 0.7
+                max_ss_dx = max_sp_dx - 0.5
+                max_s_dx = max_sp_dx + 0.2
+            else:
+                max_sssp_dx = max_s_dx - 1.9
+                max_sss_dx = max_s_dx - 1.3
+                max_ssp_dx = max_s_dx - 0.9
+                max_ss_dx = max_s_dx - 0.7
+                max_sp_dx = max_s_dx - 0.2
+            if minuse_dx == 0:
+                min_sss_dx = min_sssp_dx + 0.6
+                min_ssp_dx = min_sssp_dx + 1
+                min_ss_dx = min_sssp_dx + 1.2
+                min_sp_dx = min_sssp_dx + 1.7
+                min_s_dx = min_sssp_dx + 1.9
+            elif minuse_dx == 1:
+                min_sssp_dx = min_sss_dx - 0.6
+                min_ssp_dx = min_sss_dx + 0.4
+                min_ss_dx = min_sss_dx + 0.6
+                min_sp_dx = min_sss_dx + 1.1
+                min_s_dx = min_sss_dx + 1.3
+            elif minuse_dx == 2:
+                min_sssp_dx = min_ssp_dx - 1
+                min_sss_dx = min_ssp_dx - 0.4
+                min_ss_dx = min_ssp_dx + 0.2
+                min_sp_dx = min_ssp_dx + 0.7
+                min_s_dx = min_ssp_dx + 0.9
+            elif minuse_dx == 3:
+                min_sssp_dx = min_ss_dx - 1.2
+                min_sss_dx = min_ss_dx - 0.6
+                min_ssp_dx = min_ss_dx - 0.2
+                min_sp_dx = min_ss_dx + 0.5
+                min_s_dx = min_ss_dx + 0.7
+            elif minuse_dx == 4:
+                min_sssp_dx = min_sp_dx - 1.7
+                min_sss_dx = min_sp_dx - 1.1
+                min_ssp_dx = min_sp_dx - 0.7
+                min_ss_dx = min_sp_dx - 0.5
+                min_s_dx = min_sp_dx + 0.2
+            else:
+                min_sssp_dx = min_s_dx - 1.9
+                min_sss_dx = min_s_dx - 1.3
+                min_ssp_dx = min_s_dx - 0.9
+                min_ss_dx = min_s_dx - 0.7
+                min_sp_dx = min_s_dx - 0.2
+            if max_sssp > 15.0:
+                max_sssp = "--"
+            if max_ssp > 15.0:
+                max_ssp = "--"
+            if max_sp > 15.0:
+                max_sp = "--"
+            if max_sss > 15.0:
+                max_sss = "--"
+            if max_ss > 15.0:
+                max_ss = "--"
+            if max_s > 15.0:
+                max_s = "--"
+            if min_sssp > 15.0:
+                min_sssp = "--"
+            if min_ssp > 15.0:
+                min_ssp = "--"
+            if min_sp > 15.0:
+                min_sp = "--"
+            if min_sss > 15.0:
+                min_sss = "--"
+            if min_ss > 15.0:
+                min_ss = "--"
+            if min_s > 15.0:
+                min_s = "--"
+            if max_sssp_dx > 15.0:
+                max_sssp_dx = "--"
+            if max_ssp_dx > 15.0:
+                max_ssp_dx = "--"
+            if max_sp_dx > 15.0:
+                max_sp_dx = "--"
+            if max_sss_dx > 15.0:
+                max_sss_dx = "--"
+            if max_ss_dx > 15.0:
+                max_ss_dx = "--"
+            if max_s_dx > 15.0:
+                max_s_dx = "--"
+            if min_sssp_dx > 15.0:
+                min_sssp_dx = "--"
+            if min_ssp_dx > 15.0:
+                min_ssp_dx = "--"
+            if min_sp_dx > 15.0:
+                min_sp_dx = "--"
+            if min_sss_dx > 15.0:
+                min_sss_dx = "--"
+            if min_ss_dx > 15.0:
+                min_ss_dx = "--"
+            if min_s_dx > 15.0:
+                min_s_dx = "--"
+            await base.send(f"☆>> To {nickname} | 底分分析\n{name} 的 Best 40 最高与最低底分的对应定数如下表:\n----------------------\n表格遵循的格式为:\nSSS+ | SSS | SS+ | SS | S+ | S\n----------------------\n---- B25 ----\nMAX Base:\n{max_sssp} | {max_sss} | {max_ssp} | {max_ss} | {max_sp} | {max_s}\nMIN Base:\n{min_sssp} | {min_sss} | {min_ssp} | {min_ss} | {min_sp} | {min_s}\n\n---- B15 ----\nMAX Base:\n{max_sssp_dx} | {max_sss_dx} | {max_ssp_dx} | {max_ss_dx} | {max_sp_dx} | {max_s_dx}\nMIN Base:\n{min_sssp_dx} | {min_sss_dx} | {min_ssp_dx} | {min_ss_dx} | {min_sp_dx} | {min_s_dx}")
+        except Exception as e:
+            await base.send(f"×>> To {nickname} | 底分分析 - 错误\n出现意外错误啦。\n[Exception Occurred]\n{e}")
+            return

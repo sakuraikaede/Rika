@@ -304,9 +304,9 @@ async def _(bot: Bot, event: Event, state: dict):
         var = binding_map[qq]
         del role_cache[binding_map[qq]]
         del binding_map[qq]
-        await unbind.send("✔️>> COC - 解绑\n已经解绑成功啦！")
+        await unbind.send("√>> COC - 解绑\n已经解绑成功啦！")
     except KeyError:
-        await unbind.send("❌>> COC - 解绑 - 无角色\n你还未绑定角色哦~")
+        await unbind.send("×>> COC - 解绑 - 无角色\n你还未绑定角色哦~")
 
 
 intro = on_command('coc.intro ', aliases={'coc.i '})
@@ -318,7 +318,7 @@ async def _(bot: Bot, event: Event, state: dict):
     try:
         await intro.send(gen_bg_text(role_cache[name]))
     except KeyError:
-        await intro.send("❌>> COC - 找不到角色\n未找到【%s】！这个角色似乎并没有出现在这个剧本里呢~" % name)
+        await intro.send("×>> COC - 找不到角色\n未找到【%s】！这个角色似乎并没有出现在这个剧本里呢~" % name)
 
 
 time = on_command('coc.time ')
@@ -329,7 +329,7 @@ async def _(bot: Bot, event: Event, state: dict):
     t = int(str(event.get_message()).strip().split(' ')[-1])
     s = flush_buffer(t)
     if s == "":
-        await time.send("❌>> COC - 角色变化\n经过了%d小时，但没有玩家的能力值发生变化。" % t)
+        await time.send("×>> COC - 角色变化\n经过了%d小时，但没有玩家的能力值发生变化。" % t)
     else:
         await time.send("☆>> COC - 角色变化\n经过%d小时后，玩家的能力发生了如下变化：\n%s" % (t, s))
 
@@ -342,19 +342,19 @@ async def _(bot: Bot, event: Event, state: dict):
     argv = str(event.get_message()).strip().split(' ')
     argc = len(argv)
     if len(argv) != 1 and len(argv) != 3 and len(argv) != 4:
-        await stat.send("❌>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.stat <技能/属性> <add|sub|set> <值> [触发时间（小时）]！")
+        await stat.send("×>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.stat <技能/属性> <add|sub|set> <值> [触发时间（小时）]！")
         return
     role = None
     try:
         role = role_cache[binding_map[int(event.get_user_id())]]
     except KeyError:
-        await stat.send("❌>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
+        await stat.send("×>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
         return
     if argc == 1:
         stat_name = argv[0]
         value, err = search_check(role, stat_name)
         if not err:
-            await stat.send("❌>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % stat_name)
+            await stat.send("×>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % stat_name)
             return
         await stat.send("☆>> COC - 能力值\n【%s】的能力值【%s】为：%d/%d/%d" % (role['name'], stat_name, value, int(value / 2), int(value / 5)))
         return
@@ -366,11 +366,11 @@ async def _(bot: Bot, event: Event, state: dict):
         try:
             op = m[argv[1]]
         except KeyError:
-            await stat.send("❌>> COC - 不支持\n看起来命令不支持【%s】这个操作呢~" % argv[1])
+            await stat.send("×>> COC - 不支持\n看起来命令不支持【%s】这个操作呢~" % argv[1])
             return
         s, e = stat_modify(role, argv[0], op, int(argv[2]), time)
         if not e:
-            await stat.send("❌>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % argv[0])
+            await stat.send("×>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % argv[0])
         else:
             if time == 0:
                 await stat.send(s)
@@ -388,9 +388,9 @@ async def _(bot: Bot, event: Event, state: dict):
         nickname = binding_map[qq]
         role = role_cache[nickname]
         await showall.send(gen_showall_text(role), ensure_private=True)
-        await showall.send("✔️>> COC - 角色信息\n已发送私聊消息~", at_sender=True)
+        await showall.send("√>> COC - 角色信息\n已发送私聊消息~", at_sender=True)
     except KeyError:
-        await showall.send("❌>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % event.sender.nickname)
+        await showall.send("×>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % event.sender.nickname)
         return
 
 
@@ -401,7 +401,7 @@ query = on_command('coc.query ', aliases={'coc.q '})
 async def _(bot: Bot, event: Event, state: dict):
     argv = str(event.get_message()).strip().split(' ')
     if len(argv) != 2:
-        await query.send("❌>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.q <玩家名/QQ> <技能/属性>！")
+        await query.send("×>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.q <玩家名/QQ> <技能/属性>！")
         return
     role = None
     try:
@@ -410,12 +410,12 @@ async def _(bot: Bot, event: Event, state: dict):
         try:
             role = role_cache[argv[0]]
         except Exception:
-            await query.send("❌>> COC - 找不到角色\n未找到【%s】！这个角色似乎并没有出现在这个剧本里呢~" % argv[0])
+            await query.send("×>> COC - 找不到角色\n未找到【%s】！这个角色似乎并没有出现在这个剧本里呢~" % argv[0])
             return
     stat_name = argv[1]
     value, err = search_check(role, stat_name)
     if not err:
-        await query.send("❌>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % stat_name)
+        await query.send("×>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % stat_name)
         return
     await query.send("☆>> COC - 能力值\n【%s】的能力值【%s】为：%d/%d/%d" % (role['name'], stat_name, value, int(value / 2), int(value / 5)))
 
@@ -431,7 +431,7 @@ async def _(bot: Bot, event: Event, state: dict):
         name = binding_map[int(event.get_user_id())]
     except KeyError:
         pass
-    await roll.send("❌>> COC - 掷骰子\n【%s】的掷骰结果：%s" % (name, result[0]))
+    await roll.send("×>> COC - 掷骰子\n【%s】的掷骰结果：%s" % (name, result[0]))
     
     
 sancheck = on_command('coc.sancheck ', aliases={'coc.sc '})
@@ -444,7 +444,7 @@ async def _(bot: Bot, event: Event, state: dict):
     try:
         nickname = binding_map[qq]
         if len(argv) != 2:
-            await sancheck.send("❌>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.sc <成功> <失败>！")
+            await sancheck.send("×>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.sc <成功> <失败>！")
             return
         role = role_cache[nickname]
         value = random.randint(1, 100)
@@ -452,13 +452,13 @@ async def _(bot: Bot, event: Event, state: dict):
         if value > sanity:
             s, v = roll_expression(argv[1])
             role['stats']['san'] -= v
-            await sancheck.send("❌>> COC - 理智检定失败\n【%s】的理智检定：%d/%d 失败，理智扣除%s点，剩余%d点" % (nickname, value, sanity, s, role['stats']['san']))
+            await sancheck.send("×>> COC - 理智检定失败\n【%s】的理智检定：%d/%d 失败，理智扣除%s点，剩余%d点" % (nickname, value, sanity, s, role['stats']['san']))
         else:
             s, v = roll_expression(argv[0])
             role['stats']['san'] -= v
-            await sancheck.send("✔️>> COC - 理智检定成功\n【%s】的理智检定：%d/%d 成功，理智扣除%s点，剩余%d点" % (nickname, value, sanity, s, role['stats']['san']))
+            await sancheck.send("√>> COC - 理智检定成功\n【%s】的理智检定：%d/%d 成功，理智扣除%s点，剩余%d点" % (nickname, value, sanity, s, role['stats']['san']))
     except KeyError:
-        await sancheck.send("❌>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
+        await sancheck.send("×>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
         return
     
     
@@ -471,7 +471,7 @@ async def _(bot: Bot, event: Event, state: dict):
     try:
         nickname = binding_map[qq]
     except KeyError:
-        await rollcheck.send("❌>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
+        await rollcheck.send("×>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
         return
     argv = str(event.get_message()).strip().split(' ')
     try:
@@ -484,14 +484,14 @@ async def _(bot: Bot, event: Event, state: dict):
             role = role_cache[nickname]
             value, err = search_check(role, stat_name)
             if not err:
-                await rollcheck.send("❌>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % stat_name)
+                await rollcheck.send("×>> COC - 无能力值\n未找到能力值【%s】！真的有这个能力吗？" % stat_name)
                 return
             await rollcheck.send(check(nickname, stat_name, value))
         except KeyError:
-            await rollcheck.send("❌>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
+            await rollcheck.send("×>> COC - 角色未绑定\n【%s】看起来还没绑定角色呢。输入.bind <角色名称> 进行绑定吧？" % (event.sender.nickname))
             return
     except Exception:
-        await rollcheck.send("❌>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.rc <技能/属性> [值]！")
+        await rollcheck.send("×>> COC - 格式错误\n你这白痴又弄错命令格式了！给我记好了，正确的格式是.rc <技能/属性> [值]！")
         return
 
 
@@ -510,14 +510,14 @@ async def _(bot: Bot, event: Event, state: dict):
         except KeyError:
             text = requests.get("http://47.100.50.175:25565/query", {"name": name}).text
             if text == "{}":
-                await bind.send("❌>> COC - 找不到角色\n小犽没能找到角色【%s】，下次再出错就把你拉入黑名单了哦！" % name)
+                await bind.send("×>> COC - 找不到角色\n小犽没能找到角色【%s】，下次再出错就把你拉入黑名单了哦！" % name)
                 return
             role_cache[name] = demjson.decode(text, encoding='utf-8')
         if check_map(name):
             binding_map[qq] = name
         else:
-            await bind.send("❌>> COC - 角色已被绑定\n这个角色已经绑定过啦！难道还想两个人控制一个角色吗？！")
+            await bind.send("×>> COC - 角色已被绑定\n这个角色已经绑定过啦！难道还想两个人控制一个角色吗？！")
             return
-        await bind.send("✔️>> COC - 绑定成功\n绑定成功！现在千雪已经认为【%s】就是【%s】了哦！" % (event.sender.nickname, name))
+        await bind.send("√>> COC - 绑定成功\n绑定成功！现在千雪已经认为【%s】就是【%s】了哦！" % (event.sender.nickname, name))
         return
-    await bind.send("❌>> COC - 已绑定\n你已经绑定过角色了哟~")
+    await bind.send("×>> COC - 已绑定\n你已经绑定过角色了哟~")
