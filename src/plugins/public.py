@@ -27,7 +27,7 @@ helper = on_command('help', aliases={'about'})
 
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await helper.send("☆>> 关于\n犽(Kiba) | Gon Plus\n版本: 2.7 (2.70.211209)\n----------------------\nGithub:\nhttps://github.com/Killua-Blitz/Kiba\nProject Kiba Credits:\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
+    await helper.send("☆>> 关于\nRika\n----------------------\nGithub:\nhttps://github.com/sakuraikaede/Rika\nProject Rika Credits:@Sakurai Kaede\n@Killua Blitz\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n----------------------\n☆>> 帮助\n查询舞萌模块帮助 maimai.help\n查询跑团模块帮助 coc.help\n查询其它模块帮助 others.help")
    
 help_others = on_command('others.help')
 
@@ -53,22 +53,22 @@ gocho <str1> <str2>                                                         生�
 投骰子<数量>                                                                       在线投骰子(?)
 投百面骰子<数量>                                                             * 可以选择六面/百面
 
-                                                                                              这个功能可以随机禁言你1-600秒，前提小犽是管理员。
+                                                                                              这个功能可以随机禁言你1-600秒，前提 Rika 是管理员。
 烟我                                                                                    * 注意:为防止误触发，
-                                                                                              这个功能你需要at一下小犽再说这个命令才能执行。
+                                                                                              这个功能你需要at一下 Rika 再说这个命令才能执行。
 
                                                                                                群里摇人。
 随个[男/女]群友                                                                      你也可以不带参数直接说“随个”然后后面加啥都可以。
-                                                                                               当然小犽容易骂你就是了。
+                                                                                               当然 Rika 容易骂你就是了。
 
 帮选                                                                                      帮你选 
 
-扔瓶子                                                                                   扔个瓶子给犽。说不定会被别人读到哦。
+扔瓶子                                                                                   扔个瓶子给 Rika。说不定会被别人读到哦。
 
 捞瓶子                                                                                    捞一个瓶子，看看上面留言什么了？
 
 
-扔瓶子                                                                                   扔个瓶子给犽。说不定会被别人读到哦。
+扔瓶子                                                                                   扔个瓶子给 Rika。说不定会被别人读到哦。
 
 捞瓶子                                                                                   捞一个瓶子，看看上面留言什么了？
 
@@ -294,7 +294,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await poke_setting.send(f"√>> 戳一戳设置 - 成功\n戳一戳已成功设置为: {argv[0]}")
         await db.commit()
     except (IndexError, ValueError):
-        await poke_setting.finish("☆>> 戳一戳设置 - 帮助\n本命令的格式:\n戳一戳设置 <默认/限制 (秒)/禁用>\n\n - 默认:将启用默认的戳一戳设定，包括随机性抽中禁言 1 - 1 分 30 秒。\n - 限制 (秒):在戳完一次 Kiba 的指定时间内，调用戳一戳只会让 Kiba 反过来戳你。在指定时间外时，与默认相同。\n- 禁用:禁用戳一戳的相关功能。")
+        await poke_setting.finish("☆>> 戳一戳设置 - 帮助\n本命令的格式:\n戳一戳设置 <默认/限制 (秒)/禁用>\n\n - 默认:将启用默认的戳一戳设定，包括随机性抽中禁言 1 - 1 分 30 秒。\n - 限制 (秒):在戳完一次 Rika 的指定时间内，调用戳一戳只会让 Rika 反过来戳你。在指定时间外时，与默认相同。\n- 禁用:禁用戳一戳的相关功能。")
     pass
 
 shuffle = on_command('shuffle')
@@ -481,7 +481,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await plp_settings.finish("!>> 漂流社区设置\n这个...只有管理员可以设置漂流社区。")
                 return
     except Exception as e:
-        await plp_settings.finish(f"!>> 漂流社区设置 - 现在是私聊？\n群的瓶子开关在私聊是无法设置的，或您输入了错误的群号(犽不在这个群)。\n如果需要在私聊处理成员的拉黑，您需要在命令后面添加犽所在群号以便查验您是否为管理员。\n请在如果不是私聊，看下下面的错误记录。\nTechnical Information:\n{e}")
+        await plp_settings.finish(f"!>> 漂流社区设置 - 现在是私聊？\n群的瓶子开关在私聊是无法设置的，或您输入了错误的群号(Rika 不在这个群)。\n如果需要在私聊处理成员的拉黑，您需要在命令后面添加 Rika 所在群号以便查验您是否为管理员。\n请在如果不是私聊，看下下面的错误记录。\nTechnical Information:\n{e}")
         return
     try:
         if argv[0] == "完全启用":
@@ -742,7 +742,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await c.execute(f'select * from plp_table order by random() limit 1')
             data = await c.fetchone()
             if data is None:
-                await plp_find.finish(f"×>> To {nickname} | 漂流社区: 捞瓶子 - 没有瓶子\n啊呀....小犽这目前一个瓶子都莫得。要不先扔一个看看？")
+                await plp_find.finish(f"×>> To {nickname} | 漂流社区: 捞瓶子 - 没有瓶子\n啊呀....Rika 这目前一个瓶子都莫得。要不先扔一个看看？")
                 return
             else:
                 if data[4] == 0:
@@ -818,7 +818,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     db = get_driver().config.db
     c = await db.cursor()
     if str(event.user_id) not in Config.superuser:
-        await plp_clean.finish(f"×>> To {nickname} | 漂流社区: 洗瓶子 - 没有权限\n这个...只有小犽的管理员才可以清空瓶子。")
+        await plp_clean.finish(f"×>> To {nickname} | 漂流社区: 洗瓶子 - 没有权限\n这个...只有 Rika 的管理员才可以清空瓶子。")
         return
     else:
         await c.execute(f'delete from plp_table')

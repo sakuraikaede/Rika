@@ -31,7 +31,7 @@ driver = get_driver()
 
 @driver.on_startup
 def _():
-    logger.info("Kiba Kernel -> Load \"DX\" successfully")
+    logger.info("Rika Kernel -> Load \"DX\" successfully")
 
 help_mai = on_command('maimai.help')
 
@@ -80,7 +80,7 @@ b40 / b50                                                                       
 <等级><Rank/Sync/Combo状态>进度                             * Rank: S/S+/SS/SS+/SSS/SSS+等
                                                                                              Sync: FS/FS+/FDX/FDX+ Combo: FC/FC+/AP/AP+
 
-我要在<等级>上<分值>分                                                   犽的锦囊 - 快速推荐上分歌曲。
+我要在<等级>上<分值>分                                                   Rika 锦囊 - 快速推荐上分歌曲。
 
 查看排名/查看排行                                                               查看查分器网站 Rating 的 TOP50 排行榜！
 
@@ -484,7 +484,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n忌 | 共 {bad_count} 项:\n'
         for i in range(bad_count):
             s += f'{wm_list[bad_value[i]]} '
-    s += f'\n\n★ 犽之锦囊 | Kiba\'s Hints\n游玩提示:\n{tips_list[tips_value]}\n'
+    s += f'\n\n★ Rika 锦囊 | Rika\'s Hints\n游玩提示:\n{tips_list[tips_value]}\n'
     s += "运势歌曲:\n"
     music = total_list[hash(qq) * now.day * now.month % len(total_list)]
     await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
@@ -553,7 +553,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
     nickname = event.sender.nickname
     if name not in music_aliases:
-        await find_song.finish(f"×>> To {nickname} | 别名查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
+        await find_song.finish(f"×>> To {nickname} | 别名查歌 - 错误\n这个别称太新了，我找不到这首歌啦。")
         return
     result_set = music_aliases[name]
     if len(result_set) == 1:
@@ -725,7 +725,7 @@ async def _(bot: Bot, event: Event):
             break
     su = Config.superuser
     if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
-        await disable_guess_music.finish("×>> 猜歌 - 设置 - 无权限\n抱歉，只有群管理员/小犽管理者才有权调整猜歌设置。")
+        await disable_guess_music.finish("×>> 猜歌 - 设置 - 无权限\n抱歉，只有群管理员/Rika 管理者才有权调整猜歌设置。")
         return
     db = get_driver().config.db
     c = await db.cursor()
@@ -804,7 +804,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await guess_music.send("×>> 猜歌 - 正在进行中\n当前已有正在进行的猜歌，要不要来参与一下呀？")
                 return
     if len(guess_dict) >= 5:
-        await guess_music.finish("×>> 猜歌 - 同时进行的群过多\n小犽有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
+        await guess_music.finish("×>> 猜歌 - 同时进行的群过多\nRika 有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
         return
     if k in guess_cd_dict and time.time() < guess_cd_dict[k]:
         await guess_music.finish(f"×>> 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢")
@@ -846,7 +846,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     now = datetime.datetime.now()
     c = await db.cursor()
     if event.message_type != "group":
-        await waiting_set.finish("×>> 出勤大数据 - 设置\n抱歉，群管理员/小犽管理者才有权调整店铺设置，请在群内再试一次。")
+        await waiting_set.finish("×>> 出勤大数据 - 设置\n抱歉，群管理员/Rika 管理者才有权调整店铺设置，请在群内再试一次。")
         return
     arg = str(event.get_message())
     group_members = await bot.get_group_member_list(group_id=event.group_id)
@@ -855,7 +855,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             break
     su = Config.superuser
     if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
-        await waiting_set.finish("×>> 出勤大数据 - 设置\n抱歉，只有群管理员/小犽管理者才有权调整店铺设置。")
+        await waiting_set.finish("×>> 出勤大数据 - 设置\n抱歉，只有群管理员/Rika 管理者才有权调整店铺设置。")
         return
     if len(argv) > 2 or argv[0] == "帮助":
         await waiting_set.finish("☆>> 出勤大数据 - 帮助\n命令格式是:\n设置店铺 [店铺名] [店铺位置]\n注意只有管理员才可以有权设置店铺信息哦。")
@@ -1337,10 +1337,10 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': res.groups()[2].strip()}
     player_data, success = await get_player_data(payload)
     if success == 400:
-        await rise_score.send(f"×>> To {nickname} | 犽的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await rise_score.send(f"×>> To {nickname} | Rika 锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await rise_score.send(f'🚫>> To {nickname} | 犽的锦囊 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await rise_score.send(f'🚫>> To {nickname} | Rika 锦囊 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         dx_ra_lowest = 999
@@ -1382,12 +1382,12 @@ async def _(bot: Bot, event: Event, state: T_State):
                             if music_ra - sd_ra_lowest == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_sd_list:
                                 music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
         if len(music_dx_list) == 0 and len(music_sd_list) == 0:
-            await rise_score.send(f"×>> To {nickname} | 犽的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
+            await rise_score.send(f"×>> To {nickname} | Rika 锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
             return
         elif len(music_dx_list) + len(music_sd_list) > 60:
-            await rise_score.send(f"!>> To {nickname} | 犽的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
+            await rise_score.send(f"!>> To {nickname} | Rika 的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
             return
-        msg = f'☆>> To {nickname} | 犽的锦囊 - 升 {res.groups()[1]} 分攻略\n'
+        msg = f'☆>> To {nickname} | Rika 的锦囊 - 升 {res.groups()[1]} 分攻略\n'
         if len(music_sd_list) != 0:
             msg += f'推荐以下旧版本乐曲：\n'
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):

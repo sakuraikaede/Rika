@@ -109,7 +109,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         s += f'\n次推荐 | 共 {bad_count} 项 >\n'
         for i in range(bad_count):
             s += f'{maj_list[bad_value[i]]} '
-    s += f"\n\n★ 犽之锦囊 | Kiba \'s Hints\n{majtips_list[tips_value]}"
+    s += f"\n\n★ Rika 锦囊 | Rika \'s Hints\n{majtips_list[tips_value]}"
     await jrmj.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))

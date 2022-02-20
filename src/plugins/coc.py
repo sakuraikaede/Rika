@@ -20,7 +20,7 @@ driver = get_driver()
 
 @driver.on_startup
 def _():
-    logger.info("Kiba Kernel -> Load \"COC\" successfully")
+    logger.info("Rika Kernel -> Load \"COC\" successfully")
 
 
 class CocEvent:
@@ -510,7 +510,7 @@ async def _(bot: Bot, event: Event, state: dict):
         except KeyError:
             text = requests.get("http://47.100.50.175:25565/query", {"name": name}).text
             if text == "{}":
-                await bind.send("×>> COC - 找不到角色\n小犽没能找到角色【%s】，下次再出错就把你拉入黑名单了哦！" % name)
+                await bind.send("×>> COC - 找不到角色\nRika 没能找到角色【%s】，下次再出错就把你拉入黑名单了哦！" % name)
                 return
             role_cache[name] = demjson.decode(text, encoding='utf-8')
         if check_map(name):

@@ -10,8 +10,8 @@ config: nonebot.config.Config = driver.config
 
 @driver.on_startup
 async def init_db():
-    config.db = await aiosqlite.connect("src/static/Kiba.db")
-    logger.info("Kiba Kernel -> Starting to Create \"Kiba Database\"")
+    config.db = await aiosqlite.connect("src/static/Rika.db")
+    logger.info("Rika Kernel -> Starting to Create \"Rika Database\"")
     try:
         await config.db.executescript(
             "create table group_poke_table (group_id bigint primary key not null, last_trigger_time int, triggered int, disabled bit, strategy text);"
@@ -23,9 +23,9 @@ async def init_db():
             "create table group_plp_table (group_id bigint, disableinsert int, disabletake int, disablereply int);"
             "create table plp_blacklist_table (id bigint, lastbanner bigint, disableinsert int, disabletake int, disablereply int)"
             )
-        logger.info("Kiba Kernel -> Create \"Kiba Database\" successfully")
+        logger.info("Rika Kernel -> Create \"Rika Database\" successfully")
     except Exception:
-        logger.info("Kiba Kernel --Skip-> Database Created....Skipped Creating Databases.")
+        logger.info("Rika Kernel --Skip-> Database Created....Skipped Creating Databases.")
         pass
 
 @driver.on_shutdown
