@@ -1,6 +1,6 @@
 <div align="center">
 
-# Kiba
+# Rika
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot
@@ -8,21 +8,21 @@ Version 2.42_A
 <!-- prettier-ignore-end -->
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/Blitz-Raynor/Kiba/main/LICENSE">
-    <img src="https://img.shields.io/github/license/Blitz-Raynor/Kiba" alt="license">
+  <a href="https://raw.githubusercontent.com/sakuraikaede/Rika/main/LICENSE">
+    <img src="https://img.shields.io/github/license/sakuraikaede/Rika" alt="license">
   </a>
 
 <div align="left">
 
 ## 欢迎使用
 
-欢迎您使用 Kiba 并搭建属于您自己的 Kiba bot！ 
+欢迎您使用 Rika 并搭建属于您自己的 Rika bot！ 
 
-Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为Maimai DX/Maimai/雀魂玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 https://github.com/Diving-Fish/mai-bot。
+Rika 项目是基于 Kiba、Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为Maimai DX/Maimai/雀魂玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 https://github.com/Killua-Blitz/Kiba 以及 https://github.com/Diving-Fish/mai-bot。
 
-在此感谢 Diving-Fish 的 Mai-Bot / Chiyuki 开源项目。
+在此感谢 子犽 的 Rika 开源项目 以及 Diving-Fish 的 Mai-Bot / Chiyuki 开源项目。
 
-接下来，本手册为您提供对Kiba最基础的配置、教程与支持。
+接下来，本手册为您提供对Rika最基础的配置、教程与支持。
 
 ## Step 1. 安装 Python
 
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 ```
 依赖项目安装完成后，您应设置目录的Config.py。
 
-Config.py在`src/libraries`文件夹中。使用编辑工具打开后，在 bot_id 一栏中输入您拟运行 Kiba 项目的 QQ 号码，输入完成之后保存关闭。
+Config.py在`src/libraries`文件夹中。使用编辑工具打开后，在 bot_id 一栏中输入您拟运行 Rika 项目的 QQ 号码，输入完成之后保存关闭。
 
 **注意：除 Config.py 外，除非自主添加/删除功能，您不应编辑其他的 '*.py' 文件。否则可能导致 Bot 无法按预期运行。**
 
@@ -104,7 +104,7 @@ servers:
 
 ## 帮助与说明
 
-Kiba 提供了如下功能：
+Rika 提供了如下功能：
 
 命令 | 功能
 --- | ---
