@@ -3,7 +3,7 @@
 # Rika
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
-基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot
+基于 Kiba & Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能 Bot
 Version 2.42_A
 <!-- prettier-ignore-end -->
 
